@@ -41,13 +41,15 @@
  * NetHack version numbers above describe the upstream base it tracks.
  */
 #define NEONHACK
-#define GAME_TITLE "NeonHack"
+/* NeonHack 2: the city of Neo Yendor, a year after NeonHack */
+#define NEONHACK2
+#define GAME_TITLE "NeonHack 2"
 #define NEONHACK_VERSION_STRING "0.1.0"
-/* in-world years are this far ahead of the real calendar (2026 -> 2187) */
-#define NEON_YEAR_OFFSET 161
+/* in-world years are this far ahead of the real calendar (2026 -> 2188) */
+#define NEON_YEAR_OFFSET 162
 
 #define COPYRIGHT_BANNER_A \
-    "NeonHack " NEONHACK_VERSION_STRING ", a variant of NetHack, Copyright 1985-2026"
+    "NeonHack 2 " NEONHACK_VERSION_STRING ", a variant of NetHack, Copyright 1985-2026"
 #define COPYRIGHT_BANNER_B \
     "         By Stichting Mathematisch Centrum and M. Stephenson."
 /* nomakedefs.copyright_banner_c is generated at runtime */

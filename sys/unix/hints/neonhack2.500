@@ -1,4 +1,4 @@
-# NeonHack (NetHack 5.0 variant)  neonhack.500, derived from linux.500 $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
+# NeonHack 2 (NetHack 5.0 variant)  neonhack2.500, derived from linux.500 $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
 #
@@ -20,7 +20,7 @@
 #        multiw-1.500 contains sections 1 to 2
 #-INCLUDE multiw-1.500
 
-# NeonHack defaults: tty + curses interfaces, tty is the default, and the
+# NeonHack 2 defaults: tty + curses interfaces, tty is the default, and the
 # game is installed into a playground directory inside the source tree.
 # Any of these can still be overridden on the make command line.
 WANT_WIN_TTY=1
@@ -28,9 +28,9 @@ WANT_WIN_CURSES=1
 WANT_DEFAULT=tty
 WANT_SOURCE_INSTALL=1
 
-# the executable is called neonhack (the Makefiles assign GAME after the
+# the executable is called neonhack2 (the Makefiles assign GAME after the
 # hints PRE section, hence 'override')
-override GAME = neonhack
+override GAME = neonhack2
 
 # Some distros (image-based ones in particular) ship the ncurses runtime
 # but not its headers.  When /usr/include lacks them, compile against

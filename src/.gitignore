@@ -12,6 +12,7 @@ Systos
 SysBe
 nethack
 neonhack
+neonhack2
 *.o
 *.tag
 tiles.bmp

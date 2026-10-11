@@ -14,7 +14,7 @@ top=$(cd "$(dirname "$0")/.." && pwd)
 play="$top/playground"
 S=${NHSESSION:-nhtest}
 D=${NHDELAY:-0.25}
-game=$(ls "$play"/neonhack "$play"/nethack 2>/dev/null | head -1)
+game=$(ls "$play"/neonhack2 "$play"/neonhack "$play"/nethack 2>/dev/null | head -1)
 opts=${NHOPTS:-"name:Tester,role:Wizard,race:human,gender:male,align:neutral,!legacy,!tutorial,!autopickup,suppress_alert:5.0.0,!splash_screen"}
 cmd=$1; shift
 case "$cmd" in

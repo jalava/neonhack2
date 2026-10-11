@@ -125,7 +125,7 @@ static boolean ignore_errors_on_unmatched = FALSE,
 /* used for messaging. Also used in options.c */
 static const char *default_configfile =
 #ifdef UNIX
-    ".neonhackrc";
+    ".neonhack2rc";
 #else
 #if defined(MACOS9) || defined(__BEOS__)
     "NetHack Defaults";
@@ -318,22 +318,26 @@ fopen_config_file(const char *filename, int src)
         return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
-    /* NeonHack: an existing ~/.nethackrc is used when there's no
-       ~/.neonhackrc, so NetHack players keep their settings */
+    /* NeonHack 2: ~/.neonhack2rc, else an existing ~/.neonhackrc or
+       ~/.nethackrc, so NeonHack and NetHack players keep their settings */
     if (envp) {
-        Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
-        set_configfile_name(tmp_config);
-        if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
-            Sprintf(tmp_config, "%s/%s", envp, ".neonhackrc");
-            if (access(tmp_config, 4) == -1) /* 4 is R_OK */
-                return fp;
-            (void) fclose(fp);
+        static const char *const older_rc[] = { ".neonhackrc", ".nethackrc" };
+        int i;
+
+        Sprintf(tmp_config, "%s/%s", envp, ".neonhack2rc");
+        if (access(tmp_config, 4) == -1) { /* 4 is R_OK */
+            for (i = 0; i < (int) SIZE(older_rc); i++) {
+                Sprintf(tmp_config, "%s/%s", envp, older_rc[i]);
+                set_configfile_name(tmp_config);
+                if ((fp = fopen(configfile, "r")) != (FILE *) 0)
+                    return fp;
+            }
         }
     }
     if (!envp)
-        Strcpy(tmp_config, ".neonhackrc");
+        Strcpy(tmp_config, ".neonhack2rc");
     else
-        Sprintf(tmp_config, "%s/%s", envp, ".neonhackrc");
+        Sprintf(tmp_config, "%s/%s", envp, ".neonhack2rc");
 
     set_configfile_name(tmp_config);
     if ((fp = fopen(configfile, "r")) != (FILE *) 0)
@@ -1911,8 +1915,12 @@ rcfile(void)
     go.opt_phase = environ_opt;
     /* getenv() instead of nhgetenv(): let total length of options be long;
        parseoptions() will check each individually */
-    envname = "NEONHACKOPTIONS";
+    envname = "NEONHACK2OPTIONS";
     opts = getenv(envname);
+    if (!opts) {
+        envname = "NEONHACKOPTIONS";
+        opts = getenv(envname);
+    }
     if (!opts) {
         envname = "NETHACKOPTIONS";
         opts = getenv(envname);

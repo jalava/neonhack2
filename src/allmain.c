@@ -14,7 +14,9 @@
 staticfn void moveloop_preamble(boolean);
 staticfn void u_calc_moveamt(int);
 staticfn void maybe_generate_rnd_mon(void);
+#ifndef NEONHACK2
 staticfn void maybe_do_tutorial(void);
+#endif
 #ifdef POSITIONBAR
 staticfn void do_positionbar(void);
 #endif
@@ -566,6 +568,7 @@ moveloop_core(void)
     }
 }
 
+#ifndef NEONHACK2
 staticfn void
 maybe_do_tutorial(void)
 {
@@ -585,14 +588,17 @@ maybe_do_tutorial(void)
         iflags.nofollowers = FALSE;
     }
 }
+#endif /* !NEONHACK2 */
 
 void
 moveloop(boolean resuming)
 {
     moveloop_preamble(resuming);
 
+#ifndef NEONHACK2 /* the city prologue replaces NetHack's tutorial */
     if (!resuming)
         maybe_do_tutorial();
+#endif
 
     for (;;) {
         moveloop_core();

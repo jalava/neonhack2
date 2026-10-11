@@ -16,7 +16,7 @@ home=$(mktemp -d /tmp/nhfuzz.XXXXXX)
 # of the playground; that lets several fuzzers run at once
 pg="$home/playground"
 mkdir -p "$pg/save"
-cp "$play/nhdat" "$play/symbols" "$play/license" "$play/neonhack" "$pg/"
+cp "$play/nhdat" "$play/symbols" "$play/license" "$play/neonhack2" "$pg/"
 touch "$pg/perm" "$pg/record" "$pg/logfile" "$pg/xlogfile" "$pg/livelog"
 log="$pg/paniclog"
 touch "$log"
@@ -25,7 +25,7 @@ tmux kill-session -t "$S" 2>/dev/null
 while tmux has-session -t "$S" 2>/dev/null; do sleep 0.05; done
 opts="role:$role,race:random,gender:random,align:random,!legacy,!tutorial,time,suppress_alert:5.0.0,!splash_screen"
 tmux new-session -d -s "$S" -x 80 -y 24 \
-    "cd '$pg' && HOME='$home' NETHACKDIR='$pg' TERM=xterm-256color NETHACKOPTIONS='$opts' ./neonhack -D --debug:fuzzer 2>"$home/stderr"; echo \"[game exited \$?]\"; sleep 3600"
+    "cd '$pg' && HOME='$home' NETHACKDIR='$pg' TERM=xterm-256color NETHACKOPTIONS='$opts' ./neonhack2 -D --debug:fuzzer 2>"$home/stderr"; echo \"[game exited \$?]\"; sleep 3600"
 sleep 1; for k in 1 2 3; do tmux send-keys -t "$S" Enter; sleep 0.3; done
 end=$((SECONDS + secs)); alive=yes; prev=""
 while [ $SECONDS -lt $end ]; do
