@@ -275,8 +275,9 @@ moveloop_core(void)
 
                 if (u.ublesscnt)
                     u.ublesscnt--;
-                /* NeonHack: cyberware upkeep */
+                /* NeonHack: cyberware upkeep and corporate heat */
                 cyber_turn();
+                heat_turn();
 
                 /* One possible result of prayer is healing.  Whether or
                  * not you get healed depends on your current hit points.

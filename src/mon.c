@@ -3663,6 +3663,15 @@ xkilled(
     }
     if ((mtmp->mpeaceful && !rn2(2)) || mtmp->mtame)
         change_luck(-1);
+    /* NeonHack: the corporations notice crimes */
+    if (mtmp->mpeaceful && (is_human(mdat) || is_elf(mdat))
+        && mndx != PM_HUMAN)
+        heat_add(20);
+    else if (mtmp->mpeaceful && !mtmp->mtame)
+        heat_add(3);
+    if ((is_mercenary(mdat) || mdat->mlet == S_KOP)
+        && (mtmp->mpeaceful || !rn2(3)))
+        heat_add(mtmp->mpeaceful ? 4 : 1);
     if (is_unicorn(mdat) && sgn(u.ualign.type) == sgn(mdat->maligntyp)) {
         change_luck(-5);
         You_feel("guilty...");
@@ -4088,6 +4097,20 @@ mnearto(
 staticfn void
 m_respond_shrieker(struct monst *mtmp)
 {
+    /* NeonHack: security drones call for backup instead of shrieking */
+    if (mtmp->data == &mons[PM_SECURITY_DRONE]) {
+        if (!Deaf) {
+            pline("%s blares an alarm!", Monnam(mtmp));
+            stop_occupation();
+        }
+        if (!mtmp->mpeaceful)
+            heat_add(1);
+        if (!rn2(10))
+            (void) makemon(&mons[rn2(3) ? PM_SECURITY_DRONE : PM_SOLDIER],
+                           0, 0, NO_MM_FLAGS);
+        aggravate();
+        return;
+    }
     if (!Deaf) {
         pline("%s shrieks.", Monnam(mtmp));
         stop_occupation();
@@ -5732,6 +5755,7 @@ angry_guards(boolean silent)
         }
     }
     if (ct) {
+        heat_add(10); /* NeonHack: assaulting security */
         if (!silent) { /* do we want pline msgs? */
             char buf[BUFSZ];
 

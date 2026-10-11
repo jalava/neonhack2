@@ -1962,6 +1962,8 @@ struct ext_func_tab extcmdlist[] = {
               wiz_flip_level, IFBURIED | WIZMODECMD, NULL },
     { C('g'), "wizgenesis", "create a monster",
               wiz_genesis, IFBURIED | WIZMODECMD, NULL },
+    { '\0',   "wizheat", "set corporate heat and send a squad",
+              wiz_heat, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { C('i'), "wizidentify", "identify all items in inventory",
               wiz_identify, IFBURIED | WIZMODECMD, NULL },
     { '\0',   "wizintrinsic", "set an intrinsic",

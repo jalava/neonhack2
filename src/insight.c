@@ -415,11 +415,13 @@ enlightenment(
        included there due to space considerations;
        shown for both basic and magic enlightenment */
     status_enlightenment(mode, final);
-    /* NeonHack: installed cyberware; the hero always knows about it */
-    if (u.ucyber) {
+    /* NeonHack: installed cyberware and corporate heat; the hero always
+       knows about these */
+    if (u.ucyber || u.uheat) {
         enlght_out("");
-        enlght_out(final ? "Final Cyberware:" : "Cyberware:");
+        enlght_out(final ? "Final Street Status:" : "Street Status:");
         cyber_enlightenment(enlght_out);
+        heat_enlightenment(enlght_out);
     }
     /* remaining attributes; shown for potion,&c or wizard mode and
        explore mode ^X or end of game disclosure */

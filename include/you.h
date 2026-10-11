@@ -515,6 +515,7 @@ struct you {
     long ucybershort;           /* turns until shorted-out implants recover */
     long uneuroblock;           /* turns of neuroblocker protection left */
     long uheat;                 /* how hard corporate security wants you */
+    long uheatsquad;            /* turn the last corpsec squad deployed */
 }; /* end of `struct you' */
 
 

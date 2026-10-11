@@ -518,6 +518,7 @@ call_kops(struct monst *shkp, boolean nearshop)
     Soundeffect(se_alarm, 80);
     if (!Deaf)
         pline("An alarm sounds!");
+    heat_add(15); /* NeonHack: shoplifting gets reported */
 
     nokops = ((svm.mvitals[PM_KEYSTONE_KOP].mvflags & G_GONE)
               && (svm.mvitals[PM_KOP_SERGEANT].mvflags & G_GONE)
@@ -1399,6 +1400,8 @@ make_happy_shk(struct monst *shkp, boolean silentkops)
 
     pacify_shk(shkp, FALSE);
     eshkp->following = 0;
+    if (eshkp->robbed)
+        heat_add(-10); /* NeonHack: the complaint gets withdrawn */
     eshkp->robbed = 0L;
     if (!Role_if(PM_ROGUE))
         adjalign(sgn(u.ualign.type));

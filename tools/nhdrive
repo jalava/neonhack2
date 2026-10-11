@@ -5,6 +5,7 @@
 #   nhdrive keys 'text'            type text literally
 #   nhdrive key Enter|Escape|C-x   send named tmux keys
 #   nhdrive screen                 print the current 80x24 screen
+#   nhdrive cursor                 print the cursor's column and row
 #   nhdrive stop                   kill the session
 #
 # Env: NHSESSION (tmux session name), NHOPTS (NETHACKOPTIONS),
@@ -33,6 +34,7 @@ start)
 keys)   tmux send-keys -t "$S" -l -- "$*"; sleep "$D" ;;
 key)    tmux send-keys -t "$S" "$@"; sleep "$D" ;;
 screen) tmux capture-pane -t "$S" -p ;;
+cursor) tmux display -p -t "$S" '#{cursor_x} #{cursor_y}' ;;
 stop)   tmux kill-session -t "$S" 2>/dev/null ;;
 *)      sed -n '2,12p' "$0"; exit 1 ;;
 esac

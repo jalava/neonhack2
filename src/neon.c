@@ -13,6 +13,8 @@
  *              at the price of cyber load and, past your capacity,
  *              cyberpsychosis; EMPs and shocks short them out.
  *   hacking    a cyberdeck takes over robots and opens electronic locks.
+ *   heat       crimes draw the attention of corporate security, which
+ *              sends armed squads once you're wanted.
  */
 
 #include "hack.h"
@@ -28,6 +30,8 @@ staticfn int hack_chance(struct obj *, int);
 staticfn boolean hack_feedback(struct obj *);
 staticfn int hack_robot(struct obj *, struct monst *);
 staticfn int hack_lock(struct obj *, coordxy, coordxy);
+staticfn boolean squad_allowed_here(void);
+staticfn void send_squad(void);
 
 /* ------------------------------------------------------------------ */
 /*  Firearms                                                          */
@@ -886,6 +890,126 @@ dohack(void)
         return ECMD_OK;
     }
     return use_cyberdeck(deck);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Heat                                                              */
+/* ------------------------------------------------------------------ */
+
+#define HEAT_MAX 100
+
+/* crimes add heat; good behavior (or payment) takes it away */
+void
+heat_add(int amount)
+{
+    long old = u.uheat;
+
+    u.uheat += amount;
+    if (u.uheat < 0)
+        u.uheat = 0;
+    if (u.uheat > HEAT_MAX)
+        u.uheat = HEAT_MAX;
+    if (old < HEAT_WANTED && u.uheat >= HEAT_WANTED) {
+        You_feel("the cold attention of a corporate algorithm.");
+        pline("You are now wanted by corporate security.");
+        u.uheatsquad = svm.moves; /* a little grace period */
+    } else if (old >= HEAT_WANTED && u.uheat < HEAT_WANTED) {
+        You_feel("that corporate security has lost interest in you.");
+    }
+    if (old != u.uheat)
+        disp.botl = TRUE;
+}
+
+staticfn boolean
+squad_allowed_here(void)
+{
+    /* corporate security doesn't go everywhere */
+    return !(In_sokoban(&u.uz) || In_endgame(&u.uz) || In_V_tower(&u.uz)
+             || Is_knox(&u.uz) || u.uswallow || u.uinvulnerable
+             || In_hell(&u.uz));
+}
+
+/* a squad of corporate security deploys onto the level */
+staticfn void
+send_squad(void)
+{
+    int i, n, heat = (int) u.uheat;
+    struct monst *mtmp;
+    int leader = (heat >= 80) ? PM_LIEUTENANT
+                 : (heat >= 50) ? PM_SERGEANT : NON_PM;
+
+    if (!Deaf)
+        You_hear("the whine of a corpsec dropship overhead!");
+    else
+        You_feel("the floor vibrate as something heavy lands nearby.");
+    stop_occupation();
+    n = 1 + heat / 25; /* 1..5 troopers */
+    for (i = 0; i < n; i++) {
+        mtmp = makemon(&mons[PM_SOLDIER], 0, 0, MM_NOMSG);
+        if (mtmp)
+            mtmp->mpeaceful = 0, mtmp->mstrategy &= ~STRAT_WAITMASK;
+    }
+    if (leader != NON_PM && (mtmp = makemon(&mons[leader], 0, 0, MM_NOMSG)))
+        mtmp->mpeaceful = 0, mtmp->mstrategy &= ~STRAT_WAITMASK;
+    if (heat >= 60)
+        for (i = 0; i < 2; i++)
+            (void) makemon(&mons[PM_SECURITY_DRONE], 0, 0, MM_NOMSG);
+    if (heat >= 90)
+        (void) makemon(&mons[PM_SENTRY_BOT], 0, 0, MM_NOMSG);
+    u.uheatsquad = svm.moves;
+}
+
+/* once per turn */
+void
+heat_turn(void)
+{
+    if (!u.uheat)
+        return;
+    /* heat cools off slowly: -1 every 30 turns */
+    if (!(svm.moves % 30))
+        heat_add(-1);
+    if (u.uheat >= HEAT_WANTED && svm.moves - u.uheatsquad > 300
+        && !rn2(150 - (int) min(u.uheat, (long) HEAT_MAX))
+        && squad_allowed_here())
+        send_squad();
+}
+
+/* #wizheat: set heat; if wanted, deploy a squad right away */
+int
+wiz_heat(void)
+{
+    char buf[BUFSZ];
+    int val;
+
+    if (!wizard)
+        return ECMD_OK;
+    Sprintf(buf, "Set heat to what? (now %ld, wanted at %d)", u.uheat,
+            HEAT_WANTED);
+    getlin(buf, buf);
+    if (*buf == '\033' || !*buf)
+        return ECMD_OK;
+    val = atoi(buf);
+    heat_add(val - (int) u.uheat);
+    if (u.uheat >= HEAT_WANTED && squad_allowed_here())
+        send_squad();
+    return ECMD_OK;
+}
+
+void
+heat_enlightenment(void (*out)(const char *))
+{
+    char buf[BUFSZ];
+    const char *status;
+
+    if (!u.uheat)
+        return;
+    status = (u.uheat >= 80) ? "on the corporate kill list"
+             : (u.uheat >= 50) ? "most wanted by corporate security"
+               : (u.uheat >= HEAT_WANTED) ? "wanted by corporate security"
+                 : (u.uheat >= 10) ? "a person of interest to corpsec"
+                   : "on corpsec's radar";
+    Sprintf(buf, " You are %s (heat %ld).", status, u.uheat);
+    (*out)(buf);
 }
 
 /*neon.c*/
