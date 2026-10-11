@@ -340,9 +340,9 @@ dungeon = {
       levels = {
          { name = "nc-neonmile", base = 1, title = "Neon Mile", danger = 1 },
          { name = "nc-lantern", base = 2, title = "Lantern Market",
-           short = "Lantern Mkt", danger = 3, locked = true },
+           short = "Lantern Mkt", danger = 2, locked = true },
          { name = "nc-stacks", base = 3, title = "The Stacks",
-           short = "Stacks", danger = 5, locked = true },
+           short = "Stacks", danger = 3, locked = true },
          { name = "nc-docks", base = 4, title = "Rustwater Docks",
            short = "Docks", danger = 7, locked = true },
          { name = "nc-fringe", base = 5, title = "The Fringe",
@@ -362,7 +362,7 @@ dungeon = {
       entry = -1,
       flags = { "unconnected", "city" },
       parent = "nc-stacks",
-      danger = 5,
+      danger = 3,
       lvlfill = "nc-b7fill",
       levels = {
          { name = "nc-b7roof", base = 1 },
@@ -373,7 +373,7 @@ dungeon = {
       base = 3,
       flags = { "unconnected", "city" },
       parent = "nc-lantern",
-      danger = 4,
+      danger = 3,
       lvlfill = "nc-jadefill",
    },
 }

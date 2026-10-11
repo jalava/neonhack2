@@ -26,7 +26,7 @@ door the Chrome Saints have been failing to open for a week.
         d.put(x, y, "F")
 
     # the Saints at the door
-    for x, y in ((34, 15), (42, 15), (38, 16), (27, 14), (50, 12)):
+    for x, y in ((34, 15), (42, 15), (27, 14)):
         d.mon(x, y, "street punk", peaceful=False)
     d.mon(38, 17, "black hat", peaceful=False)
     return d

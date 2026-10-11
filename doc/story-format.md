@@ -40,6 +40,7 @@ okoye = {
    home = "nc-neonmile",     -- where "spawn" puts it
    stay = true,              -- never wanders off
    hostile = false,          -- targets are hostile
+   level = 5,                -- experience level (default: the monster's)
    faction = "jade",
    chat = "okoye_chat",      -- dialogue for small talk (optional)
    idle = { "Doc Okoye wipes down her tools." },  -- one-liners otherwise

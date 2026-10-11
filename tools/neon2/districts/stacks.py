@@ -19,7 +19,7 @@ The Chrome Saints run Block 7 now, and they don't like visitors.
     d.room(lobby)
     d.sign(33, 8, "BLOCK 7")
     d.stair(40, 3, up=True, dest="Block 7")
-    for x, y in ((26, 3), (30, 5), (37, 4)):
+    for x, y in ((26, 3), (37, 4)):
         d.mon(x, y, "street punk", peaceful=False)
     d.sign(24, 2, "CHROME SAINTS - PAY OR PRAY")
     d.building(48, 1, 28, 7, doors=[(61, 7, "locked")])

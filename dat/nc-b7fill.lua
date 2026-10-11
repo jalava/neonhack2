@@ -15,10 +15,10 @@ des.stair("up")
 des.stair("down")
 
 -- the Saints
-for i = 1, 3 + nh.rn2(3) do
+for i = 1, 2 + nh.rn2(3) do
    des.monster("street punk")
 end
-if percent(40) then
+if percent(25) then
    des.monster("black hat")
 end
 for i = 1, 4 do

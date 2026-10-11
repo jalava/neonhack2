@@ -44,6 +44,7 @@ struct st_faction {
 struct st_npc {
     char *id, *name, *monster, *home, *faction, *chat;
     boolean female, stay, hostile;
+    int level; /* experience level, if not the monster type's own */
     int nidle;
     char **idle;
     d_level homelev;
@@ -374,6 +375,7 @@ st_read_npcs(lua_State *L)
             np->female = get_table_boolean_opt(L, "female", FALSE);
             np->stay = get_table_boolean_opt(L, "stay", FALSE);
             np->hostile = get_table_boolean_opt(L, "hostile", FALSE);
+            np->level = get_table_int_opt(L, "level", 0);
             lua_getfield(L, -1, "idle");
             if (lua_type(L, -1) == LUA_TTABLE) {
                 lua_len(L, -1);
@@ -982,6 +984,10 @@ story_npc_made(const char *id, struct monst *mtmp)
     }
     if (!has_mgivenname(mtmp))
         mtmp = christen_monst(mtmp, np->name);
+    if (np->level > 0 && np->level < 50) {
+        mtmp->m_lev = (uchar) np->level;
+        mtmp->mhpmax = mtmp->mhp = max(d(np->level, 8), np->level * 4);
+    }
     set_malign(mtmp);
 }
 

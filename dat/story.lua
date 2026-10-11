@@ -64,8 +64,8 @@ story = {
          },
       },
       lazarus = {
-         name = "Saint Lazarus", monster = "cyberpsycho", hostile = true,
-         home = "Block 7:2",
+         name = "Saint Lazarus", monster = "juicer", level = 5,
+         hostile = true, home = "Block 7:2",
       },
    },
 
