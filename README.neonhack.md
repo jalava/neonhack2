@@ -39,19 +39,22 @@ make all              # builds and installs into ./playground
 NetHack's keys all still work (`hjklyubn`, or digits with `number_pad`),
 but you don't need them to move:
 
-| Key | Moves |
-|---|---|
-| Arrow keys | west, east, north, south |
-| Home / PgUp | northwest / northeast |
-| End / PgDn | southwest / southeast |
-| Shift + any of those | run |
-| Ctrl + any of those | rush |
-| Left click on the map | travel there (next to you: step, open, kick) |
-| Right click | look at what's there |
+| Key | Laptop | Moves |
+|---|---|---|
+| Arrow keys | | west, east, north, south |
+| Home | Fn+Left | northwest |
+| PgUp | Fn+Up | northeast |
+| End | Fn+Right | southeast |
+| PgDn | Fn+Down | southwest |
+| Shift + any of those | | run |
+| Ctrl + any of those | | rush |
+| Left click on the map | | travel there (next to you: step, open, kick) |
+| Right click | | look at what's there |
 
-On a laptop without a numpad, Home/PgUp/End/PgDn are usually Fn+Left/Up/
-Right/Down. The keys work wherever NetHack asks for a direction or a
-map position (firing, farlook `;`, travel `_`); in menus they turn pages.
+Fn turns an arrow 45° clockwise. (That puts End and PgDn the other way
+round from a numpad's 1 and 3; with a numpad, use `number_pad`.) The keys
+work wherever NetHack asks for a direction or a map position (firing,
+farlook `;`, travel `_`); in menus they turn pages.
 
 The mouse is on by default (`mouse_support` option) in both tty and curses.
 While it is on, most terminals select text with Shift+drag. Turn it off

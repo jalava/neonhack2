@@ -865,16 +865,20 @@ curses_convert_keys(int key)
     case KEY_PPAGE:
         ret = iflags.num_pad ? '9' : 'u';
         break;
+    /* NeonHack: End and PgDn are Fn+Right and Fn+Down on laptops without
+       a numpad, so they move southeast and southwest (Fn turns an arrow
+       45 degrees clockwise); keypad keys reported as such keep their
+       numpad positions */
 #ifdef KEY_C1
     case KEY_C1:
 #endif
-    case KEY_END:
+    case KEY_NPAGE:
         ret = iflags.num_pad ? '1' : 'b';
         break;
 #ifdef KEY_C3
     case KEY_C3:
 #endif
-    case KEY_NPAGE:
+    case KEY_END:
         ret = iflags.num_pad ? '3' : 'n';
         break;
 #ifdef KEY_B2

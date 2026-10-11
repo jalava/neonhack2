@@ -108,9 +108,11 @@ wherever they already fit ("grid bug", "quantum mechanic", "mail daemon",
   break wrapping or `--More--` placement.
 * The game is called **NeonHack**: welcome line, version, tombstone
   ("FLATLINED"), death message ("You flatline..."), intro legacy text.
-* **Laptop-friendly controls**: arrows move orthogonally, Home/PgUp/End/
-  PgDn (Fn+arrows) diagonally, Shift runs, Ctrl rushes; in menus they turn
-  pages. The tty port decodes the terminal's escape sequences itself
+* **Laptop-friendly controls**: arrows move orthogonally; Home/PgUp/End/
+  PgDn, which laptops put on Fn+Left/Up/Right/Down, move diagonally with
+  Fn turning the arrow 45° clockwise (Home NW, PgUp NE, End SE, PgDn SW,
+  so End/PgDn differ from a numpad's 1/3). Shift runs, Ctrl rushes; in
+  menus the keys turn pages. The tty port decodes the terminal's escape sequences itself
   (it used to see an arrow as ESC, `[`, `A`), and reports xterm mouse
   clicks. `mouse_support` is on by default; left click = `mouseaction`
   (travel/step/act), right click = look. The curses port already knew the

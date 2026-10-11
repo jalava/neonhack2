@@ -235,11 +235,13 @@ NeonHack additions:
                    come looking for you.  Heat cools down over time.
         Display    The 'emoji' option decorates some messages (on a UTF-8
                    terminal); OPTIONS=symset:NeonGrid gives a neon map.
-        Moving     The arrow keys move; Home, PgUp, End and PgDn (Fn plus
-                   an arrow on most laptops) move diagonally.  Hold Shift
-                   to run, Ctrl to rush.  They also aim and steer the
-                   cursor, and turn pages in menus.  With 'mouse_support'
-                   (on by default) a left click on the map travels there
-                   and a right click looks at it.
+        Moving     The arrow keys move.  Home, PgUp, End and PgDn (Fn plus
+                   Left, Up, Right, Down on most laptops) move diagonally,
+                   turned 45 degrees clockwise from the arrow: Home goes
+                   northwest, PgUp northeast, End southeast and PgDn
+                   southwest.  Hold Shift to run, Ctrl to rush.  The keys
+                   also aim and steer the cursor, and turn pages in menus.
+                   With 'mouse_support' (on by default) a left click on
+                   the map travels there and a right click looks at it.
 
         Have Fun, and Happy Hacking!

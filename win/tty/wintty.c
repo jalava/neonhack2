@@ -4069,10 +4069,12 @@ tty_raw_print_bold(const char *str)
  * stdio's buffered getchar().
  *
  * When the core wants a command, a direction or a map position the
- * arrows move west/east/north/south and Home/PgUp/End/PgDn (Fn+arrows on
- * most laptops) move northwest/northeast/southwest/southeast, like the
- * curses interface; Shift runs and Ctrl rushes.  In menus the keys turn
- * pages.  Anywhere else they are ignored.
+ * arrows move west/east/north/south.  Laptops without a numpad have
+ * Home/PgUp/End/PgDn on Fn+Left/Up/Right/Down, so those move diagonally
+ * with Fn turning the arrow 45 degrees clockwise: Home northwest, PgUp
+ * northeast, End southeast, PgDn southwest (unlike a numpad's 7/9/1/3).
+ * Shift runs and Ctrl rushes.  In menus the keys turn pages.  Anywhere
+ * else they are ignored.
  */
 
 #define TTYKEY_WAIT 50      /* msec to wait for the rest of a sequence */
@@ -4149,7 +4151,7 @@ ttykey_escape(void)
         case 'C': return TK_DIR + DIR_E;
         case 'D': return TK_DIR + DIR_W;
         case 'H': return TK_DIR + DIR_NW;
-        case 'F': return TK_DIR + DIR_SW;
+        case 'F': return TK_DIR + DIR_SE;
         }
         return TK_IGNORE;
     }
@@ -4214,13 +4216,13 @@ ttykey_escape(void)
     case 'C': return TK_DIR + DIR_E;  /* Right */
     case 'D': return TK_DIR + DIR_W;  /* Left */
     case 'H': return TK_DIR + DIR_NW; /* Home */
-    case 'F': return TK_DIR + DIR_SW; /* End */
+    case 'F': return TK_DIR + DIR_SE; /* End */
     case '~':
         switch (parm[0]) {
         case 1: case 7: return TK_DIR + DIR_NW; /* Home */
-        case 4: case 8: return TK_DIR + DIR_SW; /* End */
+        case 4: case 8: return TK_DIR + DIR_SE; /* End */
         case 5: return TK_DIR + DIR_NE;         /* PgUp */
-        case 6: return TK_DIR + DIR_SE;         /* PgDn */
+        case 6: return TK_DIR + DIR_SW;         /* PgDn */
         }
         break;
     }
@@ -4288,11 +4290,11 @@ ttykey_read(coordxy *x, coordxy *y, int *mod, boolean menu)
             switch (dir) {
             case DIR_N: case DIR_W: case DIR_NE: /* Up, Left, PgUp */
                 return MENU_PREVIOUS_PAGE;
-            case DIR_S: case DIR_E: case DIR_SE: /* Down, Right, PgDn */
+            case DIR_S: case DIR_E: case DIR_SW: /* Down, Right, PgDn */
                 return MENU_NEXT_PAGE;
             case DIR_NW: /* Home */
                 return MENU_FIRST_PAGE;
-            case DIR_SW: /* End */
+            case DIR_SE: /* End */
                 return MENU_LAST_PAGE;
             }
             continue;

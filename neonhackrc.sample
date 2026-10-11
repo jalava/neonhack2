@@ -15,7 +15,8 @@ OPTIONS=symset:NeonGrid
 # the curses interface instead of tty
 #OPTIONS=windowtype:curses
 
-# arrows and Home/PgUp/End/PgDn (Fn+arrows) always move; mouse clicks
+# arrows always move, and so do Home/PgUp/End/PgDn (Fn+arrows: Fn turns
+# the arrow 45 degrees clockwise, so End is southeast); mouse clicks
 # travel (left) and look (right).  Turn the mouse off (then text can be
 # selected without holding Shift):
 #OPTIONS=!mouse_support
