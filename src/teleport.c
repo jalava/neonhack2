@@ -1245,6 +1245,25 @@ level_tele(void)
                     }
                 }
                 force_dest = TRUE;
+            } else if (wizard && strchr(buf, ':')) {
+                /* NeonHack 2: "dungeon name:level", e.g. "Neo Yendor:3",
+                   reaches any dungeon, unconnected ones included */
+                char *colon = strchr(buf, ':');
+                xint16 dnum;
+
+                *colon = '\0';
+                dnum = dname_lookup(buf);
+                newlev = atoi(colon + 1);
+                if (dnum < 0 || newlev < 1
+                    || newlev > svd.dungeons[dnum].num_dunlevs) {
+                    pline("No such dungeon level.");
+                    newlev = 0;
+                    buf[0] = '\0';
+                    continue;
+                }
+                newlevel.dnum = dnum;
+                newlevel.dlevel = newlev;
+                force_dest = TRUE;
             } else if ((newlev = lev_by_name(buf)) == 0)
                 newlev = atoi(buf);
         } while (!newlev && !digit(buf[0])

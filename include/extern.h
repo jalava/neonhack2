@@ -871,6 +871,7 @@ extern void init_dungeons(void);
 extern s_level *find_level(const char *) NONNULLARG1;
 extern s_level *Is_special(d_level *) NONNULLARG1;
 extern branch *Is_branchlev(d_level *) NONNULLARG1;
+extern xint16 dname_lookup(const char *) NONNULLARG1;
 extern boolean builds_up(d_level *) NONNULLARG1;
 extern xint16 ledger_no(d_level *) NONNULLARG1;
 extern xint16 maxledgerno(void);
@@ -2759,7 +2760,7 @@ extern void inven_inuse(boolean);
 extern int dorecover(NHFILE *) NONNULLARG1;
 extern void restcemetery(NHFILE *, struct cemetery **) NONNULLARG12;
 extern void trickery(char *) NO_NNARGS;
-extern void getlev(NHFILE *, int, xint8) NONNULLARG1;
+extern void getlev(NHFILE *, int, xint16) NONNULLARG1;
 extern void get_plname_from_file(NHFILE *, char *, boolean) NONNULLARG12;
 #ifdef SELECTSAVED
 extern int restore_menu(winid);
@@ -2861,7 +2862,7 @@ extern boolean tricked_fileremoved(NHFILE *, char *) NONNULLARG2;
 #ifdef INSURANCE
 extern void savestateinlock(void);
 #endif
-extern void savelev(NHFILE *, xint8) NONNULLARG1;
+extern void savelev(NHFILE *, xint16) NONNULLARG1;
 /* extern genericptr_t mon_to_buffer(struct monst *, int *); */
 extern void savecemetery(NHFILE *, struct cemetery **) NONNULLARG12;
 extern void savefruitchn(NHFILE *) NONNULLARG1;

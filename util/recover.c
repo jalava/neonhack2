@@ -211,7 +211,7 @@ restore_savefile(char *basename)
 {
     int gfd, lfd, sfd;
     int res = 0, lev, savelev, hpid, pltmpsiz;
-    xint8 levc;
+    xint16 levc;
     struct version_info version_data;
     char plbuf[PL_NSIZ_PLUS], indicator, cscsize;
 
@@ -370,15 +370,15 @@ restore_savefile(char *basename)
     set_levelfile_name(0);
     (void) unlink(lock);
 
-    for (lev = 1; lev < 256 && res == 0; lev++) {
-        /* level numbers are kept in 'xint8's in save.c, so the
-         * maximum level number (for the endlevel) must be < 256
+    for (lev = 1; lev <= MAXDUNGEON * MAXLEVEL && res == 0; lev++) {
+        /* level numbers are kept in 'xint16's in save.c; the highest
+         * ledger number is MAXDUNGEON * MAXLEVEL
          */
         if (lev != savelev) {
             lfd = open_levelfile(lev);
             if (lfd >= 0) {
                 /* any or all of these may not exist */
-                levc = (xint8) lev;
+                levc = (xint16) lev;
                 if (write(sfd, (genericptr_t) &levc, sizeof levc)
                     != sizeof levc) {
                     res = -1;

@@ -2867,15 +2867,15 @@ recover_savefile(void)
     NHFILE *gnhfp, *lnhfp, *snhfp;
     int lev, savelev, hpid,
         pltmpsiz, cscount = get_critical_size_count();
-    xint8 levc;
+    xint16 levc;
     struct version_info version_data;
-    int processed[256];
+    int processed[MAXLINFO + 1];
     char savename[SAVESIZE], errbuf[BUFSZ], indicator, file_cscount;
     char tmpplbuf[PL_NSIZ_PLUS];
     const char *savewrite_failure = (const char *) 0;
     off_t filesz = 0;
 
-    for (lev = 0; lev < 256; lev++)
+    for (lev = 0; lev <= MAXLINFO; lev++)
         processed[lev] = 0;
 
     /* level 0 file contains:
@@ -3027,15 +3027,15 @@ recover_savefile(void)
     close_nhfile(gnhfp);
     processed[0] = 1;
 
-    for (lev = 1; lev < 256; lev++) {
-        /* level numbers are kept in xint8's in save.c, so the
-         * maximum level number (for the endlevel) must be < 256
+    for (lev = 1; lev <= MAXLINFO; lev++) {
+        /* level numbers are kept in xint16's in save.c; the highest
+         * ledger number is MAXLINFO
          */
         if (lev != savelev) {
             lnhfp = open_levelfile(lev, (char *) 0);
             if (lnhfp) {
                 /* any or all of these may not exist */
-                levc = (xint8) lev;
+                levc = (xint16) lev;
                 (void) write(snhfp->fd, (genericptr_t) &levc, sizeof(levc));
                 if (!copy_bytes(lnhfp->fd, snhfp->fd)) {
                     close_nhfile(lnhfp);
@@ -3055,7 +3055,7 @@ recover_savefile(void)
      * We have a successful savefile!
      * Only now do we erase the level files.
      */
-    for (lev = 0; lev < 256; lev++) {
+    for (lev = 0; lev <= MAXLINFO; lev++) {
         if (processed[lev]) {
             const char *fq_lock;
 

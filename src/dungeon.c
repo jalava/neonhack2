@@ -296,6 +296,18 @@ dname_to_dnum(const char *s)
 
 RESTORE_WARNING_UNREACHABLE_CODE
 
+/* NeonHack 2: dungeon number for a name, ignoring case; -1 if none */
+xint16
+dname_lookup(const char *s)
+{
+    xint16 i;
+
+    for (i = 0; i < svn.n_dgns; i++)
+        if (!strcmpi(svd.dungeons[i].dname, s))
+            return i;
+    return -1;
+}
+
 s_level *
 find_level(const char *s)
 {
@@ -1488,7 +1500,9 @@ builds_up(d_level *lev)
             return br->end1_up;
         }
     }
-    impossible("builds_up: can't find branch for dungeon %d", lev->dnum);
+    /* NeonHack 2: one-floor city sites have no parent branch */
+    if (!dptr->flags.unconnected)
+        impossible("builds_up: can't find branch for dungeon %d", lev->dnum);
     return FALSE;
 }
 

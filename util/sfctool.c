@@ -411,7 +411,7 @@ process_savefile(const char *srcfnam, enum saveformats srcstyle,
         /********************
          *    lev 0         *
          ********************/
-        xint8 lev = 0;
+        xint16 lev = 0;
 
         getlev(nhfp[srcidx], lev, FALSE);
     }
@@ -429,12 +429,12 @@ process_savefile(const char *srcfnam, enum saveformats srcstyle,
         /********************
          * Do all levels    *
          ********************/
-        xint8 ltmp;
+        xint16 ltmp;
 
         restoreinfo.mread_flags = 1; /* return despite error */
         while (1) {
             ltmp = -1;
-            Sfi_xint8(nhfp[srcidx], &ltmp, "gamestate-level_number");
+            Sfi_xint16(nhfp[srcidx], &ltmp, "gamestate-level_number");
             if (nhfp[srcidx]->eof || ltmp == -1)
                 break;
 
