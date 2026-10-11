@@ -588,10 +588,8 @@ use_medkit(struct obj *obj)
     if (obj->cursed)
         heal /= 2;
     You("patch yourself up with %s.", the(xname(obj)));
+    /* uncursed kits also cure sickness, blessed ones blindness too */
     healup(heal, 0, (boolean) !obj->cursed, (boolean) obj->blessed);
-    if (!obj->cursed && Sick) {
-        make_sick(0L, (char *) 0, TRUE, SICK_ALL);
-    }
     return ECMD_TIME;
 }
 
@@ -920,6 +918,10 @@ dohack(void)
 {
     struct obj *deck;
 
+    if (nohands(gy.youmonst.data)) {
+        You("can't work a cyberdeck in your current form.");
+        return ECMD_OK;
+    }
     for (deck = gi.invent; deck; deck = deck->nobj)
         if (deck->otyp == CYBERDECK)
             break;
@@ -964,6 +966,7 @@ squad_allowed_here(void)
 {
     /* corporate security doesn't go everywhere */
     return !(In_sokoban(&u.uz) || In_endgame(&u.uz) || In_V_tower(&u.uz)
+             || In_tutorial(&u.uz)
              || Is_knox(&u.uz) || u.uswallow || u.uinvulnerable
              || In_hell(&u.uz));
 }
