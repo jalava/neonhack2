@@ -378,6 +378,21 @@ extern int alternative_palette(char *);
 extern void change_palette(void);
 #endif
 
+/* ### city.c ### */
+
+extern boolean In_city(d_level *) NONNULLARG1;
+extern boolean In_district(d_level *) NONNULLARG1;
+extern boolean city_district_of(d_level *, d_level *) NONNULLARG12;
+extern int city_difficulty(d_level *) NONNULLARG1;
+extern char *city_place_name(d_level *, char *, boolean) NONNULLARG12;
+extern boolean city_resolve_dest(const char *, d_level *) NONNULLARG12;
+extern void city_start_level(void);
+extern boolean city_shaft_level(d_level *) NONNULLARG1;
+extern boolean city_no_shortcuts(d_level *) NONNULLARG1;
+extern void city_set_arrival(int, coordxy, coordxy);
+extern boolean city_place_arrival(void);
+extern void city_lost_stairs(void);
+
 /* ### cmd.c ### */
 
 extern void cmdbind_freeall(void);
@@ -1600,6 +1615,7 @@ extern void topologize(struct mkroom *) NONNULLARG1;
 #endif
 /* place_branch() has tests for NULL branch arg, preventing NONNULLARG1 */
 extern void place_branch(branch *, coordxy, coordxy) NO_NNARGS;
+extern void place_site_exit(void);
 extern boolean occupied(coordxy, coordxy);
 extern int okdoor(coordxy, coordxy);
 extern boolean maybe_sdoor(int);

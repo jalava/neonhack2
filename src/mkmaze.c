@@ -1218,6 +1218,7 @@ makemaz(const char *s)
 
     /* place branch stair or portal */
     place_branch(Is_branchlev(&u.uz), 0, 0);
+    place_site_exit(); /* NeonHack 2 */
 
     populate_maze();
 }

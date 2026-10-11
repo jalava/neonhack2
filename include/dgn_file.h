@@ -24,6 +24,8 @@ struct tmpdungeon {
         entry_lev; /* entry level for this dungeon */
     char boneschar;
     int align;
+    int danger;            /* NeonHack 2 */
+    char *parent, *shortname;
 };
 
 struct tmplevel {
@@ -32,6 +34,8 @@ struct tmplevel {
     struct couple lev;
     int chance, rndlevs, chain, flags;
     char boneschar;
+    int danger;            /* NeonHack 2 */
+    char *title, *shortname;
 };
 
 struct tmpbranch {
@@ -58,6 +62,7 @@ struct tmpbranch {
 #define MAZELIKE    0x04
 #define ROGUELIKE   0x08
 #define UNCONNECTED 0x10
+#define CITY        0x80 /* NeonHack 2: districts and city sites */
 
 #define D_ALIGN_NONE 0
 #define D_ALIGN_CHAOTIC (AM_CHAOTIC << 4)

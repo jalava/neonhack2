@@ -1175,14 +1175,16 @@ level_tele(void)
         do {
             newlevel.dnum = rn2(svn.n_dgns);
         } while (newlevel.dnum == astral_level.dnum
-                 || svd.dungeons[newlevel.dnum].flags.unconnected
+                 || (svd.dungeons[newlevel.dnum].flags.unconnected
+                     && !svd.dungeons[newlevel.dnum].flags.city)
                  || !svd.dungeons[newlevel.dnum].num_dunlevs);
         newlevel.dlevel = 1 + rn2(dunlevs_in_dungeon(&newlevel));
         assign_level(&u.ucamefrom, &u.uz);
         schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0, (char *) 0);
         return;
     }
-    if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz))
+    if ((u.uhave.amulet || In_endgame(&u.uz) || In_sokoban(&u.uz)
+         || In_city(&u.uz)) /* NeonHack 2: the city's grid is jammed */
         && !wizard) {
         You_feel("very disoriented for a moment.");
         return;
@@ -2212,7 +2214,8 @@ random_teleport_level(void)
     int nlev, max_depth, min_depth, cur_depth = (int) depth(&u.uz);
 
     /* [the endgame case can only occur in wizard mode] */
-    if (!rn2(5) || single_level_branch(&u.uz) || In_endgame(&u.uz))
+    if (!rn2(5) || single_level_branch(&u.uz) || In_endgame(&u.uz)
+        || In_city(&u.uz)) /* NeonHack 2: no level teleport in the city */
         return cur_depth;
 
     /* What I really want to do is as follows:

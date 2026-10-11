@@ -1328,10 +1328,34 @@ doup(void)
         return ECMD_TIME;
     }
     if (ledger_no(&u.uz) == 1) {
-        if (iflags.debug_fuzzer)
-            return ECMD_OK;
-        if (y_n("Beware, there will be no return!  Still climb?") != 'y')
-            return ECMD_OK;
+        d_level shaft;
+
+        if (!city_shaft_level(&shaft)) {
+            if (iflags.debug_fuzzer)
+                return ECMD_OK;
+            if (y_n("Beware, there will be no return!  Still climb?") != 'y')
+                return ECMD_OK;
+        } else if (u.uhave.amulet) {
+            /* NeonHack 2: with the Amulet these stairs reach the Grid's
+               root (the endgame) or, if you'd rather, Ashfall */
+            char c;
+
+            if (iflags.debug_fuzzer)
+                return ECMD_OK;
+            c = ynq("Carry the Amulet up to the Grid's root?"
+                    "  There will be no return!");
+            if (c == 'q')
+                return ECMD_OK;
+            if (c == 'n') {
+                if (!next_to_u()) {
+                    You("are held back by your pet!");
+                    return ECMD_OK;
+                }
+                You("take the stairs up the shaft instead.");
+                goto_level(&shaft, TRUE, FALSE, FALSE);
+                return ECMD_TIME;
+            }
+        }
     }
     if (!next_to_u()) {
         You("are held back by your pet!");
@@ -1500,6 +1524,10 @@ goto_level(
 
     if (dunlev(newlevel) > dunlevs_in_dungeon(newlevel))
         newlevel->dlevel = dunlevs_in_dungeon(newlevel);
+    /* NeonHack 2: depth means nothing between city dungeons; stairs
+       go the way the hero went */
+    if (at_stairs && (In_city(newlevel) || In_city(&u.uz)))
+        up = (u.dz < 0);
     if (newdungeon) {
         if (In_endgame(newlevel)) { /* 1st Endgame Level !!! */
             if (!u.uhave.amulet)
@@ -1515,8 +1543,15 @@ goto_level(
         }
     }
     new_ledger = ledger_no(newlevel);
-    if (new_ledger <= 0)
-        done(ESCAPED); /* in fact < 0 is impossible */
+    if (new_ledger <= 0) {
+        /* NeonHack 2: out of the Undercity means back up the shaft */
+        if (city_shaft_level(newlevel)) {
+            new_ledger = ledger_no(newlevel);
+            newdungeon = (u.uz.dnum != newlevel->dnum);
+            city_set_arrival(CITY_ARRIVE_SHAFT, 0, 0);
+        } else
+            done(ESCAPED); /* in fact < 0 is impossible */
+    }
 
     /* If you have the amulet and are trying to get out of Gehennom,
      * going up a set of stairs sometimes does some very strange things!
@@ -1719,7 +1754,9 @@ goto_level(
     gv.vision_full_recalc = 0; /* don't let that reenable vision yet */
     flush_screen(-1);       /* ensure all map flushes are postponed */
 
-    if (portal && !In_endgame(&u.uz)) {
+    if (city_place_arrival()) {
+        ; /* NeonHack 2: metro, taxi, or waking up at a clinic */
+    } else if (portal && !In_endgame(&u.uz)) {
         /* find the portal on the new level */
         struct trap *ttrap;
 
@@ -1749,7 +1786,9 @@ goto_level(
             if (stway) {
                 u_on_newpos(stway->sx, stway->sy);
                 stway->u_traversed = TRUE;
-            } else if (newdungeon)
+            } else if (In_city(&u.uz) && In_city(&u.uz0))
+                city_lost_stairs();
+            else if (newdungeon)
                 u_on_sstairs(1);
             else
                 u_on_dnstairs();
@@ -1767,7 +1806,9 @@ goto_level(
             if (stway) {
                 u_on_newpos(stway->sx, stway->sy);
                 stway->u_traversed = TRUE;
-            } else if (newdungeon)
+            } else if (In_city(&u.uz) && In_city(&u.uz0))
+                city_lost_stairs();
+            else if (newdungeon)
                 u_on_sstairs(0);
             else
                 u_on_upstairs();

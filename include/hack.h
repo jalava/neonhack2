@@ -380,6 +380,9 @@ struct dgn_topology { /* special dungeon levels for speed */
     xint16 d_sokoban_dnum;
     xint16 d_mines_dnum, d_quest_dnum;
     xint16 d_tutorial_dnum;
+    xint16 d_city_dnum;          /* NeonHack 2: Neo Yendor, the districts */
+    d_level d_citystart_level;   /* the district a new game starts in */
+    d_level d_ashfall_level;     /* the district over the Undercity */
     d_level d_qstart_level, d_qlocate_level, d_nemesis_level;
     d_level d_knox_level;
     d_level d_mineend_level;
@@ -388,6 +391,9 @@ struct dgn_topology { /* special dungeon levels for speed */
 
 /* macros for accessing the dungeon levels by their old names */
 /* clang-format off */
+#define city_dnum               (svd.dungeon_topology.d_city_dnum)
+#define citystart_level         (svd.dungeon_topology.d_citystart_level)
+#define ashfall_level           (svd.dungeon_topology.d_ashfall_level)
 #define oracle_level            (svd.dungeon_topology.d_oracle_level)
 #define bigroom_level           (svd.dungeon_topology.d_bigroom_level)
 #define rogue_level             (svd.dungeon_topology.d_rogue_level)

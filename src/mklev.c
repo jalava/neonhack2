@@ -1378,6 +1378,7 @@ makelevel(void)
         prevstairs = gs.stairs; /* used to test for place_branch() success */
         /* Place multi-dungeon branch. */
         place_branch(branchp, 0, 0);
+        place_site_exit(); /* NeonHack 2: the way out of a city site */
 
         /* for main dungeon level 1, the stairs up where the hero starts
            are branch stairs; treat them as if hero had just come down
@@ -1744,6 +1745,35 @@ place_branch(
      * next call.
      */
     gm.made_branch = TRUE;
+}
+
+/* NeonHack 2: a city site's entrance floor gets stairs back down (or up)
+   to the district whose lobby leads here, unless its level file already
+   placed them */
+void
+place_site_exit(void)
+{
+    dungeon *dptr = &svd.dungeons[u.uz.dnum];
+    stairway *stway;
+    coord m = { 0, 0 };
+    boolean up;
+
+    if (!In_city(&u.uz) || In_district(&u.uz) || dptr->parent.dlevel <= 0
+        || u.uz.dlevel != dptr->entry_lev)
+        return;
+    for (stway = gs.stairs; stway; stway = stway->next)
+        if (on_level(&stway->tolev, &dptr->parent))
+            return;
+    (void) find_branch_room(&m);
+    if (!isok(m.x, m.y) || !m.x) {
+        impossible("No room for the way out of %s.", dptr->dname);
+        return;
+    }
+    /* the lobby is below a tower and above a basement */
+    up = !builds_up(&u.uz);
+    stairway_add(m.x, m.y, up, FALSE, &dptr->parent);
+    (void) set_levltyp(m.x, m.y, STAIRS);
+    levl[m.x][m.y].ladder = up ? LA_UP : LA_DOWN;
 }
 
 staticfn boolean

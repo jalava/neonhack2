@@ -604,6 +604,15 @@ init_level(int dgn, int proto_index, struct proto_dungeon *pd)
 
     new_level->rndlevs = tlevel->rndlevs;
     new_level->next = (s_level *) 0;
+    /* NeonHack 2 */
+    new_level->flags.city = !!(pd->tmpdungeon[dgn].flags & CITY);
+    new_level->danger = (xint16) tlevel->danger;
+    if (tlevel->title)
+        copynchars(new_level->title, tlevel->title,
+                   (int) sizeof new_level->title - 1);
+    if (tlevel->shortname)
+        copynchars(new_level->shortname, tlevel->shortname,
+                   (int) sizeof new_level->shortname - 1);
 }
 
 staticfn int
@@ -741,6 +750,8 @@ static struct level_map {
                   { "wizard2", &wiz2_level },
                   { "wizard3", &wiz3_level },
                   { "minend", &mineend_level },
+                  { "nc-neonmile", &citystart_level },
+                  { "nc-ashfall", &ashfall_level },
                   { "soko1", &sokoend_level },
                   { X_START, &qstart_level },
                   { X_LOCATE, &qlocate_level },
@@ -757,10 +768,11 @@ get_dgn_flags(lua_State *L)
 {
     int dgn_flags = 0;
     static const char *const flagstrs[] = {
-        "town", "hellish", "mazelike", "roguelike", "unconnected", NULL
+        "town", "hellish", "mazelike", "roguelike", "unconnected", "city",
+        NULL
     };
     static const int flagstrs2i[] = {
-        TOWN, HELLISH, MAZELIKE, ROGUELIKE, UNCONNECTED, 0
+        TOWN, HELLISH, MAZELIKE, ROGUELIKE, UNCONNECTED, CITY, 0
     };
 
     lua_getfield(L, -1, "flags");
@@ -834,6 +846,11 @@ init_dungeon_levels(
             lvl_chance = get_table_int_opt(L, "chance", 100);
             lvl_align = get_dgn_align(L);
             lvl_flags = get_dgn_flags(L);
+            /* NeonHack 2 district fields */
+            tmpl = &pd->tmplevel[pd->n_levs + f];
+            tmpl->danger = get_table_int_opt(L, "danger", 0);
+            tmpl->title = get_table_str_opt(L, "title", NULL);
+            tmpl->shortname = get_table_str_opt(L, "short", NULL);
             /* array index is offset by cumulative number of levels
                defined for preceding branches (iterations of 'while'
                loop we're inside, not branch connections below) */
@@ -1027,6 +1044,10 @@ init_dungeon_dungeons(
     dgn_flags = get_dgn_flags(L);
     dgn_fill = get_table_str_opt(L, "lvlfill", emptystr);
     dgn_themerms = get_table_str_opt(L, "themerooms", emptystr);
+    /* NeonHack 2 city site fields */
+    pd->tmpdungeon[dngidx].danger = get_table_int_opt(L, "danger", 0);
+    pd->tmpdungeon[dngidx].parent = get_table_str_opt(L, "parent", NULL);
+    pd->tmpdungeon[dngidx].shortname = get_table_str_opt(L, "short", NULL);
 
     debugpline4("DUNGEON[%i]: %s, base=(%i,%i)",
                 dngidx, dgn_name, dgn_base, dgn_range);
@@ -1039,6 +1060,11 @@ init_dungeon_dungeons(
         free((genericptr_t) dgn_protoname);
         free((genericptr_t) dgn_fill);
         free((genericptr_t) dgn_themerms);
+        if (pd->tmpdungeon[dngidx].parent)
+            free((genericptr_t) pd->tmpdungeon[dngidx].parent);
+        if (pd->tmpdungeon[dngidx].shortname)
+            free((genericptr_t) pd->tmpdungeon[dngidx].shortname);
+        pd->tmpdungeon[dngidx].parent = pd->tmpdungeon[dngidx].shortname = 0;
         return FALSE;
     }
 
@@ -1103,6 +1129,12 @@ init_dungeon_dungeons(
     svd.dungeons[dngidx].flags.rogue_like = !!(dgn_flags & ROGUELIKE);
     svd.dungeons[dngidx].flags.align = dgn_align;
     svd.dungeons[dngidx].flags.unconnected = !!(dgn_flags & UNCONNECTED);
+    svd.dungeons[dngidx].flags.city = !!(dgn_flags & CITY);
+    svd.dungeons[dngidx].danger = (xint16) pd->tmpdungeon[dngidx].danger;
+    if (pd->tmpdungeon[dngidx].shortname)
+        copynchars(svd.dungeons[dngidx].shortname,
+                   pd->tmpdungeon[dngidx].shortname,
+                   (int) sizeof svd.dungeons[dngidx].shortname - 1);
 
     init_dungeon_set_entry(pd, dngidx);
 
@@ -1178,6 +1210,7 @@ fixup_level_locations(void)
     mines_dnum = dname_to_dnum("The Old Metro");
     tower_dnum = dname_to_dnum("Vlad's Tower");
     tutorial_dnum = dname_to_dnum("The Tutorial");
+    city_dnum = dname_lookup("Neo Yendor");
 
     /* one special fixup for dummy surface level */
     if ((x = find_level("dummy")) != 0) {
@@ -1205,10 +1238,18 @@ free_proto_dungeon(struct proto_dungeon *pd)
         free((genericptr_t) pd->tmplevel[i].name);
         if (pd->tmplevel[i].chainlvl)
             free((genericptr_t) pd->tmplevel[i].chainlvl);
+        if (pd->tmplevel[i].title)
+            free((genericptr_t) pd->tmplevel[i].title);
+        if (pd->tmplevel[i].shortname)
+            free((genericptr_t) pd->tmplevel[i].shortname);
     }
     for (i = 0; i < svn.n_dgns; i++) {
         free((genericptr_t) pd->tmpdungeon[i].name);
         free((genericptr_t) pd->tmpdungeon[i].protoname);
+        if (pd->tmpdungeon[i].parent)
+            free((genericptr_t) pd->tmpdungeon[i].parent);
+        if (pd->tmpdungeon[i].shortname)
+            free((genericptr_t) pd->tmpdungeon[i].shortname);
     }
 }
 
@@ -1323,6 +1364,18 @@ init_dungeons(void)
 
     init_castle_tune();
     fixup_level_locations();
+    /* NeonHack 2: the district each city site's lobby is in */
+    for (i = 0; i < svn.n_dgns; i++) {
+        s_level *plev;
+
+        if (!pd.tmpdungeon[i].parent)
+            continue;
+        if ((plev = find_level(pd.tmpdungeon[i].parent)) != 0)
+            assign_level(&svd.dungeons[i].parent, &plev->dlevel);
+        else
+            panic("init_dungeons: %s has unknown parent level %s",
+                  svd.dungeons[i].dname, pd.tmpdungeon[i].parent);
+    }
     nhl_done(L);
     free_proto_dungeon(&pd);
 #ifdef DEBUG
@@ -1372,6 +1425,8 @@ deepest_lev_reached(boolean noquest)
     for (i = 0; i < svn.n_dgns; i++) {
         if (noquest && i == quest_dnum)
             continue;
+        if (svd.dungeons[i].flags.city)
+            continue; /* NeonHack 2: city levels aren't "deep" */
         tmp.dlevel = svd.dungeons[i].dunlev_ureached;
         if (tmp.dlevel == 0)
             continue;
@@ -1541,9 +1596,13 @@ prev_level(boolean at_stairs)
         /* Taking an up dungeon branch. */
         /* KMH -- Upwards branches are okay if not level 1 */
         /* (Just make sure it doesn't go above depth 1) */
-        if (!u.uz.dnum && u.uz.dlevel == 1 && !u.uhave.amulet)
+        if (!u.uz.dnum && u.uz.dlevel == 1 && !u.uhave.amulet
+            && !city_shaft_level(&newlevel))
             done(ESCAPED);
-        else {
+        else if (!u.uz.dnum && u.uz.dlevel == 1 && !u.uhave.amulet) {
+            /* NeonHack 2: up the shaft, back to Ashfall */
+            goto_level(&newlevel, at_stairs, FALSE, FALSE);
+        } else {
             newlevel.dnum = stway->tolev.dnum;
             newlevel.dlevel = stway->tolev.dlevel;
             goto_level(&newlevel, at_stairs, FALSE, FALSE);
@@ -1664,7 +1723,8 @@ Can_dig_down(d_level *lev)
 {
     return (boolean) (!svl.level.flags.hardfloor
                       && !Is_botlevel(lev)
-                      && !Invocation_lev(lev));
+                      && !Invocation_lev(lev)
+                      && !city_no_shortcuts(lev));
 }
 
 /*
@@ -1691,7 +1751,7 @@ Can_rise_up(coordxy x, coordxy y, d_level *lev)
 
     /* can't rise up from inside the top of the Wizard's tower */
     /* KMH -- or in sokoban */
-    if (In_endgame(lev) || In_sokoban(lev)
+    if (In_endgame(lev) || In_sokoban(lev) || city_no_shortcuts(lev)
         || (Is_wiz1_level(lev) && In_W_tower(x, y, lev)))
         return FALSE;
     return (boolean) (lev->dlevel > 1
@@ -2042,7 +2102,10 @@ level_difficulty(void)
 {
     xint16 res;
 
-    if (In_endgame(&u.uz)) {
+    if (In_city(&u.uz)) {
+        /* NeonHack 2: danger rating, even when carrying the Amulet */
+        res = city_difficulty(&u.uz);
+    } else if (In_endgame(&u.uz)) {
         res = depth(&sanctum_level) + u.ulevel / 2;
     } else if (u.uhave.amulet) {
         res = deepest_lev_reached(FALSE);

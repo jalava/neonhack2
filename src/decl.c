@@ -871,10 +871,11 @@ static const struct instance_globals_saved_c init_svc = {
 
 static const struct instance_globals_saved_d init_svd = {
     /* dungeon.c */
-    { { {0},{0},{0},{0}, 0, {0}, 0, 0, 0, 0, 0 } }, /* dungeons */
+    { { {0},{0},{0},{0}, 0, {0}, 0, 0, 0, 0, 0, 0, {0}, {0} } }, /* dungeons */
     { {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
     {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0},
     0, 0, 0, 0, 0,
+    0, {0}, {0},
     {0}, {0}, {0},
     {0}, {0}, {0} },                     /* dungeon_topology */
     /* decl.c */

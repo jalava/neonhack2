@@ -179,7 +179,9 @@ On_stairs_dn(coordxy x, coordxy y)
 boolean
 known_branch_stairs(stairway *sway)
 {
-    return (sway && sway->tolev.dnum != u.uz.dnum && sway->u_traversed);
+    /* NeonHack 2: metro stations always look like branch stairs */
+    return (sway && ((sway->tolev.dnum != u.uz.dnum && sway->u_traversed)
+                     || sway->kind == STWAY_METRO));
 }
 
 /* describe staircase 'sway' based on whether hero knows the destination */
@@ -197,6 +199,28 @@ stairs_description(
     tolev = sway->tolev;
     stairs = sway->isladder ? "ladder" : stcase ? "staircase" : "stairs";
     updown = sway->up ? "up" : "down";
+
+    /* NeonHack 2: city stairs say where they go */
+    if (sway->kind == STWAY_METRO) {
+        Strcpy(outbuf, "metro station");
+        return outbuf;
+    } else if (In_city(&u.uz) && In_city(&tolev)) {
+        char place[BUFSZ];
+
+        Sprintf(outbuf, "%s %s to %s", stairs, updown,
+                city_place_name(&tolev, place, FALSE));
+        return outbuf;
+    } else if (u.uz.dnum == 0 && u.uz.dlevel == 1 && sway->up
+               && !u.uhave.amulet && ashfall_level.dlevel > 0) {
+        char place[BUFSZ];
+
+        Sprintf(outbuf, "%s %s the shaft to %s", stairs, updown,
+                city_place_name(&ashfall_level, place, FALSE));
+        return outbuf;
+    } else if (In_city(&u.uz) && tolev.dnum == 0 && tolev.dlevel == 1) {
+        Sprintf(outbuf, "%s %s the shaft to the Undercity", stairs, updown);
+        return outbuf;
+    }
 
     if (!known_branch_stairs(sway)) {
         /* ordinary stairs or branch stairs to not-yet-visited branch */

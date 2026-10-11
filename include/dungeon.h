@@ -20,6 +20,7 @@ typedef struct d_flags {     /* dungeon/level type flags */
     Bitfield(rogue_like, 1); /* is this an old-fashioned presentation? */
     Bitfield(align, 3);      /* dungeon alignment. */
     Bitfield(unconnected, 1); /* dungeon not connected to any branch */
+    Bitfield(city, 1);        /* NeonHack 2: a district or a city site */
 } d_flags;
 
 typedef struct s_level { /* special dungeon level element */
@@ -29,7 +30,17 @@ typedef struct s_level { /* special dungeon level element */
     char boneid;    /* character to id level in bones files */
     uchar rndlevs;  /* no. of randomly available similar levels */
     d_flags flags;  /* type flags */
+    /* NeonHack 2 districts */
+    xint16 danger;      /* difficulty, used instead of depth */
+    char title[24];     /* "Lantern Market" */
+    char shortname[12]; /* for the status line: "Lantern Mkt" */
 } s_level;
+
+/* NeonHack 2: how the hero arrives after a city journey */
+#define CITY_ARRIVE_NONE 0
+#define CITY_ARRIVE_XY 1    /* at a given spot */
+#define CITY_ARRIVE_METRO 2 /* at the district's metro station */
+#define CITY_ARRIVE_SHAFT 3 /* at the top of the shaft to the Undercity */
 
 /* level region types */
 enum level_region_types {
@@ -70,6 +81,10 @@ typedef struct dungeon {   /* basic dungeon identifier */
     xint16 dunlev_ureached; /* how deep you have been in this dungeon */
     int ledger_start,      /* the starting depth in "real" terms */
         depth_start;       /* the starting depth in "logical" terms */
+    /* NeonHack 2 city sites */
+    xint16 danger;         /* difficulty of the entry floor */
+    d_level parent;        /* district whose lobby leads here */
+    char shortname[12];    /* for the status line: "Block 7" */
 } dungeon;
 
 /*

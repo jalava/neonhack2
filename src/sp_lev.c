@@ -4169,6 +4169,12 @@ l_create_stairway(lua_State *L, boolean using_ladder)
     long scoord;
     int up = 0; /* default is down */
     int ltype = lua_type(L, 1);
+    /* NeonHack 2: stairs to anywhere, and metro stations */
+    static const char *const stairkinds[] = { "stairs", "metro", NULL };
+    static const int stairkinds2i[] = { STWAY_NORMAL, STWAY_METRO };
+    char *destname = (char *) 0;
+    int kind = STWAY_NORMAL;
+    d_level sdest;
 
     create_des_coder();
 
@@ -4177,6 +4183,9 @@ l_create_stairway(lua_State *L, boolean using_ladder)
         lcheck_param_table(L);
         get_table_xy_or_coord(L, &ax, &ay);
         up = stairdirs2i[get_table_option(L, "dir", "down", stairdirs)];
+        destname = get_table_str_opt(L, "dest", (char *) 0);
+        kind = stairkinds2i[get_table_option(L, "kind", "stairs",
+                                             stairkinds)];
         x = (coordxy) ax;
         y = (coordxy) ay;
     } else {
@@ -4201,6 +4210,29 @@ l_create_stairway(lua_State *L, boolean using_ladder)
     if ((badtrap = t_at(x, y)) != 0)
         deltrap(badtrap);
     SpLev_Map[x][y] = 1;
+
+    if (destname || kind == STWAY_METRO) {
+        /* a metro station "goes" nowhere; the city map picks the stop */
+        if (kind == STWAY_METRO) {
+            assign_level(&sdest, &u.uz);
+        } else if (!city_resolve_dest(destname, &sdest)) {
+            impossible("des.stair: unknown destination \"%s\"", destname);
+            free((genericptr_t) destname);
+            return 0;
+        }
+        free((genericptr_t) destname);
+        if (using_ladder) {
+            levl[x][y].typ = LADDER;
+        } else {
+            if (levl[x][y].typ != ROOM && levl[x][y].typ != CORR)
+                levl[x][y].typ = ROOM;
+            (void) set_levltyp(x, y, STAIRS);
+        }
+        stairway_add(x, y, up ? TRUE : FALSE, using_ladder, &sdest);
+        gs.stairs->kind = kind; /* stairway_add() put it first */
+        levl[x][y].ladder = up ? LA_UP : LA_DOWN;
+        return 0;
+    }
 
     if (using_ladder) {
         levl[x][y].typ = LADDER;

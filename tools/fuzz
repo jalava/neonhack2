@@ -35,9 +35,12 @@ while [ $SECONDS -lt $end ]; do
     prev=$cur
 done
 pane=$(tmux capture-pane -t "$S" -p)
+# which levels did it reach? (level files are <uid>wizard.<ledger>)
+levs=$(ls "$pg" | sed -n 's/^[0-9]*wizard\.\([0-9][0-9]*\)$/\1/p' | sort -n | tr '\n' ' ')
 tmux kill-session -t "$S" 2>/dev/null
 after=$(wc -l < "$log")
 echo "role=$role alive=$alive ran=${secs}s paniclog:+$((after - before)) lines"
+echo "  level files: $levs"
 [ "$after" -gt "$before" ] && tail -n $((after - before)) "$log"
 if [ "$alive" = no ]; then
     echo "--- screen before exit ---"; echo "$prev"

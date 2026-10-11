@@ -801,6 +801,7 @@ newgame(void)
     init_artifacts(); /* before u_init() in case $WIZKIT specifies
                        * any artifacts */
     u_init_misc();
+    city_start_level(); /* NeonHack 2: start in the city, not the dungeon */
 
     l_nhcore_init();  /* create a Lua state that lasts until end of game */
     reset_glyphmap(gm_newgame);
@@ -814,7 +815,10 @@ newgame(void)
     /* quest_init();  --  Now part of role_init() */
 
     mklev();
-    u_on_upstairs();
+    if (In_city(&u.uz))
+        u_on_rndspot(0); /* the district's arrival region */
+    else
+        u_on_upstairs();
     vision_reset();          /* set up internals for level (after mklev) */
     check_special_room(FALSE);
 

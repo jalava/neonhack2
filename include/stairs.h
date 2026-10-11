@@ -11,8 +11,13 @@ typedef struct stairway { /* basic stairway identifier */
     boolean up;           /* up or down? */
     boolean isladder;     /* ladder or stairway? */
     boolean u_traversed;  /* hero has traversed this stair */
+    xint8 kind;           /* NeonHack 2: STWAY_xxx */
     struct stairway *next;
 } stairway;
+
+/* stairway kinds */
+#define STWAY_NORMAL 0
+#define STWAY_METRO 1 /* a metro station; goes wherever the map says */
 
 #endif /* STAIRS_H */
 

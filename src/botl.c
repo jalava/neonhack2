@@ -446,7 +446,11 @@ describe_level(
             addbranch = (dflgs & 2) != 0; /* False: status, True: livelog */
     int ret = 1;
 
-    if (Is_knox(&u.uz)) {
+    if (In_city(&u.uz)) {
+        /* NeonHack 2: "Neon Mile", "Block 7 3F" */
+        (void) city_place_name(&u.uz, buf, !addbranch);
+        addbranch = FALSE;
+    } else if (Is_knox(&u.uz)) {
         Sprintf(buf, "%s", svd.dungeons[u.uz.dnum].dname);
         addbranch = FALSE;
     } else if (In_quest(&u.uz)) {

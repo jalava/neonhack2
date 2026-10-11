@@ -985,8 +985,10 @@ rest_stairs(NHFILE *nhfp)
         stairway_add(stway.sx, stway.sy, stway.up, stway.isladder,
                      &(stway.tolev));
         newst = stairway_at(stway.sx, stway.sy);
-        if (newst)
+        if (newst) {
             newst->u_traversed = stway.u_traversed;
+            newst->kind = stway.kind;
+        }
 #endif
     }
 }

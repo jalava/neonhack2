@@ -330,4 +330,39 @@ dungeon = {
          },
       }
    },
+   -- NeonHack 2: the city of Neo Yendor.  Its levels are the districts;
+   -- they aren't joined by stairs but by the metro (and taxis).  "danger"
+   -- replaces depth when monsters and items are generated.
+   {
+      name = "Neo Yendor",
+      base = 8,
+      flags = { "unconnected", "city" },
+      levels = {
+         { name = "nc-neonmile", base = 1, title = "Neon Mile", danger = 1 },
+         { name = "nc-lantern", base = 2, title = "Lantern Market",
+           short = "Lantern Mkt", danger = 3 },
+         { name = "nc-stacks", base = 3, title = "The Stacks",
+           short = "Stacks", danger = 5 },
+         { name = "nc-docks", base = 4, title = "Rustwater Docks",
+           short = "Docks", danger = 7 },
+         { name = "nc-fringe", base = 5, title = "The Fringe",
+           short = "Fringe", danger = 7 },
+         { name = "nc-chrome", base = 6, title = "Chrome Heights",
+           short = "Chrome Hts", danger = 11 },
+         { name = "nc-ashfall", base = 7, title = "Ashfall", danger = 9 },
+         { name = "nc-zenith", base = 8, title = "Zenith", danger = 14 },
+      }
+   },
+   -- City sites: buildings and tunnels entered from a lobby on their
+   -- "parent" district.  "entry = -1" makes a tower: you enter at the
+   -- bottom and climb.  Danger rises by one per floor.
+   {
+      name = "Block 7",
+      base = 4,
+      entry = -1,
+      flags = { "unconnected", "city" },
+      parent = "nc-stacks",
+      danger = 5,
+      themerooms = "themerms.lua",
+   },
 }
