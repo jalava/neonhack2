@@ -5480,7 +5480,10 @@ newcham(
 
     mtmp->meverseen = 0; /* never seen mon in present shape; newsym() ->
                           * display_monster() may change it right back */
-    newsym(mtmp->mx, mtmp->my);
+    /* [NeonHack: not when off the map, e.g. a shapeshifting pet that
+       hasn't been placed on its new level yet (found by the fuzzer)] */
+    if (mtmp->mx)
+        newsym(mtmp->mx, mtmp->my);
 
     if (msg) {
         /* oldname is capitalized and might be an assigned name */

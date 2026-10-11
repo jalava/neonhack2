@@ -1507,6 +1507,8 @@ see_monsters(void)
             continue;
         if ((mon->mstate & MON_STILL_ARRIVING) != 0)
             continue;
+        if (!mon->mx) /* NeonHack: off the map (fuzzer level regen) */
+            continue;
         newsym(mon->mx, mon->my);
         if (mon->wormno)
             see_wsegs(mon);
