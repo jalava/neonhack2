@@ -45,7 +45,16 @@ Testing: scripted tmux play-tests (`tools/nhdrive`) for every feature,
 multi-minute runs of NetHack's fuzzer for all 13 roles (`tools/fuzz`).
 The fuzzer found and fixed: Lua levels using NetHack object names
 (`obj:chest`), trap names caught by the object rename (`des.trap("arrow")`),
-and a shapeshifter display update at <0,0> during level regeneration.
+UTF-8 cursor accounting while typing extended commands, and several
+display updates at <0,0> for monsters not on the map (arriving
+shapeshifting pets, level regeneration, parked vault guards).  For the
+vault guards, upstream's post-5.0.0 fixes c42d35eac, d13eceb28 and
+a9614ee8d are backported.  All 13 roles survive 7-10 minute fuzzer runs.
+
+Upstream's `NetHack-5.0` branch has ~1100 post-release commits (5.0.1
+development).  NeonHack stays on the 5.0.0 release; merging that branch
+later is possible but will conflict in `monsters.h`, `objects.h` and the
+renamed strings.
 
 Ideas for later: monsters using grenades and cyberdecks, implant removal
 at clinics, bribing corpsec, re-themed Fort Ludios/Medusa/Castle
