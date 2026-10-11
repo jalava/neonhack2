@@ -2896,7 +2896,7 @@ zapyourself(struct obj *obj, boolean ordinary)
         /* probably don't need these to be urgent; player just gave input
            without subsequent opportunity to dismiss --More-- with ESC */
         urgent_pline("You irradiate yourself with pure energy!");
-        urgent_pline("You die.");
+        urgent_pline("You flatline.");
         /* They might survive with an amulet of life saving */
         done(DIED);
         break;

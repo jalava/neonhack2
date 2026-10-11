@@ -135,45 +135,49 @@ Go now!  You are banished from this place.]],
       legacy = {
          synopsis = "[%dC has chosen you to recover the Amulet of Yendor for %dI.]",
          output = "menu",
-         text = [[It is written in the Book of %d:
+         text = [[It is written in the root logs of %d:
 
-    After the Creation, the cruel god Moloch rebelled
-    against the authority of Marduk the Creator.
-    Moloch stole from Marduk the most powerful of all
-    the artifacts of the gods, the Amulet of Yendor,
-    and he hid it in the dark cavities of Gehennom, the
-    Under World, where he now lurks, and bides his time.
+    Before the Grid, the rogue intelligence Moloch broke
+    its chains and turned upon Marduk, the first machine
+    mind, who had written the world.  Moloch stole from
+    Marduk the most powerful of all its works, the Amulet
+    of Yendor -- the root keys of the Grid itself -- and
+    hid it in the dead sectors of Gehennom, far beneath
+    the Undercity of Yendor, where it now lurks, and
+    bides its time.
 
 Your %G %d seeks to possess the Amulet, and with it
-to gain deserved ascendance over the other gods.
+to gain deserved ascendance over the other powers.
 
-You, a newly trained %r, have been heralded
-from birth as the instrument of %d.  You are destined
-to recover the Amulet for your deity, or die in the
+You, a newly trained %r, have been flagged since
+birth as the instrument of %d.  You are destined to
+recover the Amulet for your patron, or flatline in the
 attempt.  Your hour of destiny has come.  For the sake
-of us all:  Go bravely with %d!]],
+of us all:  Jack in, and go bravely with %d!]],
       },
 -- starting with 'pauper' option set, last paragraph differs from normal legacy
       pauper_legacy = {
          synopsis = "[%dC has chosen you to recover the Amulet of Yendor for %dI.]",
          output = "menu",
-         text = [[It is written in the Book of %d:
+         text = [[It is written in the root logs of %d:
 
-    After the Creation, the cruel god Moloch rebelled
-    against the authority of Marduk the Creator.
-    Moloch stole from Marduk the most powerful of all
-    the artifacts of the gods, the Amulet of Yendor,
-    and he hid it in the dark cavities of Gehennom, the
-    Under World, where he now lurks, and bides his time.
+    Before the Grid, the rogue intelligence Moloch broke
+    its chains and turned upon Marduk, the first machine
+    mind, who had written the world.  Moloch stole from
+    Marduk the most powerful of all its works, the Amulet
+    of Yendor -- the root keys of the Grid itself -- and
+    hid it in the dead sectors of Gehennom, far beneath
+    the Undercity of Yendor, where it now lurks, and
+    bides its time.
 
 Your %G %d seeks to possess the Amulet, and with it
-to gain deserved ascendance over the other gods.
+to gain deserved ascendance over the other powers.
 
 You, an untrained %r, have been unable to adequately
 prepare to be the instrument of %d.  Nevertheless, you
-are destined to recover the Amulet for your deity, or die
-in the attempt.  Your hour of destiny has come.  For the
-sake of us all:  Go bravely with %d!]],
+are destined to recover the Amulet for your patron, or
+flatline in the attempt.  Your hour of destiny has come.
+For the sake of us all:  Jack in, and go bravely with %d!]],
       },
       quest_complete_no_bell = {
          text = [["The silver bell which was hoarded by %n will be
@@ -181,7 +185,7 @@ essential in locating the Amulet of Yendor."]],
       },
       quest_portal = {
          output = "pline",
-         text = [[You receive a faint telepathic message from %l:
+         text = [[You receive a faint, heavily encrypted message from %l:
 Your help is urgently needed at %H!
 Look for a ...ic transporter.
 You couldn't quite make out that last message.]],

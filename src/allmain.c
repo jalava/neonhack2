@@ -849,7 +849,7 @@ newgame(void)
     return;
 }
 
-/* show "welcome [back] to NetHack" message at program startup */
+/* show "welcome [back] to NeonHack" message at program startup */
 void
 welcome(boolean new_game) /* false => restoring an old game */
 {
@@ -867,7 +867,7 @@ welcome(boolean new_game) /* false => restoring an old game */
     }
 
     if (Hallucination)
-        pline("NetHack is filmed in front of an undead studio audience.");
+        pline(GAME_TITLE " is filmed in front of a live studio holo-audience.");
 
     /*
      * The "welcome back" message always describes your innate form
@@ -911,8 +911,8 @@ welcome(boolean new_game) /* false => restoring an old game */
             (currentgend && gu.urole.name.f) ? gu.urole.name.f
                                              : gu.urole.name.m);
 
-    pline(new_game ? "%s %s, welcome to NetHack!  You are a%s."
-                   : "%s %s, the%s, welcome back to NetHack!",
+    pline(new_game ? "%s %s, welcome to " GAME_TITLE "!  You are a%s."
+                   : "%s %s, the%s, welcome back to " GAME_TITLE "!",
           Hello((struct monst *) 0), svp.plname, buf);
 
     if (new_game) {

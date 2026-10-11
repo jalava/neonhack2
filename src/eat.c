@@ -282,7 +282,7 @@ choke(struct obj *food)
             You("choke over it.");
             Strcpy(svk.killer.name, "quick snack");
         }
-        You("die...");
+        You("flatline...");
         done(CHOKING);
     }
 }
@@ -3438,7 +3438,7 @@ newuhs(boolean incr)
             u.uhs = STARVED;
             disp.botl = TRUE;
             bot();
-            You("die from starvation.");
+            You("flatline from starvation.");
             svk.killer.format = KILLED_BY;
             Strcpy(svk.killer.name, "starvation");
             done(STARVING);
@@ -3503,7 +3503,7 @@ newuhs(boolean incr)
         disp.botl = TRUE;
         bot();
         if ((Upolyd ? u.mh : u.uhp) < 1) {
-            You("die from hunger and exhaustion.");
+            You("flatline from hunger and exhaustion.");
             svk.killer.format = KILLED_BY;
             Strcpy(svk.killer.name, "exhaustion");
             done(STARVING);

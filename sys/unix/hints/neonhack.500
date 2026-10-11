@@ -28,6 +28,10 @@ WANT_WIN_CURSES=1
 WANT_DEFAULT=tty
 WANT_SOURCE_INSTALL=1
 
+# the executable is called neonhack (the Makefiles assign GAME after the
+# hints PRE section, hence 'override')
+override GAME = neonhack
+
 # Some distros (image-based ones in particular) ship the ncurses runtime
 # but not its headers.  When /usr/include lacks them, compile against
 # another ncurses 6 header set (Homebrew's by default) and link the

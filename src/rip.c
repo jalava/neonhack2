@@ -27,9 +27,9 @@ staticfn void center(int, char *);
 static const char *const rip_txt[] = {
     "                       ----------",
     "                      /          \\",
-    "                     /    REST    \\",
-    "                    /      IN      \\",
-    "                   /     PEACE      \\",
+    "                     /   SIGNAL   \\",
+    "                    /     LOST     \\",
+    "                   /   FLATLINED    \\",
     "                  /                  \\",
     "                  |                  |", /* Name of player */
     "                  |                  |", /* Amount of $ */
@@ -37,9 +37,9 @@ static const char *const rip_txt[] = {
     "                  |                  |", /* . */
     "                  |                  |", /* . */
     "                  |                  |", /* . */
-    "                  |       1001       |", /* Real year of death */
+    "                  |       1001       |", /* In-world year of death */
     "                 *|     *  *  *      | *",
-    "        _________)/\\\\_//(\\/(/\\)/\\//\\/|_)_______", 0
+    "  __/\\__/\\/\\__/\\_)___________________|_)_______", 0
 };
 #define STONE_LINE_CENT 28 /* char[] element of center of stone face */
 #else                      /* NH320_DEDICATION */
@@ -106,7 +106,7 @@ genl_outrip(winid tmpwin, int how, time_t when)
     /* arbitrary upper limit; practical upper limit is quite a bit less */
     if (cash > 999999999L)
         cash = 999999999L;
-    Sprintf(buf, "%ld Au", cash);
+    Sprintf(buf, "%ld cr", cash); /* credits */
     center(GOLD_LINE, buf);
 
     /* Put together death description */
@@ -134,8 +134,8 @@ genl_outrip(winid tmpwin, int how, time_t when)
             dpx = &dpx[i0 + 1];
     }
 
-    /* Put year on stone */
-    year = (int) ((yyyymmdd(when) / 10000L) % 10000L);
+    /* Put year on stone; NeonHack is set 161 years in the future */
+    year = (int) ((yyyymmdd(when) / 10000L) % 10000L) + NEON_YEAR_OFFSET;
     Sprintf(buf, "%4d", year);
     center(YEAR_LINE, buf);
 

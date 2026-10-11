@@ -700,7 +700,7 @@ nh_timeout(void)
                     adjattrib(A_CON, -1, 1);
                     break;
                 }
-                urgent_pline("You die from your illness.");
+                urgent_pline("You flatline from your illness.");
                 if (kptr && kptr->name[0]) {
                     svk.killer.format = kptr->format;
                     Strcpy(svk.killer.name, kptr->name);

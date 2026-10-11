@@ -125,7 +125,7 @@ static boolean ignore_errors_on_unmatched = FALSE,
 /* used for messaging. Also used in options.c */
 static const char *default_configfile =
 #ifdef UNIX
-    ".nethackrc";
+    ".neonhackrc";
 #else
 #if defined(MACOS9) || defined(__BEOS__)
     "NetHack Defaults";
@@ -318,10 +318,22 @@ fopen_config_file(const char *filename, int src)
         return fp;
 #else /* should be only UNIX left */
     envp = nh_getenv("HOME");
-    if (!envp)
-        Strcpy(tmp_config, ".nethackrc");
-    else
+    /* NeonHack: an existing ~/.nethackrc is used when there's no
+       ~/.neonhackrc, so NetHack players keep their settings */
+    if (envp) {
         Sprintf(tmp_config, "%s/%s", envp, ".nethackrc");
+        set_configfile_name(tmp_config);
+        if ((fp = fopen(configfile, "r")) != (FILE *) 0) {
+            Sprintf(tmp_config, "%s/%s", envp, ".neonhackrc");
+            if (access(tmp_config, 4) == -1) /* 4 is R_OK */
+                return fp;
+            (void) fclose(fp);
+        }
+    }
+    if (!envp)
+        Strcpy(tmp_config, ".neonhackrc");
+    else
+        Sprintf(tmp_config, "%s/%s", envp, ".neonhackrc");
 
     set_configfile_name(tmp_config);
     if ((fp = fopen(configfile, "r")) != (FILE *) 0)
@@ -1899,8 +1911,12 @@ rcfile(void)
     go.opt_phase = environ_opt;
     /* getenv() instead of nhgetenv(): let total length of options be long;
        parseoptions() will check each individually */
-    envname = "NETHACKOPTIONS";
+    envname = "NEONHACKOPTIONS";
     opts = getenv(envname);
+    if (!opts) {
+        envname = "NETHACKOPTIONS";
+        opts = getenv(envname);
+    }
     if (!opts) {
         /* fall back to original name; discouraged */
         envname = "HACKOPTIONS";

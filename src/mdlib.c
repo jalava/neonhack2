@@ -337,7 +337,9 @@ version_id_string(char *outbuf, size_t bufsz, const char *build_date)
     Strcpy(&subbuf[1], PORT_SUB_ID);
 #endif
 
-    Snprintf(outbuf, bufsz, "%s NetHack%s Version %s%s - last %s %s.",
+    Snprintf(outbuf, bufsz,
+             "%s " GAME_TITLE "%s Version " NEONHACK_VERSION_STRING
+             " [NetHack %s%s] - last %s %s.",
              PORT_ID, subbuf, mdlib_version_string(versbuf, "."), statusbuf,
              date_via_env ? "revision" : "build", build_date);
     return outbuf;
@@ -363,7 +365,9 @@ bannerc_string(char *outbuf, size_t bufsz, const char *build_date)
 #endif
 #endif
 
-    Snprintf(outbuf, bufsz, "         Version %s %s%s, %s %s.",
+    Snprintf(outbuf, bufsz,
+            "         Version " NEONHACK_VERSION_STRING
+            " [NetHack %s] %s%s, %s %s.",
             mdlib_version_string(versbuf, "."), PORT_ID, subbuf,
             date_via_env ? "revised" : "built", build_date);
     return outbuf;

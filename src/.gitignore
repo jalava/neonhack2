@@ -11,6 +11,7 @@ SysV-AT
 Systos
 SysBe
 nethack
+neonhack
 *.o
 *.tag
 tiles.bmp
