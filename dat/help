@@ -1,19 +1,21 @@
-        Welcome to NetHack!                ( description of version 3.6 )
+        Welcome to NeonHack!         ( a cyberpunk variant of NetHack 5.0 )
 
-        NetHack is a Dungeons and Dragons like game where you (the adventurer)
-descend into the depths of the dungeon in search of the Amulet of Yendor,
-reputed to be hidden somewhere below the twentieth level.  You begin your
-adventure with a pet that can help you in many ways, and can be trained
-to do all sorts of things.  On the way you will find useful (or useless)
-items, quite possibly with magic properties, and assorted monsters.  You can
-attack a monster by trying to move onto the space a monster is on (but often
-it is much wiser to leave it alone).
+        NeonHack is NetHack reimagined in a neon-lit megacity.  You (the
+runner) descend through the Undercity of the arcology Yendor in search
+of the Amulet of Yendor, a pre-collapse data amulet said to hold the root
+keys of the Grid, reputed to be hidden somewhere below the twentieth
+level.  You begin your adventure with a pet that can help you in many
+ways.  On the way you will find useful (or useless) gear -- guns,
+cyberware, scripts and stranger things -- and assorted monsters, from
+street punks and security drones to things that should not exist.  You
+can attack a monster by trying to move onto the space a monster is on
+(but often it is much wiser to leave it alone).
 
         Unlike most adventure games, which give you a verbal description of
-your location, NetHack gives you a visual image of the dungeon level you are
-on.
+your location, NeonHack gives you a visual image of the dungeon level you
+are on.
 
-        NetHack uses the following symbols:
+        NeonHack uses the following symbols:
 
         - and |  The walls of a room, possibly also open doors or a grave.
         .        The floor of a room or a doorway.
@@ -27,12 +29,12 @@ on.
         %        Something edible (not necessarily healthy).
         /        A wand.
         =        A ring.
-        ?        A scroll.
-        !        A potion.
-        (        Some other useful object (pick-axe, key, lamp...)
-        $        A pile of gold.
+        ?        A script (a single-use program).
+        !        A vial.
+        (        Some other useful object (pick-axe, keycard, implant...)
+        $        A pile of credits.
         *        A gem or rock (possibly valuable, possibly worthless).
-        +        A closed door, or a spellbook containing a spell
+        +        A closed door, or a spellchip containing a spell
                  you can learn.
         ^        A trap (once you detect it).
         "        An amulet, or a spider web.
@@ -75,7 +77,7 @@ b j n   1 2 3           g<dir>:   run in direction <dir> until something
                 used but 'y' and 'z' are swapped.
 
 Commands:
-        NetHack knows the following commands:
+        NeonHack knows the following commands:
         ?       Help menu.
         /       What-is, tell what a symbol represents.  You may choose to
                 specify a location or give a symbol argument.  Enabling the
@@ -210,5 +212,28 @@ Commands:
         your armor class is (the lower the better), your experience level,
         and the state of your stomach.  Optionally, you may or may not see
         other information such as spell points, how much gold you have, etc.
+
+NeonHack additions:
+
+        Firearms   Pistols, revolvers, submachine guns, assault rifles and
+                   shotguns work like NetHack's bows and crossbows: wield
+                   the gun, quiver its ammunition and fire with 'f'.
+                   Guns are loud and wake up everything nearby; automatic
+                   weapons fire bursts; a bullet that hits is spent.
+        Grenades   Throw them with 't'.  Frag grenades explode, flashbangs
+                   blind and stun, EMP grenades shut down machines.
+        Cyberware  Apply an implant to install it in yourself.  Implants
+                   give permanent abilities but load your mind; past your
+                   limit you suffer cyberpsychosis ("CyPsy" on the status
+                   line).  A medkit makes surgery safer; vials of
+                   neuroblocker hold the psychosis back.  ^X lists your
+                   implants under "Street Status".
+        Hacking    #hack (or M-h, or apply a cyberdeck) takes over an
+                   adjacent robot or opens an electronic lock.
+        Heat       Murder, shoplifting and attacking security raise your
+                   heat.  When you are "Wanted", corporate security squads
+                   come looking for you.  Heat cools down over time.
+        Display    The 'emoji' option decorates some messages (on a UTF-8
+                   terminal); OPTIONS=symset:NeonGrid gives a neon map.
 
         Have Fun, and Happy Hacking!

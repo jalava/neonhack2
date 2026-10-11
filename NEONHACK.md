@@ -8,6 +8,48 @@ cyberpunk-native features that plug into NetHack's existing systems
 (intrinsics, skills, shops, Kops, conducts) instead of bolting on a new game.
 
 Base: upstream tag `NetHack-5.0.0_Released`, branch `neonhack`.
+Player-facing overview: `README.neonhack.md`.
+
+## Status (2026-10-11)
+
+All twelve phases below are implemented and committed.  Notes on where
+the result differs from the plan:
+
+* **Racial names.** dwarf -> cyborg, gnome -> scav, orc -> mutant and
+  elf -> synth as planned; kobolds became ratkin.  The army became
+  corporate security ("corpsec trooper" ... "corpsec captain") instead of
+  adding a separate corpsec monster.
+* **New monster names.** The hostile netrunner is a "black hat" because
+  "netrunner" is the player-monster name of the Netrunner role.
+* **Item names.** "instant noodles" became "cup of ramen" (the wish parser
+  singularizes "noodles").  Implant names are singular ("optic implant",
+  "muscle graft").
+* **Firearms.** Rounds that hit are always spent; misses can be picked up.
+  Guns add a small per-model damage bonus; shotguns hit hardest within two
+  squares.  Monsters fire guns (via NetHack's launcher AI) but don't throw
+  grenades.
+* **Cyberware.** Implants can't be removed.  Reflex boosters make you
+  very fast (FROMCYBER isn't part of INTRINSIC).
+* **Hacking.** Uses cyberdeck battery charges rather than Pw.
+* **Heat.** There's no bribe mechanic; heat decays over time and drops
+  when a robbed shopkeeper is paid.  Squads don't deploy in Sokoban, Fort
+  Ludios, Vlad's Tower, Gehennom or the endgame.
+* **Display.** The default map is vanilla ASCII; the neon look is the
+  opt-in `NeonGrid` symset.  Emoji are only used in tty messages on UTF-8
+  locales.
+* **Text.** Monk, Tourist and Valkyrie keep NetHack's quest stories (they
+  fit); the Guidebook is not rewritten.
+
+Testing: scripted tmux play-tests (`tools/nhdrive`) for every feature,
+`#wizmondiff`, `#wizrumorcheck`, `luac -p` on every level file, and
+multi-minute runs of NetHack's fuzzer for all 13 roles (`tools/fuzz`).
+The fuzzer found and fixed: Lua levels using NetHack object names
+(`obj:chest`), trap names caught by the object rename (`des.trap("arrow")`),
+and a shapeshifter display update at <0,0> during level regeneration.
+
+Ideas for later: monsters using grenades and cyberdecks, implant removal
+at clinics, bribing corpsec, re-themed Fort Ludios/Medusa/Castle
+descriptions, a NeonHack Guidebook, curses-port emoji support.
 Every NeonHack change is a normal commit on top, so `git diff
 NetHack-5.0.0_Released` always shows the complete variant.
 

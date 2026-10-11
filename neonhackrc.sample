@@ -1,0 +1,19 @@
+# Sample NeonHack configuration.  Copy to ~/.neonhackrc and edit.
+# Every NetHack option works; these are just suggestions.
+
+OPTIONS=name:Case
+# role, race, gender and alignment; NetHack names work too (role:Wizard)
+#OPTIONS=role:Netrunner,race:human,gender:female,align:chaotic
+OPTIONS=pettype:cat,!autopickup,time,showexp
+
+# neon map: box-drawing walls in 24-bit color (needs a UTF-8 terminal)
+OPTIONS=symset:NeonGrid
+
+# emoji in some messages (only used on UTF-8 terminals); turn off with
+#OPTIONS=!emoji
+
+# the curses interface instead of tty
+#OPTIONS=windowtype:curses
+
+# NeonHack status conditions are on by default; turn them off with
+#OPTIONS=!cond_cyberpsycho,!cond_wanted

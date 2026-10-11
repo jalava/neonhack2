@@ -870,16 +870,20 @@ do_play_instrument(struct obj *instr)
                     if (gears) {
                         Soundeffect(se_tumbler_click, 50);
                         Soundeffect(se_gear_turn, 50);
-                        You_hear("%d tumbler%s click and %d gear%s turn.",
+                        /* NeonHack: the drawbridge lock answers like a
+                           modem; "lock" is a right note in the right place
+                           (a NetHack gear), "echo" a right note in the
+                           wrong place (a tumbler) */
+                        You_hear("%d carrier tone%s echo and %d handshake tone%s lock.",
                                  tumblers, plur(tumblers), gears,
                                  plur(gears));
                     } else {
                         Soundeffect(se_tumbler_click, 50);
-                        You_hear("%d tumbler%s click.", tumblers,
+                        You_hear("%d carrier tone%s echo.", tumblers,
                                  plur(tumblers));
                     }
                 } else if (gears) {
-                    You_hear("%d gear%s turn.", gears, plur(gears));
+                    You_hear("%d handshake tone%s lock.", gears, plur(gears));
                     /* could only get `gears == 5' by playing five
                        correct notes followed by excess; otherwise,
                        tune would have matched above */
