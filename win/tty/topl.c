@@ -12,8 +12,12 @@
 
 static void redotoplin(const char *);
 static void topl_putsym(char);
-static int utf8_seqlen(unsigned char);
+static int utf8_seqlen(const char *);
 static int utf8_colwidth(const char *, int);
+
+/* NeonHack: set while message text (not getlin() echo, which erases one
+   byte at a time) is being written, so UTF-8 can be measured by width */
+static boolean topl_msg_utf8 = FALSE;
 static void removetopl(int);
 static void msghistory_snapshot(boolean);
 static void free_msghistory_snapshot(boolean);
@@ -135,7 +139,9 @@ redotoplin(const char *str)
         }
         end_glyphout(); /* in case message printed during graphics output */
     }
+    topl_msg_utf8 = TRUE;
     putsyms(str);
+    topl_msg_utf8 = FALSE;
     cl_end();
     ttyDisplay->toplin = TOPLINE_NEED_MORE;
     if (ttyDisplay->cury && otoplin != TOPLINE_SPECIAL_PROMPT)
@@ -271,8 +277,11 @@ update_topl(const char *bp)
         Strcat(gt.toplines, "  ");
         Strcat(gt.toplines, bp);
         cw->curx += 2;
-        if (!skip)
+        if (!skip) {
+            topl_msg_utf8 = TRUE;
             addtopl(bp);
+            topl_msg_utf8 = FALSE;
+        }
         return;
     } else if (!skip) {
         if (ttyDisplay->toplin == TOPLINE_NEED_MORE) {
@@ -292,7 +301,7 @@ update_topl(const char *bp)
         otl = tl;
         /* advance to the byte where the display reaches column CO-1 */
         while (*tl && cols < CO - 1) {
-            int len = utf8_seqlen((unsigned char) *tl);
+            int len = utf8_seqlen(tl);
 
             cols += utf8_colwidth(tl, len);
             tl += len;
@@ -361,11 +370,20 @@ topl_putsym(char c)
    characters are written as a unit and advance the cursor by their
    display width, so emoji don't throw off wrapping or --More-- */
 
-/* byte length of the UTF-8 sequence starting with lead byte 'c' */
+/* byte length of the well-formed UTF-8 sequence at 's'; 1 for ASCII and
+   for anything malformed (a stray high byte is shown as one column, as
+   in NetHack) */
 static int
-utf8_seqlen(unsigned char c)
+utf8_seqlen(const char *s)
 {
-    return (c < 0xC0) ? 1 : (c < 0xE0) ? 2 : (c < 0xF0) ? 3 : 4;
+    const unsigned char *b = (const unsigned char *) s;
+    int i, len = (b[0] < 0xC2 || b[0] > 0xF4) ? 1
+                 : (b[0] < 0xE0) ? 2 : (b[0] < 0xF0) ? 3 : 4;
+
+    for (i = 1; i < len; i++)
+        if ((b[i] & 0xC0) != 0x80)
+            return 1;
+    return len;
 }
 
 /* display width of the UTF-8 sequence 's' of 'len' bytes */
@@ -408,7 +426,7 @@ tty_strwidth(const char *str)
     int len, width = 0;
 
     while (*str) {
-        len = utf8_seqlen((unsigned char) *str);
+        len = utf8_seqlen(str);
         width += utf8_colwidth(str, len);
         while (len-- > 0 && *str)
             str++;
@@ -422,8 +440,13 @@ putsyms(const char *str)
     struct WinDesc *cw = wins[WIN_MESSAGE];
     int len, width;
 
+    if (!topl_msg_utf8) { /* byte-at-a-time, as NetHack does */
+        while (*str)
+            topl_putsym(*str++);
+        return;
+    }
     while (*str) {
-        len = utf8_seqlen((unsigned char) *str);
+        len = utf8_seqlen(str);
         if (len == 1) {
             topl_putsym(*str++);
             continue;
