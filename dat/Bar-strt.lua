@@ -71,10 +71,10 @@ des.door("open",28,05)
 -- Elder
 des.monster({ id = "Pelias", coord = {10, 07}, inventory = function()
    des.object({ id = "runesword", spe = 5 });
-   des.object({ id = "chain mail", spe = 5 });
+   des.object({ id = "mesh armor", spe = 5 });
 end })
 -- The treasure of Pelias
-des.object("chest", 09, 05)
+des.object("strongbox", 09, 05)
 -- chieftain guards for the audience chamber
 des.monster("clan rider", 10, 05)
 des.monster("clan rider", 10, 09)

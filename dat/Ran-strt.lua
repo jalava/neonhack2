@@ -48,11 +48,11 @@ des.levregion({ region = {51,2,77,18}, region_islev = 1, type="branch" })
 -- Orion
 des.monster({ id = "Orion", coord = {20, 10}, inventory = function()
    des.object({ id = "leather armor", spe = 4 });
-   des.object({ id = "yumi", spe = 4 });
-   des.object({ id = "ya", spe = 4, quantity = 50 });
+   des.object({ id = "revolver", spe = 4 });
+   des.object({ id = "hollow-point bullet", spe = 4, quantity = 50 });
 end })
 -- The treasure of Orion
-des.object("chest", 20, 10)
+des.object("strongbox", 20, 10)
 -- Guards for the audience chamber
 des.monster("hunter", 19, 09)
 des.monster("hunter", 20, 09)
@@ -65,8 +65,8 @@ des.monster("hunter", 21, 11)
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,40,20))
 -- Traps
-des.trap("arrow",30,09)
-des.trap("arrow",30,10)
+des.trap("bullet",30,09)
+des.trap("bullet",30,10)
 des.trap("pit",40,09)
 des.trap("spiked pit")
 des.trap("bear")

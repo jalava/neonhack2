@@ -32,18 +32,18 @@ des.monster("&",place[1])
 des.monster("hell hound pup",place[2])
 des.monster("hell hound pup",place[3])
 des.monster("cryowolf",place[4])
-des.object({ id = "chest", coord = place[5],
+des.object({ id = "strongbox", coord = place[5],
              contents = function()
                 des.object("amulet of life saving")
              end
 });
-des.object({ id = "chest", coord = place[6],
+des.object({ id = "strongbox", coord = place[6],
              contents = function()
                 des.object("amulet of strangulation")
              end
 });
 des.object("water walking boots",place[7])
-des.object("crystal plate mail",place[8])
+des.object("smartglass plate",place[8])
 
 local spbooks = {
    "spellbook of invisibility",

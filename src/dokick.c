@@ -318,7 +318,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
             setmangry(mtmp, TRUE);
         /* greedy monsters catch gold */
         if (cansee(mtmp->mx, mtmp->my))
-            pline("%s %scatches the gold.", Monnam(mtmp),
+            pline("%s %scatches the credits.", Monnam(mtmp),
                   was_sleeping ? "awakens and " : "");
         (void) mpickobj(mtmp, gold);
         gold = (struct obj *) 0; /* obj has been freed */
@@ -359,7 +359,7 @@ ghitm(struct monst *mtmp, struct obj *gold)
             SetVoice(mtmp, 0, 80, 0);
             verbalize(umoney ? "Drop the rest and follow me."
                       : hidden_gold(TRUE)
-                        ? "You still have hidden gold.  Drop it now."
+                        ? "You still have hidden credits.  Drop them now."
                         : mtmp->mpeaceful
                           ? "I'll take care of that; please move along."
                           : "I'll take that; now get moving.");

@@ -19,6 +19,13 @@ cmd=$1; shift
 case "$cmd" in
 start)
     tmux kill-session -t "$S" 2>/dev/null
+    while tmux has-session -t "$S" 2>/dev/null; do sleep 0.05; done
+    # killing the session hangs up the game, which saves it; drop the test
+    # character's save so every start is a fresh game
+    tname=$(printf '%s\n' "$opts" | tr ',' '\n' | sed -n 's/^name://p')
+    [ -n "$tname" ] && rm -f "$play/save/$(id -u)$tname" "$play/save/$(id -u)$tname".gz
+    # debug mode (-D) always plays as "wizard"
+    case " $* " in *" -D "*) rm -f "$play/save/$(id -u)wizard" "$play/save/$(id -u)wizard".gz ;; esac
     home=$(mktemp -d /tmp/nhhome.XXXXXX)
     tmux new-session -d -s "$S" -x "${NHCOLS:-80}" -y "${NHROWS:-24}" \
         "cd '$play' && HOME='$home' TERM=xterm-256color NETHACKOPTIONS='$opts' '$game' $*; echo '[game exited]'; sleep 600"

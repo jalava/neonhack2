@@ -1247,7 +1247,7 @@ use_crystal_ball(struct obj **optr)
             useup(obj);
             *optr = obj = 0; /* it's gone */
             /* physical damage cause by the shards and force */
-            losehp(Maybe_Half_Phys(rnd(30)), "exploding crystal ball",
+            losehp(Maybe_Half_Phys(rnd(30)), "exploding satellite uplink",
                    KILLED_BY_AN);
             break;
         }
@@ -1275,7 +1275,7 @@ use_crystal_ball(struct obj **optr)
                       poly_gender() == 1 ? "babe" : "dude");
                 break;
             case 3:
-                pline_The("crystal pulses with sinister %s light!",
+                pline_The("screen pulses with sinister %s light!",
                           hcolor((char *) 0));
                 break;
             case 4:
@@ -1309,13 +1309,13 @@ use_crystal_ball(struct obj **optr)
      *  for help in using the crystal ball.
      */
 
-    You("peer into %s...", the(xname(obj)));
+    You("tune %s to the orbital feeds...", the(xname(obj)));
     nomul(-rnd(charged ? 10 : 2));
-    gm.multi_reason = "gazing into a crystal ball";
+    gm.multi_reason = "staring at a satellite feed";
     gn.nomovemsg = "";
 
     if (!charged) {
-        pline_The("vision is unclear.");
+        pline_The("feed is nothing but static.");
 
         if (obj->spe < 0) { /* destroy ball if used after being cancelled */
  implode:   /* no damage to hero but 'multi' has a small negative value */
@@ -1361,7 +1361,7 @@ use_crystal_ball(struct obj **optr)
             if (!rn2(100)) /* make them nervous */
                 You_see("the Wizard of Yendor gazing out at you.");
             else
-                pline_The("vision is unclear.");
+                pline_The("feed is nothing but static.");
         }
     }
     return;

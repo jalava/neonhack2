@@ -172,7 +172,7 @@ trap_description(char *outbuf, int tnum, coordxy x, coordxy y)
      * traps now (defined trap types but not part of ftrap chain).
      */
     if (trapped_chest_at(tnum, x, y))
-        Strcpy(outbuf, "trapped chest"); /* might actually be a large box */
+        Strcpy(outbuf, "trapped strongbox"); /* might actually be a large box */
     else if (trapped_door_at(tnum, x, y))
         Strcpy(outbuf, "trapped door"); /* not "trap door"... */
     else
@@ -2355,7 +2355,7 @@ doidtrap(void)
         boolean chesttrap = trapped_chest_at(tt, x, y);
 
         if (chesttrap || trapped_door_at(tt, x, y)) {
-            pline("That is a trapped %s.", chesttrap ? "chest" : "door");
+            pline("That is a trapped %s.", chesttrap ? "strongbox" : "door");
             return ECMD_OK; /* trap ID'd, but no time elapses */
         }
     }

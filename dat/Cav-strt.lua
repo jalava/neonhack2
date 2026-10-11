@@ -56,10 +56,10 @@ des.altar({ x=36,y=02, align="coaligned", type="shrine" })
 -- Shaman Karnov
 des.monster({ id = "Shaman Karnov", coord = {35, 02}, inventory = function()
    des.object({ id = "leather armor", spe = 5 });
-   des.object({ id = "club", spe = 5 });
+   des.object({ id = "baseball bat", spe = 5 });
 end })
 -- The treasure of Shaman Karnov
-des.object("chest", 34, 02)
+des.object("strongbox", 34, 02)
 -- neanderthal guards for the audience chamber
 des.monster("feral elder", 20, 03)
 des.monster("feral elder", 20, 02)

@@ -64,7 +64,7 @@ des.monster({ id = "Doc Hippocrates", coord = {37, 10}, inventory = function()
    des.object({ id = "silver dagger", spe = 5 });
 end })
 -- The treasure of Hippocrates
-des.object("chest", 37, 10)
+des.object("strongbox", 37, 10)
 -- intern guards for the audience chamber
 des.monster("orderly", 29, 08)
 des.monster("orderly", 29, 09)

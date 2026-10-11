@@ -51,7 +51,7 @@ cost(struct obj *otmp)
         return 30;
     case SCR_BLANK_PAPER:
     default:
-        impossible("You can't write such a weird scroll!");
+        impossible("You can't write such a weird script!");
     }
     return 1000;
 }
@@ -101,8 +101,8 @@ dowrite(struct obj *pen)
     /* can't write on a novel (unless/until it's been converted into a blank
        spellbook), but we want messages saying so to avoid "spellbook" */
     typeword = (paper->otyp == SPE_NOVEL) ? "book"
-               : (paper->oclass == SPBOOK_CLASS) ? "spellbook"
-                 : "scroll";
+               : (paper->oclass == SPBOOK_CLASS) ? "spellchip"
+                 : "script";
     if (Blind) {
         if (!paper->dknown) {
             You("don't know whether that %s is blank or not.", typeword);
@@ -129,9 +129,9 @@ dowrite(struct obj *pen)
     if (namebuf[0] == '\033' || !namebuf[0])
         return ECMD_TIME;
     nm = namebuf;
-    if (!strncmpi(nm, "scroll ", 7))
+    if (!strncmpi(nm, "scroll ", 7) || !strncmpi(nm, "script ", 7))
         nm += 7;
-    else if (!strncmpi(nm, "spellbook ", 10))
+    else if (!strncmpi(nm, "spellbook ", 10) || !strncmpi(nm, "spellchip ", 10))
         nm += 10;
     if (!strncmpi(nm, "of ", 3))
         nm += 3;
@@ -271,10 +271,10 @@ dowrite(struct obj *pen)
         Your("marker dries out!");
         /* scrolls disappear, spellbooks don't */
         if (paper->oclass == SPBOOK_CLASS) {
-            pline_The("spellbook is left unfinished and your writing fades.");
+            pline_The("spellchip is left unfinished and your writing fades.");
             update_inventory(); /* pen charges */
         } else {
-            pline_The("scroll is now useless and disappears!");
+            pline_The("script is now useless and disappears!");
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
@@ -331,7 +331,7 @@ dowrite(struct obj *pen)
                 wipeout_text(namebuf, (6 + MAXULEV - u.ulevel) / 6, 0);
             } else
                 Sprintf(namebuf, "%s was here!", svp.plname);
-            You("write \"%s\" and the scroll disappears.", namebuf);
+            You("write \"%s\" and the script disappears.", namebuf);
             useup(paper);
         }
         obfree(new_obj, (struct obj *) 0);
@@ -345,7 +345,7 @@ dowrite(struct obj *pen)
            have passed the write-an-unknown scroll test
            above we can still fail this one, so it's doubly
            hard to write an unknown scroll while blind */
-        You("fail to write the scroll correctly and it disappears.");
+        You("fail to write the script correctly and it disappears.");
         useup(paper);
         obfree(new_obj, (struct obj *) 0);
         return ECMD_TIME;
@@ -357,7 +357,7 @@ dowrite(struct obj *pen)
     /* success */
     if (new_obj->oclass == SPBOOK_CLASS) {
         /* acknowledge the change in the object's description... */
-        pline_The("spellbook warps strangely, then turns %s.",
+        pline_The("spellchip warps strangely, then turns %s.",
                   new_book_description(new_obj->otyp, namebuf));
     }
     new_obj->blessed = (curseval > 0);

@@ -76,7 +76,7 @@ des.monster({ id = "Arch Priest", coord = {28, 10}, inventory = function()
    des.object({ id = "mace", spe = 4 });
 end })
 -- The treasure of High Priest
-des.object("chest", 27, 10)
+des.object("strongbox", 27, 10)
 -- knight guards for the audience chamber
 des.monster("acolyte", 32, 07)
 des.monster("acolyte", 32, 08)

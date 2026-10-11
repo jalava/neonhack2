@@ -54,18 +54,18 @@ des.door("locked",08,07)
 des.door("locked",10,07)
 des.door("closed",03,06)
 -- treasures
-des.object("chest", 07,05)
+des.object("strongbox", 07,05)
 
-des.object("chest",niches[6])
-des.object("chest",niches[1])
-des.object("chest",niches[2])
-des.object("chest",niches[3])
-des.object({ id = "chest", coord=niches[4],
+des.object("strongbox",niches[6])
+des.object("strongbox",niches[1])
+des.object("strongbox",niches[2])
+des.object("strongbox",niches[3])
+des.object({ id = "strongbox", coord=niches[4],
              contents = function()
                 des.object({ id = "wax candle", quantity=math.random(4,8) })
              end
 });
-des.object({ id = "chest", coord=niches[5],
+des.object({ id = "strongbox", coord=niches[5],
              contents = function()
                 des.object({ id = "tallow candle", quantity=math.random(4,8) })
              end

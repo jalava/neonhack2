@@ -521,7 +521,7 @@ dipfountain(struct obj *obj)
                             delobj(otmp);
                     }
                 }
-                You("lost some of your gold in the fountain!");
+                You("lost some of your credits in the fountain!");
                 CLEAR_FOUNTAIN_LOOTED(u.ux, u.uy);
                 exercise(A_WIS, FALSE);
             }

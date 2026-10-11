@@ -100,7 +100,7 @@ des.monster({ id = "Twoflower", coord = {64, 03}, inventory = function()
    des.object({ id = "hawaiian shirt", spe = 3 });
 end })
 -- The treasure of Twoflower
-des.object("chest", 64, 03)
+des.object("strongbox", 64, 03)
 -- guides for the audience chamber
 des.monster("guide", 29, 03)
 des.monster("guide", 32, 04)

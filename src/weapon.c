@@ -120,11 +120,11 @@ weapon_descr(struct obj *obj)
         break;
     case P_BOW:
         if (is_ammo(obj))
-            descr = "arrow";
+            descr = "bullet";
         break;
     case P_CROSSBOW:
         if (is_ammo(obj))
-            descr = "bolt";
+            descr = "shell";
         break;
     case P_FLAIL:
         if (obj->otyp == GRAPPLING_HOOK)

@@ -141,7 +141,7 @@ des.object(object[4],54,11)
 des.object(object[4],55,11)
 -- THE WAND OF WISHING in 1 of the 4 towers
 local loc = place:rndcoord(1);
-des.object({ id = "chest", trapped = 0, locked = 1, coord = loc ,
+des.object({ id = "strongbox", trapped = 0, locked = 1, coord = loc ,
              contents = function()
                 des.object("wishing");
                 des.object("potion of gain level");
@@ -151,7 +151,7 @@ des.object({ id = "chest", trapped = 0, locked = 1, coord = loc ,
 des.engraving({ coord = loc, type="burn", text="Elbereth" })
 des.object({ id = "scroll of scare monster", coord = loc, buc="cursed" })
 -- The treasure of the lord
-des.object("chest",37,08)
+des.object("strongbox",37,08)
 -- Traps
 des.trap("trap door",40,08)
 des.trap("trap door",44,08)

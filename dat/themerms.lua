@@ -101,7 +101,7 @@ themeroom_fills = {
    {
       name = "Trap room",
       contents = function(rm)
-         local traps = { "arrow", "dart", "falling rock", "bear",
+         local traps = { "bullet", "dart", "falling rock", "bear",
                         "land mine", "sleep gas", "rust",
                         "anti magic" };
          shuffle(traps);
@@ -133,7 +133,7 @@ themeroom_fills = {
    {
       name = "Buried treasure",
       contents = function(rm)
-         des.object({ id = "chest", buried = true, contents = function(otmp)
+         des.object({ id = "strongbox", buried = true, contents = function(otmp)
             local xobj = otmp:totable();
             -- keep track of the last buried treasure
             if (xobj.NO_OBJ == nil) then
@@ -205,7 +205,7 @@ themeroom_fills = {
       name = "Light source",
       eligible = function(rm) return rm.lit == false; end,
       contents = function(rm)
-         des.object({ id = "oil lamp", lit = true });
+         des.object({ id = "kerosene lamp", lit = true });
       end
    },
 
@@ -231,8 +231,8 @@ themeroom_fills = {
             des.object({ class = ")", coord = loc, buc = "not-blessed" });
          end
          if percent(45) then
-            des.object({ id = "bow", coord = loc, buc = "not-blessed" });
-            des.object({ id = "arrow", coord = loc, buc = "not-blessed" });
+            des.object({ id = "pistol", coord = loc, buc = "not-blessed" });
+            des.object({ id = "bullet", coord = loc, buc = "not-blessed" });
          end
          if percent(65) then
             des.object({ class = "[", coord = loc, buc = "not-blessed" });
@@ -252,7 +252,7 @@ themeroom_fills = {
          local locs = selection.room():percentage(30);
          local func = function(x,y)
             if (percent(25)) then
-               des.object("chest");
+               des.object("strongbox");
             else
                des.monster({ class = "m", appear_as = "obj:chest" });
             end
@@ -784,7 +784,7 @@ xx|.....|xx
             -- the chest isn't locked so that kicking it to gain access to its
             -- contents won't be necessary; otherwise retain lock state from
             -- random creation.
-            -- "pick-axe", "dwarvish mattock" could be included in the list of
+            -- "pick-axe", "jackhammer" could be included in the list of
             -- escape items but don't normally generate in containers.
             local escape_items = {
                "scroll of teleportation", "ring of teleportation",
@@ -795,16 +795,16 @@ xx|.....|xx
             local box
             if itmcls[ "material" ] == "glass" then
                   -- explicitly force chest to be unlocked
-                  box = des.object({ id = "chest", coord = chest_spots[1],
+                  box = des.object({ id = "strongbox", coord = chest_spots[1],
                                     olocked = "no" });
             else
                   -- accept random locked/unlocked state
-                  box = des.object({ id = "chest", coord = chest_spots[1] });
+                  box = des.object({ id = "strongbox", coord = chest_spots[1] });
             end;
             box:addcontent(itm);
 
             for i = 2, #chest_spots do
-                  des.object({ id = "chest", coord = chest_spots[i] });
+                  des.object({ id = "strongbox", coord = chest_spots[i] });
             end
 
             shuffle(nasty_undead);

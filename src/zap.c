@@ -5777,11 +5777,11 @@ item_what(int dmgtyp)
  */
 const char *const destroy_strings[][3] = {
     /* also used in trap.c */
-    { "freezes and shatters", "freeze and shatter", "shattered potion" },
-    { "boils and explodes", "boil and explode", "boiling potion" },
-    { "ignites and explodes", "ignite and explode", "exploding potion" },
-    { "catches fire and burns", "catch fire and burn", "burning scroll" },
-    { "catches fire and burns", "", "burning book" },
+    { "freezes and shatters", "freeze and shatter", "shattered vial" },
+    { "boils and explodes", "boil and explode", "boiling vial" },
+    { "ignites and explodes", "ignite and explode", "exploding vial" },
+    { "catches fire and burns", "catch fire and burn", "burning script" },
+    { "catches fire and burns", "", "burning spellchip" },
     { "turns to dust and vanishes", "", "" },
     { "breaks apart and explodes", "", "exploding wand" },
 };
@@ -6168,13 +6168,14 @@ wishcmdassist(int triesleft)
         wishinfo[] = {
   "Wish details:",
   "",
-  "Enter the name of an object, such as \"potion of monster detection\",",
-  "\"scroll labeled README\", \"elven mithril-coat\", or \"Grimtooth\"",
-  "(without the quotes).",
+  "Enter the name of an object, such as \"vial of monster detection\",",
+  "\"script labeled README\", \"synthsilk coat\", or \"Grimtooth\"",
+  "(without the quotes).  NetHack names such as \"potion of healing\"",
+  "or \"elven mithril-coat\" are understood too.",
   "",
   "For object types which come in stacks, you may specify a plural name",
-  "such as \"potions of healing\", or specify a count, such as \"1000 gold",
-  "pieces\", although that aspect of your wish might not be granted.",
+  "such as \"vials of healing\", or specify a count, such as \"1000",
+  "credits\", although that aspect of your wish might not be granted.",
   "",
   "You may also specify various prefix values which might be used to",
   "modify the item, such as \"uncursed\" or \"rustproof\" or \"+1\".",

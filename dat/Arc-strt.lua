@@ -75,7 +75,7 @@ des.monster({ id = "Lord Carnarvon", coord = {25, 10}, inventory = function()
    des.object({ id = "bullwhip", spe = 4 });
 end })
 -- The treasure of Lord Carnarvon
-des.object("chest", 25, 10)
+des.object("strongbox", 25, 10)
 -- student guards for the audience chamber
 des.monster("intern", 26, 09)
 des.monster("intern", 27, 09)

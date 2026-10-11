@@ -1193,7 +1193,7 @@ cpostfx(int pm)
         tmp += 20;
         if (gy.youmonst.data->mlet != S_MIMIC && !Unchanging) {
             char buf[BUFSZ];
-            const char *tempshape = !Hallucination ? "a pile of gold"
+            const char *tempshape = !Hallucination ? "a pile of credits"
                                                    : "an orange";
 
             if (!u.uconduct.polyselfs++) /* you're changing form */
@@ -1205,7 +1205,7 @@ cpostfx(int pm)
             if (u.usteed)
                 dismount_steed(DISMOUNT_FELL);
             nomul(-tmp);
-            gm.multi_reason = "pretending to be a pile of gold";
+            gm.multi_reason = "pretending to be a pile of credits";
             Sprintf(buf,
                     Hallucination
                        ? "You suddenly dread being peeled and mimic %s again!"
@@ -3658,9 +3658,9 @@ floorfood(
         if (uptr != &mons[PM_RUST_MONSTER]
             && (gold = g_at(u.ux, u.uy)) != 0) {
             if (gold->quan == 1L)
-                Sprintf(qbuf, "There is 1 gold piece here; eat it?");
+                Sprintf(qbuf, "There is 1 credit here; eat it?");
             else
-                Sprintf(qbuf, "There are %ld gold pieces here; eat them?",
+                Sprintf(qbuf, "There are %ld credits here; eat them?",
                         gold->quan);
             if ((c = yn_function(qbuf, ynqchars, 'n', TRUE)) == 'y') {
                 return gold;

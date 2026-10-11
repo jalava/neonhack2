@@ -397,7 +397,7 @@ doread(void)
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
                            (scroll->otyp == T_SHIRT) ? "a T-shirt"
-                           : "an apron");
+                           : "a lab coat");
 
         /* populate 'buf[]' */
         mesg = (otyp == T_SHIRT) ? tshirt_text(scroll, buf)
@@ -568,7 +568,7 @@ doread(void)
         else if (scroll->oclass == SPBOOK_CLASS)
             what = "mystic runes";
         else if (!scroll->dknown)
-            what = "formula on the scroll";
+            what = "formula on the script";
         if (what) {
             pline("Being blind, you cannot read the %s.", what);
             return ECMD_OK;
@@ -601,8 +601,8 @@ doread(void)
         && otyp != SPE_BLANK_PAPER && otyp != SCR_BLANK_PAPER)
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT, "became literate by reading %s",
-                           (scroll->oclass == SPBOOK_CLASS) ? "a book"
-                           : (scroll->oclass == SCROLL_CLASS) ? "a scroll"
+                           (scroll->oclass == SPBOOK_CLASS) ? "a spellchip"
+                           : (scroll->oclass == SCROLL_CLASS) ? "a script"
                              : something);
 
     if (scroll->oclass == SPBOOK_CLASS) {
@@ -618,12 +618,12 @@ doread(void)
                        || (otyp == SCR_REMOVE_CURSE && scroll->cursed));
         if (Blind)
             pline(nodisappear
-                      ? "You %s the formula on the scroll."
-                      : "As you %s the formula on it, the scroll disappears.",
+                      ? "You %s the formula on the script."
+                      : "As you %s the formula on it, the script disappears.",
                   silently ? "cogitate" : "pronounce");
         else
-            pline(nodisappear ? "You read the scroll."
-                              : "As you read the scroll, it disappears.");
+            pline(nodisappear ? "You read the script."
+                              : "As you read the script, it disappears.");
         if (confused) {
             if (Hallucination)
                 pline("Being so trippy, you screw up...");
@@ -1503,7 +1503,7 @@ seffect_remove_curse(struct obj **sobjp)
                 : "the power of the Force against you!"));
 
     if (scursed) {
-        pline_The("scroll disintegrates.");
+        pline_The("script disintegrates.");
     } else {
         /* 5.0: this used to use a straight
                for (obj = invent; obj; obj = obj->nobj) {}
@@ -1729,7 +1729,7 @@ seffect_genocide(struct obj **sobjp)
                              || objects[otyp].oc_name_known);
 
     if (!already_known)
-        You("have found a scroll of genocide!");
+        You("have found a script of genocide!");
     gk.known = TRUE;
     if (sblessed)
         do_class_genocide();
@@ -1813,7 +1813,7 @@ seffect_charging(struct obj **sobjp)
     }
     /* known = TRUE; -- handled inline here */
     if (!already_known) {
-        pline("This is a charging scroll.");
+        pline("This is a charging script.");
         learnscroll(sobj);
     }
     /* use it up now to prevent it from showing in the
@@ -1881,9 +1881,9 @@ seffect_fire(struct obj **sobjp)
                          makeplural(body_part(HAND)));
         } else {
             monstunseesu(M_SEEN_FIRE);
-            pline_The("scroll catches fire and you burn your %s.",
+            pline_The("script catches fire and you burn your %s.",
                       makeplural(body_part(HAND)));
-            losehp(1, "scroll of fire", KILLED_BY_AN);
+            losehp(1, "script of fire", KILLED_BY_AN);
         }
         return;
     }
@@ -1892,7 +1892,7 @@ seffect_fire(struct obj **sobjp)
     } else {
         if (sblessed) {
             if (!already_known)
-                pline("This is a scroll of fire!");
+                pline("This is a script of fire!");
             dam *= 5;
             pline("Where do you want to center the explosion?");
             getpos_sethilite(display_stinking_cloud_positions,
@@ -1905,7 +1905,7 @@ seffect_fire(struct obj **sobjp)
             }
         }
         if (u_at(cc.x, cc.y)) {
-            pline_The("scroll erupts in a tower of flame!");
+            pline_The("script erupts in a tower of flame!");
             iflags.last_msg = PLNMSG_TOWER_OF_FLAME; /* for explode() */
             burn_away_slime();
         }
@@ -1996,7 +1996,7 @@ seffect_stinking_cloud(struct obj **sobjp)
                              || objects[otyp].oc_name_known);
 
     if (!already_known)
-        You("have found a scroll of stinking cloud!");
+        You("have found a script of stinking cloud!");
     gk.known = TRUE;
     do_stinking_cloud(sobj, already_known);
 }
@@ -2005,9 +2005,9 @@ staticfn void
 seffect_blank_paper(struct obj **sobjp UNUSED)
 {
     if (Blind)
-        You("don't remember there being any magic words on this scroll.");
+        You("don't remember there being any magic words on this script.");
     else
-        pline("This scroll seems to be blank.");
+        pline("This script seems to be blank.");
     gk.known = TRUE;
 }
 
@@ -2072,9 +2072,9 @@ seffect_identify(struct obj **sobjp)
         /* scroll just identifies itself for any scroll read while confused
            or for cursed scroll read without knowing identify yet */
         if (confused || (scursed && !already_known))
-            You("identify this as an identify scroll.");
+            You("identify this as an identify script.");
         else if (!already_known)
-            pline("This is an identify scroll.");
+            pline("This is an identify script.");
         if (!already_known)
             (void) learnscrolltyp(SCR_IDENTIFY);
         if (confused || (scursed && !already_known))
@@ -2163,7 +2163,7 @@ seffect_mail(struct obj **sobjp)
     switch (sobj->spe) {
     case 2:
         /* "stamped scroll" created via magic marker--without a stamp */
-        pline("This scroll is marked \"%s\".",
+        pline("This script is marked \"%s\".",
               odd ? "Postage Due" : "Return to Sender");
         break;
     case 1:
@@ -2181,7 +2181,7 @@ seffect_mail(struct obj **sobjp)
         /* unreachable since with MAIL undefined, sobj->spe won't be 0;
            as a precaution, be prepared to give arbitrary feedback;
            caller has already reported that it disappears upon reading */
-        pline("That was a scroll of mail?");
+        pline("That was a script of mail?");
 #endif
         break;
     }
@@ -2334,7 +2334,7 @@ drop_boulder_on_player(
         newsym(u.ux, u.uy);
     }
     if (dmg)
-        losehp(Maybe_Half_Phys(dmg), "scroll of earth", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), "script of earth", KILLED_BY_AN);
 }
 
 boolean
@@ -2811,7 +2811,7 @@ do_class_genocide(void)
         }
         if (gameover || u.uhp == -1) {
             svk.killer.format = KILLED_BY_AN;
-            Strcpy(svk.killer.name, "scroll of genocide");
+            Strcpy(svk.killer.name, "script of genocide");
             if (gameover)
                 done(GENOCIDED);
         }
@@ -2976,7 +2976,7 @@ do_genocide(
                 Strcpy(svk.killer.name, "imperious order");
             } else { /* selected player deliberately, not confused */
                 svk.killer.format = KILLED_BY_AN;
-                Strcpy(svk.killer.name, "scroll of genocide");
+                Strcpy(svk.killer.name, "script of genocide");
             }
 
             /* Polymorphed characters will die as soon as they're rehumanized.
@@ -3096,7 +3096,7 @@ do_stinking_cloud(struct obj *sobj, boolean mention_stinking)
             pline("Ugh... someone cut the cheese.");
         else
             pline("%s a whiff of rotten eggs.",
-                  sobj->oclass == SCROLL_CLASS ? "The scroll crumbles with"
+                  sobj->oclass == SCROLL_CLASS ? "The script crumbles with"
                                                : "You smell");
         return;
     }

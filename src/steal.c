@@ -89,7 +89,7 @@ stealgold(struct monst *mtmp)
         /* reduce "rear hooves/claws" to "hooves/claws" */
         if (!strncmp(what, "rear ", 5))
             what += 5;
-        pline("%s quickly snatches some gold from %s %s %s!", Monnam(mtmp),
+        pline("%s quickly snatches some credits from %s %s %s!", Monnam(mtmp),
               (Levitation || Flying) ? "beneath" : "between", whose, what);
         if (!ygold || !rn2(5)) {
             if (!tele_restrict(mtmp))
@@ -391,7 +391,7 @@ steal(struct monst *mtmp, char *objnambuf)
         } else if (Blind) {
             pline("Somebody tries to rob you, but finds nothing to steal.");
         } else if (inv_cnt(TRUE) > inv_cnt(FALSE)) {
-            pline("%s tries to rob you, but isn't interested in gold.",
+            pline("%s tries to rob you, but isn't interested in credits.",
                   Monnambuf);
         } else {
             pline("%s tries to rob you, but there is nothing to steal!",

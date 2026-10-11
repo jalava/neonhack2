@@ -254,7 +254,7 @@ dosounds(void)
                     != (ROOM_INDEX(sroom) + ROOMOFFSET)) {
                     if (gold_in_vault) {
                         You_hear(!hallu
-                                     ? "someone counting gold coins."
+                                     ? "someone counting credits."
                                      : "the quarterback calling the play.");
                     } else {
                         Soundeffect(se_someone_searching, 30);
@@ -781,7 +781,7 @@ domonnoise(struct monst *mtmp)
                 Sprintf(verbuf, "How nice to hear you, child of the night!");
                 verbl_msg = verbuf;
             } else
-                verbl_msg = "I only drink... potions.";
+                verbl_msg = "I only drink... vials.";
         } else {
             static const char *const vampmsg[] = {
                 /* These first two (0 and 1) are specially handled below */
@@ -1046,7 +1046,7 @@ domonnoise(struct monst *mtmp)
                 t->tseen = 1;
             verbl_msg = "I'm trapped!";
         } else if (mtmp->mhp < mtmp->mhpmax / 2)
-            pline_msg = "asks for a potion of healing.";
+            pline_msg = "asks for a vial of healing.";
         else if (mtmp->mtame && !mtmp->isminion
                  && svm.moves > EDOG(mtmp)->hungrytime)
             verbl_msg = "I'm hungry.";

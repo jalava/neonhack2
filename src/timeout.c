@@ -1452,7 +1452,7 @@ burn_object(anything *arg, long timeout)
                 pline("%spotion of oil has burnt away.", whose);
                 break;
             case OBJ_FLOOR:
-                You_see("a burning potion of oil go out.");
+                You_see("a burning vial of oil go out.");
                 need_newsym = TRUE;
                 break;
             }

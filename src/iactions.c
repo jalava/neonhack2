@@ -93,7 +93,7 @@ item_reading_classification(struct obj *obj, char *outbuf)
     } else if (otyp == T_SHIRT) {
         Strcpy(outbuf, "Read the slogan on the shirt");
     } else if (otyp == ALCHEMY_SMOCK) {
-        Strcpy(outbuf, "Read the slogan on the apron");
+        Strcpy(outbuf, "Read the slogan on the lab coat");
     } else if (otyp == HAWAIIAN_SHIRT) {
         Strcpy(outbuf, "Look at the pattern on the shirt");
     } else if (obj->oclass == SCROLL_CLASS) {
@@ -105,7 +105,7 @@ item_reading_classification(struct obj *obj, char *outbuf)
                                   || !objects[otyp].oc_name_known))
                              ? " to activate its magic" : "");
 
-        Sprintf(outbuf, "Read this scroll%s", magic);
+        Sprintf(outbuf, "Read this script%s", magic);
     } else if (obj->oclass == SPBOOK_CLASS) {
         boolean novel = (otyp == SPE_NOVEL),
                 blank = (otyp == SPE_BLANK_PAPER
@@ -116,7 +116,7 @@ item_reading_classification(struct obj *obj, char *outbuf)
         Sprintf(outbuf, "%s this %s",
                 (novel || blank) ? "Read" : tome ? "Examine" : "Study",
                 novel ? simpleonames(obj) /* "novel" or "paperback book" */
-                      : tome ? "tome" : "spellbook");
+                      : tome ? "tome" : "spellchip");
     } else {
         res = IA_NONE;
     }
@@ -370,7 +370,7 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_APPLY_OBJ, 'a', buf);
     } else if (otmp->oclass == POTION_CLASS) {
         /* FIXME? this should probably be moved to 'D' rather than be 'a' */
-        Sprintf(buf, "Dip something into %s potion%s",
+        Sprintf(buf, "Dip something into %s vial%s",
                 is_plural(otmp) ? "one of these" : "this", plur(otmp->quan));
         ia_addmenu(win, IA_DIP_OBJ, 'a', buf);
     } else if (otmp->otyp == EXPENSIVE_CAMERA)
@@ -379,7 +379,7 @@ itemactions(struct obj *otmp)
         ia_addmenu(win, IA_APPLY_OBJ, 'a',
                    "Clean yourself off with this towel");
     else if (otmp->otyp == CRYSTAL_BALL)
-        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Peer into this crystal ball");
+        ia_addmenu(win, IA_APPLY_OBJ, 'a', "Tune in to this satellite uplink");
     else if (otmp->otyp == MAGIC_MARKER)
         ia_addmenu(win, IA_APPLY_OBJ, 'a',
                    "Write on something with this marker");
@@ -527,7 +527,7 @@ itemactions(struct obj *otmp)
     /* q: drink item */
     if (otmp->oclass == POTION_CLASS) {
         Sprintf(buf, "Quaff (drink) %s",
-                (otmp->quan > 1L) ? "one of these potions" : "this potion");
+                (otmp->quan > 1L) ? "one of these vials" : "this vial");
         ia_addmenu(win, IA_QUAFF_OBJ, 'q', buf);
     }
 

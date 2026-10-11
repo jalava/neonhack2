@@ -66,7 +66,7 @@ precheck(struct monst *mon, struct obj *obj)
 
     if (obj->oclass == POTION_CLASS) {
         coord cc;
-        static const char *const empty = "The potion turns out to be empty.";
+        static const char *const empty = "The vial turns out to be empty.";
         struct monst *mtmp;
 
         if (objdescr_is(obj, "milky")) {
@@ -276,7 +276,7 @@ mreadmsg(struct monst *mtmp, struct obj *otmp)
         }
 
         Snprintf(blindbuf, sizeof blindbuf, "reading %s", onambuf);
-        strsubst(blindbuf, "reading a scroll labeled",
+        strsubst(blindbuf, "reading a script labeled",
                  mtmp->mconf ? "attempting to incant" : "incant");
         You_hear("%s %s.",
                  x_monnam(mtmp, ARTICLE_A, (char *) 0, mflags, FALSE),
@@ -871,7 +871,7 @@ use_defensive(struct monst *mtmp)
         int obj_is_cursed;
 
         if (!otmp)
-            panic(MissingDefensiveItem, "scroll of teleportation");
+            panic(MissingDefensiveItem, "script of teleportation");
         obj_is_cursed = otmp->cursed;
         if (mtmp->isshk || mtmp->isgd || mtmp->ispriest)
             return 2;
@@ -1003,7 +1003,7 @@ use_defensive(struct monst *mtmp)
         boolean known = FALSE;
 
         if (!otmp)
-            panic(MissingDefensiveItem, "scroll of create monster");
+            panic(MissingDefensiveItem, "script of create monster");
         if (!rn2(73))
             cnt += rnd(4);
         if (mtmp->mconf || otmp->cursed)
@@ -1966,7 +1966,7 @@ use_offensive(struct monst *mtmp)
             int num;
 
             if (vis)
-                pline_The("scroll erupts in a tower of flame!");
+                pline_The("script erupts in a tower of flame!");
             shieldeff(mtmp->mx, mtmp->my);
             pline_mon(mtmp, "%s is uninjured.", Monnam(mtmp));
             (void) destroy_mitem(mtmp, SCROLL_CLASS, AD_FIRE);
@@ -1980,7 +1980,7 @@ use_offensive(struct monst *mtmp)
             if (Half_spell_damage)
                 num = (num + 1) / 2;
             else
-                losehp(num, "scroll of fire", KILLED_BY_AN);
+                losehp(num, "script of fire", KILLED_BY_AN);
             for (mtmp2 = fmon; mtmp2; mtmp2 = mtmp2->nmon) {
                 if (DEADMONSTER(mtmp2))
                     continue;
@@ -2398,7 +2398,7 @@ use_misc(struct monst *mtmp)
     switch (gm.m.has_misc) {
     case MUSE_POT_GAIN_LEVEL:
         if (!otmp)
-            panic(MissingMiscellaneousItem, "potion of gain level");
+            panic(MissingMiscellaneousItem, "vial of gain level");
         mquaffmsg(mtmp, otmp);
         if (otmp->cursed) {
             if (Can_rise_up(mtmp->mx, mtmp->my, &u.uz)) {
@@ -2441,7 +2441,7 @@ use_misc(struct monst *mtmp)
     case MUSE_WAN_MAKE_INVISIBLE:
     case MUSE_POT_INVISIBILITY:
         if (!otmp)
-            panic(MissingMiscellaneousItem, "potion of invisibility");
+            panic(MissingMiscellaneousItem, "vial of invisibility");
         if (otmp->otyp == WAN_MAKE_INVISIBLE) {
             mzapwand(mtmp, otmp, TRUE);
         } else
@@ -2487,7 +2487,7 @@ use_misc(struct monst *mtmp)
         return 2;
     case MUSE_POT_SPEED:
         if (!otmp)
-            panic(MissingMiscellaneousItem, "potion of speed");
+            panic(MissingMiscellaneousItem, "vial of speed");
         mquaffmsg(mtmp, otmp);
         /* note difference in potion effect due to substantially
            different methods of maintaining speed ratings:
@@ -2507,7 +2507,7 @@ use_misc(struct monst *mtmp)
         return 2;
     case MUSE_POT_POLYMORPH:
         if (!otmp)
-            panic(MissingMiscellaneousItem, "potion of polymorph");
+            panic(MissingMiscellaneousItem, "vial of polymorph");
         mquaffmsg(mtmp, otmp);
         m_useup(mtmp, otmp);
         if (vismon)

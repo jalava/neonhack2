@@ -179,7 +179,7 @@
     PCHAR( 70, '^',  S_polymorph_trap, "polymorph trap", CLR_BRIGHT_GREEN)
     PCHAR( 71, '~',  S_vibrating_square, "vibrating square", CLR_MAGENTA)
     PCHAR( 72, '^',  S_trapped_door, "trapped door", CLR_ORANGE)
-    PCHAR( 73, '^',  S_trapped_chest, "trapped chest", CLR_ORANGE)
+    PCHAR( 73, '^',  S_trapped_chest, "trapped strongbox", CLR_ORANGE)
     /* end traps                                                       */
     /* end cmap B */
     /*                                                                   */
@@ -470,13 +470,13 @@
     OBJCLASS( 4,  '=', RING,   S_ring, "rings", "ring")
     OBJCLASS( 5,  '"', AMULET, S_amulet, "amulets", "amulet")
     OBJCLASS( 6,  '(', TOOL,   S_tool, "tools",
-                                       "useful item (pick-axe, key, lamp...)")
+                                       "useful item (pick-axe, keycard, flashlight...)")
     OBJCLASS( 7,  '%', FOOD,   S_food, "food", "piece of food")
-    OBJCLASS( 8,  '!', POTION, S_potion, "potions", "potion")
-    OBJCLASS( 9,  '?', SCROLL, S_scroll, "scrolls", "scroll")
-    OBJCLASS(10,  '+', SPBOOK, S_book, "spellbooks", "spellbook")
+    OBJCLASS( 8,  '!', POTION, S_potion, "vials", "vial")
+    OBJCLASS( 9,  '?', SCROLL, S_scroll, "scripts", "script")
+    OBJCLASS(10,  '+', SPBOOK, S_book, "spellchips", "spellchip")
     OBJCLASS(11,  '/', WAND,   S_wand, "wands", "wand")
-    OBJCLASS2(12, '$', COIN,   GOLD_SYM, S_coin, "coins", "pile of coins")
+    OBJCLASS2(12, '$', COIN,   GOLD_SYM, S_coin, "credits", "pile of credits")
     OBJCLASS(13,  '*', GEM,    S_gem, "rocks", "gem or rock")
     OBJCLASS(14,  '`', ROCK,   S_rock, "large stones", "boulder or statue")
     OBJCLASS(15,  '0', BALL,   S_ball, "iron balls", "iron ball")

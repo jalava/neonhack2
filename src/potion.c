@@ -735,7 +735,7 @@ peffect_water(struct obj *otmp)
                     you_unwere(FALSE);
                 set_ulycn(NON_PM); /* cure lycanthropy */
             }
-            losehp(Maybe_Half_Phys(d(2, 6)), "potion of holy water",
+            losehp(Maybe_Half_Phys(d(2, 6)), "vial of holy water",
                    KILLED_BY_AN);
         } else if (otmp->cursed) {
             You_feel("quite proud of yourself.");
@@ -756,7 +756,7 @@ peffect_water(struct obj *otmp)
         } else {
             if (u.ualign.type == A_LAWFUL) {
                 pline("This burns like %s!", hliquid("acid"));
-                losehp(Maybe_Half_Phys(d(2, 6)), "potion of unholy water",
+                losehp(Maybe_Half_Phys(d(2, 6)), "vial of unholy water",
                        KILLED_BY_AN);
             } else
                 You_feel("full of dread.");
@@ -891,7 +891,7 @@ peffect_paralysis(struct obj *otmp)
             Your("%s are frozen to the %s!", makeplural(body_part(FOOT)),
                  surface(u.ux, u.uy));
         nomul(-(rn1(10, 25 - 12 * bcsign(otmp))));
-        gm.multi_reason = "frozen by a potion";
+        gm.multi_reason = "frozen by a vial";
         gn.nomovemsg = You_can_move_again;
         exercise(A_DEX, FALSE);
     }
@@ -968,7 +968,7 @@ peffect_sickness(struct obj *otmp)
         pline("(But in fact it was mildly stale %s.)", fruitname(TRUE));
         if (!Role_if(PM_HEALER)) {
             /* NB: blessed otmp->fromsink is not possible */
-            losehp(1, "mildly contaminated potion", KILLED_BY_AN);
+            losehp(1, "mildly contaminated vial", KILLED_BY_AN);
         }
     } else {
         if (Poison_resistance)
@@ -983,7 +983,7 @@ peffect_sickness(struct obj *otmp)
             Sprintf(contaminant, "%s%s",
                     (Poison_resistance) ? "mildly " : "",
                     (otmp->fromsink) ? "contaminated tap water"
-                    : "contaminated potion");
+                    : "contaminated vial");
             if (!Fixed_abil) {
                 poisontell(typ, FALSE);
                 (void) adjattrib(typ, Poison_resistance ? -1 : -rn1(4, 3),
@@ -1030,7 +1030,7 @@ staticfn void
 peffect_gain_ability(struct obj *otmp)
 {
     if (otmp->cursed) {
-        pline("Ulch!  That potion tasted foul!");
+        pline("Ulch!  That vial tasted foul!");
         gp.potion_unkn++;
     } else if (Fixed_abil) {
         gp.potion_nothing++;
@@ -1275,7 +1275,7 @@ peffect_oil(struct obj *otmp)
             /* fire damage */
             vulnerable = !Fire_resistance || Cold_resistance;
             losehp(d(vulnerable ? 4 : 2, 4),
-                   "quaffing a burning potion of oil",
+                   "quaffing a burning vial of oil",
                    KILLED_BY);
         }
         /*
@@ -1306,7 +1306,7 @@ peffect_acid(struct obj *otmp)
               otmp->blessed ? " a little" : otmp->cursed ? " a lot"
                                                          : " like acid");
         dmg = d(otmp->cursed ? 2 : 1, otmp->blessed ? 4 : 8);
-        losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+        losehp(Maybe_Half_Phys(dmg), "vial of acid", KILLED_BY_AN);
         exercise(A_CON, FALSE);
     }
     if (Stoned)
@@ -1418,7 +1418,7 @@ peffects(struct obj *otmp)
         peffect_polymorph(otmp);
         break;
     default:
-        impossible("What a funny potion! (%u)", otmp->otyp);
+        impossible("What a funny vial! (%u)", otmp->otyp);
         return 0;
     }
     return -1;
@@ -1636,8 +1636,8 @@ potionhit(struct monst *mon, struct obj *obj, int how)
         pline_The("%s crashes on your %s and breaks into shards.", botlnam,
                   body_part(HEAD));
         losehp(Maybe_Half_Phys(rnd(2)),
-               (how == POTHIT_OTHER_THROW) ? "propelled potion" /* scatter */
-                                           : "thrown potion",
+               (how == POTHIT_OTHER_THROW) ? "propelled vial" /* scatter */
+                                           : "thrown vial",
                KILLED_BY_AN);
     } else {
         tx = mon->mx, ty = mon->my;
@@ -1699,7 +1699,7 @@ potionhit(struct monst *mon, struct obj *obj, int how)
                       obj->blessed ? " a little"
                                    : obj->cursed ? " a lot" : "");
                 dmg = d(obj->cursed ? 2 : 1, obj->blessed ? 4 : 8);
-                losehp(Maybe_Half_Phys(dmg), "potion of acid", KILLED_BY_AN);
+                losehp(Maybe_Half_Phys(dmg), "vial of acid", KILLED_BY_AN);
             }
             break;
         }
@@ -1951,7 +1951,7 @@ potionbreathe(struct obj *obj)
     case POT_GAIN_ABILITY:
         if (obj->cursed) {
             if (!breathless(gy.youmonst.data)) {
-                pline("Ulch!  That potion smells terrible!");
+                pline("Ulch!  That vial smells terrible!");
             } else if (haseyes(gy.youmonst.data)) {
                 const char *eyes = body_part(EYE);
 
@@ -2043,7 +2043,7 @@ potionbreathe(struct obj *obj)
         if (!Free_action) {
             pline("%s seems to be holding you.", Something);
             nomul(-rnd(5));
-            gm.multi_reason = "frozen by a potion";
+            gm.multi_reason = "frozen by a vial";
             gn.nomovemsg = You_can_move_again;
             exercise(A_DEX, FALSE);
         } else
@@ -2382,7 +2382,7 @@ dip_into(void)
     char qbuf[QBUFSZ];
 
     if (!cmdq_peek(CQ_CANNED)) {
-        impossible("dip_into: where is potion?");
+        impossible("dip_into: where is vial?");
         return ECMD_FAIL;
     }
     /* note: drink_ok() callback for quaffing is also used to validate
@@ -2446,7 +2446,7 @@ potion_dip(struct obj *obj, struct obj *potion)
     short mixture;
 
     if (potion == obj && potion->quan == 1L) {
-        pline("That is a potion bottle, not a Klein bottle!");
+        pline("That is a vial bottle, not a Klein bottle!");
         return ECMD_OK;
     }
     if (obj == &hands_obj) {
@@ -2648,7 +2648,7 @@ potion_dip(struct obj *obj, struct obj *potion)
         if (potion->lamplit) { /* burning */
             fire_damage(obj, TRUE, u.ux, u.uy);
         } else if (potion->cursed) {
-            pline_The("potion spills and covers your %s with oil.",
+            pline_The("vial spills and covers your %s with oil.",
                       fingers_or_gloves(TRUE));
             make_glib((int) (Glib & TIMEOUT) + d(2, 10));
         } else if (obj->oclass != WEAPON_CLASS && !is_weptool(obj)) {

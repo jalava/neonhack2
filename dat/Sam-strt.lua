@@ -59,11 +59,11 @@ des.door("closed",50,04)
 des.door("closed",50,06)
 -- Lord Sato
 des.monster({ id = "Lord Sato", coord = {20, 04}, inventory = function()
-   des.object({ id = "splint mail", spe = 5, eroded=-1, buc="not-cursed" });
+   des.object({ id = "ballistic armor", spe = 5, eroded=-1, buc="not-cursed" });
    des.object({ id = "katana", spe = 4, eroded=-1, buc="not-cursed" });
 end })
 -- The treasure of Lord Sato
-des.object("chest", 20, 04)
+des.object("strongbox", 20, 04)
 -- roshi guards for the audience chamber
 des.monster("roshi", 18, 04)
 des.monster("roshi", 18, 05)

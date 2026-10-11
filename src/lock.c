@@ -122,7 +122,7 @@ picklock(void)
             } else {
                 gx.xlock.box->otrapped = 0;
                 gx.xlock.box->tknown = 0;
-                what = (gx.xlock.box->otyp == CHEST) ? "chest" : "box";
+                what = (gx.xlock.box->otyp == CHEST) ? "strongbox" : "box";
                 alreadyunlocked = !gx.xlock.box->olocked;
             }
             You("succeed in disarming the trap.  The %s is still %slocked.",

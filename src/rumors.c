@@ -671,7 +671,7 @@ outoracle(boolean special, boolean delphi)
         if (delphi)
             putstr(tmpwin, 0,
                    special
-                     ? "The Oracle scornfully takes all your gold and says:"
+                     ? "The Oracle scornfully takes all your credits and says:"
                      : "The Oracle meditates for a moment and then intones:");
         else
             putstr(tmpwin, 0, "The message reads:");
@@ -710,7 +710,7 @@ doconsult(struct monst *oracl)
         pline("%s is in no mood for consultations.", Monnam(oracl));
         return ECMD_OK;
     } else if (!umoney) {
-        You("have no gold.");
+        You("have no credits.");
         return ECMD_OK;
     }
 

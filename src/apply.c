@@ -1712,7 +1712,7 @@ light_cocktail(struct obj **optr)
     }
 
     if (obj->lamplit) {
-        You("snuff the lit potion.");
+        You("snuff the lit vial.");
         end_burn(obj, TRUE);
         /*
          * Free & add to re-merge potion.  This will average the
@@ -1747,7 +1747,7 @@ light_cocktail(struct obj **optr)
          */
         check_unpaid(obj);
         SetVoice(shkp, 0, 80, 0);
-        verbalize("That's in addition to the cost of the potion, of course.");
+        verbalize("That's in addition to the cost of the vial, of course.");
         bill_dummy_object(obj);
     }
     makeknown(obj->otyp);
@@ -4472,12 +4472,22 @@ unfixable_trouble_count(boolean is_horn)
 staticfn int
 flip_through_book(struct obj *obj)
 {
+    /* NeonHack: ordinary spellchips are data media, not books */
+    boolean chip = (obj->otyp != SPE_BOOK_OF_THE_DEAD
+                    && obj->otyp != SPE_NOVEL);
+
     if (Underwater) {
-        You("don't want to get the pages even more soggy, do you?");
+        if (chip)
+            You("don't want to short out the contacts, do you?");
+        else
+            You("don't want to get the pages even more soggy, do you?");
         return ECMD_OK;
     }
 
-    You("flip through the pages of %s.", thesimpleoname(obj));
+    if (chip)
+        You("scroll through the code on %s.", thesimpleoname(obj));
+    else
+        You("flip through the pages of %s.", thesimpleoname(obj));
 
     if (obj->otyp == SPE_BOOK_OF_THE_DEAD) {
         if (!Deaf) {
@@ -4493,11 +4503,15 @@ flip_through_book(struct obj *obj)
             You_feel("the pages tremble.");
         }
     } else if (Blind) {
-        pline("The pages feel %s.",
-              Hallucination ? "freshly picked"
-                            : "rough and dry");
+        if (chip)
+            pline_The("chip feels %s.",
+                      Hallucination ? "freshly picked" : "smooth and cool");
+        else
+            pline("The pages feel %s.",
+                  Hallucination ? "freshly picked"
+                                : "rough and dry");
     } else if (obj->otyp == SPE_BLANK_PAPER) {
-        pline("This spellbook %s.",
+        pline("This spellchip %s.",
               Hallucination ? "doesn't have much of a plot"
                             : "has nothing written in it");
         makeknown(obj->otyp);
@@ -4508,14 +4522,14 @@ flip_through_book(struct obj *obj)
     } else {
         static const char *const fadeness[] = {
             "fresh",
-            "slightly faded",
-            "very faded",
-            "extremely faded",
-            "barely visible"
+            "slightly degraded",
+            "very degraded",
+            "extremely degraded",
+            "barely readable"
         };
         int findx = min(obj->spestudied, MAX_SPELL_STUDY);
 
-        pline("The%s ink in this spellbook is %s.",
+        pline("The%s data on this spellchip is %s.",
               objects[obj->otyp].oc_magic ? " magical" : "",
               fadeness[findx]);
     }

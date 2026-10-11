@@ -64,10 +64,10 @@ des.door("closed",45,12)
 -- King Arthur
 des.monster({ id = "Commissioner Arthur", coord = {09, 07}, inventory = function()
    des.object({ id = "long sword", spe = 4, buc = "blessed", name = "Excalibur" });
-   des.object({ id = "plate mail", spe = 4 });
+   des.object({ id = "riot plate", spe = 4 });
 end })
 -- The treasure of King Arthur
-des.object("chest", 09, 07)
+des.object("strongbox", 09, 07)
 -- knight guards for the watchrooms
 des.monster({ id = "marshal", x=04, y=02, peaceful = 1 })
 des.monster({ id = "marshal", x=04, y=13, peaceful = 1 })

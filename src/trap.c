@@ -4675,7 +4675,7 @@ pot_acid_damage(
             or "...your <color> potion." (or just "...your potion.");
             don't re-describe potion here; if we used "It explodes!"
             then "it" might be misconstrued as applying to "grease" */
-        pline_The("potion%s %s!",
+        pline_The("vial%s %s!",
                     plur(obj->quan), otense(obj, "explode"));
     } else {
         /* First message is

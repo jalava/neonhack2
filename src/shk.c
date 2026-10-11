@@ -1030,7 +1030,7 @@ shopper_financial_report(void)
             if ((amt = shop_debt(eshkp)) != 0)
                 You("owe %s %ld %s.", shkname(shkp), amt, currency(amt));
             else if (shkp == this_shkp)
-                You("don't owe any gold here.");
+                You("don't owe any credits here.");
         }
 }
 
@@ -1489,7 +1489,7 @@ make_angry_shk(
 }
 
 static const char
-        no_money[] = "Moreover, you%s have no gold.",
+        no_money[] = "Moreover, you%s have no credits.",
         not_enough_money[] = "Besides, you don't have enough to interest %s.";
 
 /* if one item is used-up and the other isn't, the used-up one comes first;
@@ -1714,7 +1714,7 @@ menu_pick_pay_items(
         amt = ibill[i].cost;
         /* this doesn't support hallucinatory currency because shopkeeper
            isn't hallucinating; also, that would mess up the alignment */
-        Snprintf(buf, sizeof buf, "%*ld Zm, %s", amt_width, amt, p);
+        Snprintf(buf, sizeof buf, "%*ld cr, %s", amt_width, amt, p);
         any.a_int = i + 1; /* +1: avoid 0 */
         add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, buf,
                  MENU_ITEMFLAGS_NONE);
@@ -1871,16 +1871,16 @@ dopay(void)
         if (!ltmp) {
             You("do not owe %s anything.", shkname(shkp));
         } else if (!umoney) {
-            You("%shave no gold.", stashed_gold ? "seem to " : "");
+            You("%shave no credits.", stashed_gold ? "seem to " : "");
             if (stashed_gold)
-                pline("But you have some gold stashed away.");
+                pline("But you have some credits stashed away.");
         } else {
             if (umoney > ltmp) {
-                You("give %s the %ld gold piece%s %s asked for.",
+                You("give %s the %ld credit%s %s asked for.",
                     shkname(shkp), ltmp, plur(ltmp), noit_mhe(shkp));
                 pay(ltmp, shkp);
             } else {
-                You("give %s all your%s gold.", shkname(shkp),
+                You("give %s all your%s credits.", shkname(shkp),
                     stashed_gold ? " openly kept" : "");
                 pay(umoney, shkp);
                 if (stashed_gold)
@@ -1921,7 +1921,7 @@ dopay(void)
         } else {
             /* shopkeeper is angry, but has not been robbed --
              * door broken, attacked, etc. */
-            pline("%s is after your hide, not your gold!", Shknam(shkp));
+            pline("%s is after your hide, not your credits!", Shknam(shkp));
             if (umoney < 1000L) {
                 if (!umoney)
                     pline(no_money, stashed_gold ? " seem to" : "");
@@ -1929,7 +1929,7 @@ dopay(void)
                     pline(not_enough_money, noit_mhim(shkp));
                 return ECMD_TIME;
             }
-            You("try to appease %s by giving %s 1000 gold pieces.",
+            You("try to appease %s by giving %s 1000 credits.",
                 canspotmon(shkp)
                     ? x_monnam(shkp, ARTICLE_THE, "angry", 0, FALSE)
                     : shkname(shkp),
@@ -2059,7 +2059,7 @@ pay_billed_items(
 
     umoney = money_cnt(gi.invent);
     if (!umoney && !eshkp->credit) {
-        You("%shave no gold or credit%s.",
+        You("%shave no credits or store credit%s.",
             stashed_gold ? "seem to " : "", *paid_p ? " left" : "");
         return TRUE;
     }
@@ -2075,7 +2075,7 @@ pay_billed_items(
             more_than_one ? " any of" : "", plur(more_than_one ? 2 : 1),
             (ebillct > 1) ? "you've picked" : "on your bill");
         if (stashed_gold)
-            pline("Maybe you have some gold stashed away?");
+            pline("Maybe you have some credits stashed away?");
         return TRUE;
     }
 
@@ -2289,8 +2289,8 @@ dopayobj(
         if (!unseen)
             shk_names_obj(shkp, obj,
                           consumed
-                              ? "paid for %s at a cost of %ld gold piece%s.%s"
-                              : "bought %s for %ld gold piece%s.%s",
+                              ? "paid for %s at a cost of %ld credit%s.%s"
+                              : "bought %s for %ld credit%s.%s",
                           ltmp, "");
     }
 
@@ -2402,7 +2402,7 @@ buy_container(
         if (unpaidcontainer)
             container->unpaid = container->no_charge = 1;
         shk_names_obj(shkp, container,
-                      "bought %s for %ld gold piece%s.%s",
+                      "bought %s for %ld credit%s.%s",
                       totalcost, "");
         container->unpaid = container->no_charge = 0;
     }
@@ -2465,7 +2465,7 @@ insufficient_funds(
        buy_container() checks for both early but uses separate calls to us */
     if (!cost && umoney + ecredit == 0L) {
         stashed_gold = hidden_gold(TRUE);
-        You("%shave no gold or credit left.",
+        You("%shave no credits or store credit left.",
             (stashed_gold > 0) ? "seem to " : "");
         return TRUE;
     }
@@ -4067,8 +4067,8 @@ sellobj(
         if (c == 'y') {
             shk_names_obj(shkp, obj,
                           ((gs.sell_how != SELL_NORMAL)
-                           ? "traded %s for %ld zorkmid%s in %scredit."
-                    : "relinquish %s and acquire %ld zorkmid%s in %scredit."),
+                           ? "traded %s for %ld credit%s in %sstore credit."
+               : "relinquish %s and acquire %ld credit%s in %sstore credit."),
                           tmpcr, (eshkp->credit > 0L) ? "additional " : "");
             eshkp->credit += tmpcr;
             if (container)
@@ -4134,7 +4134,7 @@ sellobj(
                when container's contents are unknown, plural "items"
                should be used to not give away information.
              */
-            Sprintf(qbuf, "%s offers%s %ld gold piece%s for %s%s ",
+            Sprintf(qbuf, "%s offers%s %ld credit%s for %s%s ",
                     Shknam(shkp), short_funds ? " only" : "", offer,
                     plur(offer),
                     (cltmp && !ltmp)
@@ -4182,9 +4182,9 @@ sellobj(
             shk_names_obj(shkp, obj,
                           (gs.sell_how != SELL_NORMAL)
                            ? ((!ltmp && cltmp && only_partially_your_contents)
-                         ? "sold some items inside %s for %ld gold piece%s.%s"
-                         : "sold %s for %ld gold piece%s.%s")
-            : "relinquish %s and receive %ld gold piece%s in compensation.%s",
+                         ? "sold some items inside %s for %ld credit%s.%s"
+                         : "sold %s for %ld credit%s.%s")
+            : "relinquish %s and receive %ld credit%s in compensation.%s",
                           offer, "");
             break;
         default:

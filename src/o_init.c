@@ -667,11 +667,11 @@ disco_typename(int otyp)
         const char *actualn = (((otyp != MAGIC_HARP && otyp != WOODEN_HARP)
                                 || objects[otyp].oc_name_known)
                                ? OBJ_NAME(objects[otyp])
-                               /* undiscovered harp (since wooden harp is
-                                  non-magic so pre-discovered, only applies
-                                  to magic harp and will only be seen if
-                                  magic harp has been 'called' something) */
-                               : "harp");
+                               /* undiscovered keytar (since plastic keytar
+                                  is non-magic so pre-discovered, only applies
+                                  to magic keytar and will only be seen if
+                                  magic keytar has been 'called' something) */
+                               : "keytar");
 
         if (!actualn) { /* won't happen; used to pacify static analyzer */
             ;
@@ -733,7 +733,7 @@ disco_fmt_uniq(int uidx, char *outbuf)
        in the unique/relics section we want "papyrus spellbook" instead */
     if (!objects[uidx].oc_name_known
         && objects[uidx].oc_class == SPBOOK_CLASS)
-        Strcat(outbuf, " spellbook");
+        Strcat(outbuf, " spellchip");
 }
 
 /* sort and output sorted_lines to window and free the lines */

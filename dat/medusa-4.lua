@@ -78,7 +78,7 @@ des.levregion({ region = {27,00,79,20}, type="branch" });
 --
 des.non_diggable(selection.area(01,01,22,14));
 --
-des.object("crystal ball", 07,08)
+des.object("satellite uplink", 07,08)
 --
 -- same spot as Medusa plus downstairs
 des.object({ id="statue", coord=medloc, buc="uncursed",
@@ -88,7 +88,7 @@ des.object({ id="statue", coord=medloc, buc="uncursed",
                             des.object({ id = "shield of reflection", buc="cursed", spe=0 })
                          end
                          if percent(25) then
-                            des.object({ id = "levitation boots", spe=0 })
+                            des.object({ id = "antigrav boots", spe=0 })
                          end
                          if percent(50) then
                             des.object({ id = "scimitar", buc="blessed", spe=2 })

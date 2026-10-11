@@ -62,11 +62,11 @@ des.door("locked",19,10)
 des.door("locked",20,10)
 -- Neferet the Green, the quest leader
 des.monster({ id = "Neferet the Green", coord = {23, 05}, inventory = function()
-   des.object({ id = "elven cloak", spe = 5 });
+   des.object({ id = "stealth cloak", spe = 5 });
    des.object({ id = "quarterstaff", spe = 5 });
 end })
 -- The treasure of the quest leader
-des.object("chest", 24, 05)
+des.object("strongbox", 24, 05)
 -- apprentice guards for the audience chamber
 des.monster("apprentice", 30, 07)
 des.monster("apprentice", 24, 06)

@@ -565,7 +565,7 @@ invault(void)
                               gi.invent ? "r stuff" : "");
                 } else {
                    SetVoice(guard, 0, 80, 0);
-                   verbalize("You have hidden gold.");
+                   verbalize("You have hidden credits.");
                 }
             }
             if (Deaf) {
@@ -577,7 +577,7 @@ invault(void)
             } else {
                 SetVoice(guard, 0, 80, 0);
                 verbalize(
-                    "Most likely all your gold was stolen from this vault.");
+                    "Most likely all your credits were stolen from this vault.");
                 SetVoice(guard, 0, 80, 0);
                 verbalize("Please drop that gold and follow me.");
             }
@@ -724,7 +724,7 @@ wallify_vault(struct monst *grd)
         else
             You_hear("a distant chant.");
         if (movedgold)
-            pline("A mysterious force moves the gold into the vault.");
+            pline("A mysterious force moves the credits into the vault.");
         if (fixed)
             pline_The("damaged vault's walls are magically restored!");
     }
@@ -814,7 +814,7 @@ gd_pick_corridor_gold(struct monst *grd, int goldx, int goldy)
     }
 
     if (see_it) { /* cansee(goldx, goldy) */
-        pline("%s%s picks up the gold%s.", Some_Monnam(grd),
+        pline("%s%s picks up the credits%s.", Some_Monnam(grd),
               (grd->mpeaceful && EGD(grd)->warncnt > 5)
                  ? " calms down and" : "",
               under_u ? " from beneath you" : "");
@@ -1029,7 +1029,7 @@ gd_move(struct monst *grd)
                               noit_Monnam(grd), noit_mhis(grd));
                 } else {
                     SetVoice(grd, 0, 80, 0);
-                    verbalize("Drop all your gold, scoundrel!");
+                    verbalize("Drop all your credits, scoundrel!");
                 }
                 return 0;
             } else {
@@ -1193,7 +1193,7 @@ gd_move(struct monst *grd)
            it and give an inappropriate message */
         mpickgold(grd);
         if (canspotmon(grd))
-            pline("%s picks up some gold.", Monnam(grd));
+            pline("%s picks up some credits.", Monnam(grd));
     } else
         newsym(grd->mx, grd->my);
     restfakecorr(grd);
@@ -1225,10 +1225,10 @@ paygd(boolean silently)
 
         mnexto(grd, RLOC_NOMSG);
         if (!silently)
-            pline("%s remits your gold to the vault.", Monnam(grd));
+            pline("%s remits your credits to the vault.", Monnam(grd));
         gdx = svr.rooms[EGD(grd)->vroom].lx + rn2(2);
         gdy = svr.rooms[EGD(grd)->vroom].ly + rn2(2);
-        Sprintf(buf, "To Croesus: here's the gold recovered from %s the %s.",
+        Sprintf(buf, "To Croesus: here are the credits recovered from %s the %s.",
                 svp.plname,
                 pmname(&mons[u.umonster], flags.female ? FEMALE : MALE));
         make_grave(gdx, gdy, buf);

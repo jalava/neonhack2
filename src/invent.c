@@ -1044,7 +1044,7 @@ addinv_core2(struct obj *obj)
            scrolls */
         if (!u.uconduct.literate++)
             livelog_printf(LL_CONDUCT,
-                           "became literate by deciphering a scroll label");
+                           "became literate by deciphering a script label");
     }
 }
 
@@ -1540,6 +1540,9 @@ static const char *const currencies[] = {
     "Triganic Pu",           /* The Hitchhiker's Guide to the Galaxy */
     "woolong",               /* Cowboy Bebop */
     "zorkmid",               /* Zork, NetHack */
+    "eurodollar",            /* cyberpunk staple */
+    "nuyen",                 /* cyberpunk staple */
+    "dogecoin",              /* the internet */
 };
 
 const char *
@@ -1547,7 +1550,7 @@ currency(long amount)
 {
     const char *res;
 
-    res = Hallucination ? ROLL_FROM(currencies) : "zorkmid";
+    res = Hallucination ? ROLL_FROM(currencies) : "credit";
     if (amount != 1L)
         res = makeplural(res);
     return res;
@@ -2009,7 +2012,7 @@ getobj(
                than one invent slot of gold and picking the non-'$' one */
             || (otmp && otmp->oclass == COIN_CLASS)) {
             if (otmp && obj_ok(otmp) <= GETOBJ_EXCLUDE) {
-                You("cannot %s gold.", word);
+                You("cannot %s credits.", word);
                 return (struct obj *) 0;
             }
             /*
@@ -4788,7 +4791,7 @@ useupf(struct obj *obj, long numused)
  */
 static NEARDATA const char *names[] = {
     0, "Illegal objects", "Weapons", "Armor", "Rings", "Amulets", "Tools",
-    "Comestibles", "Potions", "Scrolls", "Spellbooks", "Wands", "Coins",
+    "Comestibles", "Vials", "Scripts", "Spellchips", "Wands", "Credits",
     "Gems/Stones", "Boulders/Statues", "Iron balls", "Chains", "Venoms"
 };
 static NEARDATA const char oth_symbols[] = { CONTAINED_SYM, '\0' };
@@ -5161,7 +5164,7 @@ doorganize_core(struct obj *obj)
                 pline1(Never_mind);
             return ECMD_OK;
         } else if (let == GOLD_SYM && obj->oclass != COIN_CLASS) {
-            pline("Only gold coins may be moved into the '%c' slot.",
+            pline("Only credits may be moved into the '%c' slot.",
                   GOLD_SYM);
             ever_mind = TRUE;
             goto noadjust;

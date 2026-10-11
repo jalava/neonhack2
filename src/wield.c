@@ -553,7 +553,7 @@ doquiver_core(const char *verb) /* "ready" or "fire" */
             goto already_quivered;
         } else if (newquiver->oclass == COIN_CLASS) {
             /* don't allow splitting a stack of coins into quiver */
-            You("can't ready only part of your gold.");
+            You("can't ready only part of your credits.");
             unsplitobj(newquiver);
             return ECMD_OK;
         }

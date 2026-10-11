@@ -108,8 +108,6 @@ static const struct Jitem Japanese_items[] = {
     { FLAIL, "nunchaku" },
     { GLAIVE, "naginata" },
     { LOCK_PICK, "osaku" },
-    { WOODEN_HARP, "koto" },
-    { MAGIC_HARP, "magic koto" },
     { KNIFE, "shito" },
     { PLATE_MAIL, "tanko" },
     { HELMET, "kabuto" },
@@ -207,11 +205,8 @@ obj_typename(int otyp)
     const char *un = ocl->oc_uname;
     int nn = ocl->oc_name_known;
 
-    if (Role_if(PM_SAMURAI)) {
+    if (Role_if(PM_SAMURAI))
         actualn = Japanese_item_name(otyp, actualn);
-        if (otyp == WOODEN_HARP || otyp == MAGIC_HARP)
-            dn = "koto";
-    }
     /* generic items don't have an actual-name; we shouldn't ever be called
        for those; pacify static analyzer without resorting to impossible() */
     if (!actualn)
@@ -220,19 +215,19 @@ obj_typename(int otyp)
     buf[0] = '\0'; /* redundant */
     switch (ocl->oc_class) {
     case COIN_CLASS:
-        return strcpy(buf, actualn); /* "gold piece" */
+        return strcpy(buf, actualn); /* "credit" */
     case POTION_CLASS:
-        Strcpy(buf, "potion");
+        Strcpy(buf, "vial");
         break;
     case SCROLL_CLASS:
-        Strcpy(buf, "scroll");
+        Strcpy(buf, "script");
         break;
     case WAND_CLASS:
         Strcpy(buf, "wand");
         break;
     case SPBOOK_CLASS:
         if (otyp != SPE_NOVEL) {
-            Strcpy(buf, "spellbook");
+            Strcpy(buf, "spellchip");
         } else {
             Strcpy(buf, !nn ? "book" : "novel");
             nn = 0;
@@ -833,7 +828,7 @@ xname_flags(
         if (dknown && obj->odiluted)
             Strcpy(buf, "diluted ");
         if (nn || un || !dknown) {
-            Strcat(buf, "potion");
+            Strcat(buf, "vial");
             if (!dknown)
                 break;
             if (nn) {
@@ -848,11 +843,11 @@ xname_flags(
             }
         } else {
             Strcat(buf, dn);
-            Strcat(buf, " potion");
+            Strcat(buf, " vial");
         }
         break;
     case SCROLL_CLASS:
-        Strcpy(buf, "scroll");
+        Strcpy(buf, "script");
         if (!dknown)
             break;
         if (nn) {
@@ -865,7 +860,7 @@ xname_flags(
             Strcat(buf, dn);
         } else {
             Strcpy(buf, dn);
-            Strcat(buf, " scroll");
+            Strcat(buf, " script");
         }
         break;
     case WAND_CLASS:
@@ -891,15 +886,15 @@ xname_flags(
             break;
             /* end of tribute */
         } else if (!dknown) {
-            Strcpy(buf, "spellbook");
+            Strcpy(buf, "spellchip");
         } else if (nn) {
             if (typ != SPE_BOOK_OF_THE_DEAD)
-                Strcpy(buf, "spellbook of ");
+                Strcpy(buf, "spellchip of ");
             Strcat(buf, actualn);
         } else if (un) {
-            xcalled(buf, BUFSZ - PREFIX, "spellbook", un);
+            xcalled(buf, BUFSZ - PREFIX, "spellchip", un);
         } else
-            Sprintf(buf, "%s spellbook", dn);
+            Sprintf(buf, "%s spellchip", dn);
         break;
     case RING_CLASS:
         if (!dknown)
@@ -2517,12 +2512,16 @@ bare_artifactname(struct obj *obj)
 static const char *const wrp[] = {
     "wand",   "ring",      "potion",     "scroll", "gem",
     "amulet", "spellbook", "spell book",
+    /* NeonHack class nouns */
+    "vial",   "script",    "spellchip",  "spell chip",
     /* for non-specific wishes */
     "weapon", "armor",     "tool",       "food",   "comestible",
 };
 static const char wrpsym[] = { WAND_CLASS,   RING_CLASS,   POTION_CLASS,
                                SCROLL_CLASS, GEM_CLASS,    AMULET_CLASS,
-                               SPBOOK_CLASS, SPBOOK_CLASS, WEAPON_CLASS,
+                               SPBOOK_CLASS, SPBOOK_CLASS,
+                               POTION_CLASS, SCROLL_CLASS, SPBOOK_CLASS,
+                               SPBOOK_CLASS, WEAPON_CLASS,
                                ARMOR_CLASS,  TOOL_CLASS,   FOOD_CLASS,
                                FOOD_CLASS };
 
@@ -3425,6 +3424,84 @@ static const struct alt_spellings {
     { "load stone", LOADSTONE },
     { "touch stone", TOUCHSTONE },
     { "flintstone", FLINT },
+    /* NeonHack: NetHack names of renamed objects */
+    { "arrow", ARROW },
+    { "elven arrow", ELVEN_ARROW },
+    { "orcish arrow", ORCISH_ARROW },
+    { "silver arrow", SILVER_ARROW },
+    { "ya", YA },
+    { "crossbow bolt", CROSSBOW_BOLT },
+    { "elven spear", ELVEN_SPEAR },
+    { "orcish spear", ORCISH_SPEAR },
+    { "dwarvish spear", DWARVISH_SPEAR },
+    { "elven dagger", ELVEN_DAGGER },
+    { "orcish dagger", ORCISH_DAGGER },
+    { "axe", AXE },
+    { "elven short sword", ELVEN_SHORT_SWORD },
+    { "orcish short sword", ORCISH_SHORT_SWORD },
+    { "dwarvish short sword", DWARVISH_SHORT_SWORD },
+    { "elven broadsword", ELVEN_BROADSWORD },
+    { "two-handed sword", TWO_HANDED_SWORD },
+    { "dwarvish mattock", DWARVISH_MATTOCK },
+    { "war hammer", WAR_HAMMER },
+    { "club", CLUB },
+    { "flail", FLAIL },
+    { "bow", BOW },
+    { "elven bow", ELVEN_BOW },
+    { "orcish bow", ORCISH_BOW },
+    { "yumi", YUMI },
+    { "crossbow", CROSSBOW },
+    { "elven leather helm", ELVEN_LEATHER_HELM },
+    { "orcish helm", ORCISH_HELM },
+    { "dwarvish iron helm", DWARVISH_IRON_HELM },
+    { "cornuthaum", CORNUTHAUM },
+    { "helmet", HELMET },
+    { "plate mail", PLATE_MAIL },
+    { "crystal plate mail", CRYSTAL_PLATE_MAIL },
+    { "bronze plate mail", BRONZE_PLATE_MAIL },
+    { "splint mail", SPLINT_MAIL },
+    { "banded mail", BANDED_MAIL },
+    { "dwarvish mithril-coat", DWARVISH_MITHRIL_COAT },
+    { "elven mithril-coat", ELVEN_MITHRIL_COAT },
+    { "chain mail", CHAIN_MAIL },
+    { "orcish chain mail", ORCISH_CHAIN_MAIL },
+    { "scale mail", SCALE_MAIL },
+    { "ring mail", RING_MAIL },
+    { "orcish ring mail", ORCISH_RING_MAIL },
+    { "elven cloak", ELVEN_CLOAK },
+    { "orcish cloak", ORCISH_CLOAK },
+    { "dwarvish cloak", DWARVISH_CLOAK },
+    { "oilskin cloak", OILSKIN_CLOAK },
+    { "alchemy smock", ALCHEMY_SMOCK },
+    { "leather cloak", LEATHER_CLOAK },
+    { "cloak of protection", CLOAK_OF_PROTECTION },
+    { "cloak of invisibility", CLOAK_OF_INVISIBILITY },
+    { "cloak of magic resistance", CLOAK_OF_MAGIC_RESISTANCE },
+    { "cloak of displacement", CLOAK_OF_DISPLACEMENT },
+    { "elven shield", ELVEN_SHIELD },
+    { "Uruk-hai shield", URUK_HAI_SHIELD },
+    { "orcish shield", ORCISH_SHIELD },
+    { "large shield", LARGE_SHIELD },
+    { "dwarvish roundshield", DWARVISH_ROUNDSHIELD },
+    { "low boots", LOW_BOOTS },
+    { "iron shoes", IRON_SHOES },
+    { "elven boots", ELVEN_BOOTS },
+    { "levitation boots", LEVITATION_BOOTS },
+    { "chest", CHEST },
+    { "ice box", ICE_BOX },
+    { "oilskin sack", OILSKIN_SACK },
+    { "skeleton key", SKELETON_KEY },
+    { "brass lantern", BRASS_LANTERN },
+    { "oil lamp", OIL_LAMP },
+    { "crystal ball", CRYSTAL_BALL },
+    { "tooled horn", TOOLED_HORN },
+    { "wooden harp", WOODEN_HARP },
+    { "magic harp", MAGIC_HARP },
+    { "leather drum", LEATHER_DRUM },
+    { "drum of earthquake", DRUM_OF_EARTHQUAKE },
+    { "lembas wafer", LEMBAS_WAFER },
+    { "cram ration", CRAM_RATION },
+    { "gold piece", GOLD_PIECE },
     { (const char *) 0, 0 },
 };
 
@@ -3531,7 +3608,8 @@ rnd_otyp_by_namedesc(
 int
 shiny_obj(char oclass)
 {
-    return (int) rnd_otyp_by_namedesc("shiny", oclass, 0);
+    /* NeonHack: the "shiny" ring of NetHack is the "LED" ring */
+    return (int) rnd_otyp_by_namedesc("LED", oclass, 0);
 }
 
 /* set wall under hero undiggable/unphaseable from string */
@@ -4376,6 +4454,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
          * (or the alternate spelling of those, "gloves of ...").
          */
         if (!strstri(d->bp, "wand ") && !strstri(d->bp, "spellbook ")
+            && !strstri(d->bp, "spellchip ")
             && !strstri(d->bp, "gauntlets ") && !strstri(d->bp, "gloves ")
             && !strstri(d->bp, "finger ")) {
             if ((d->p = strstri(d->bp, "tin of ")) != 0) {
@@ -4511,11 +4590,13 @@ readobjnam_postparse1(struct _readobjnam_data *d)
             return 3;
         }
     }
-    if (d->unlabeled && !BSTRCMPI(d->bp, d->p - 6, "scroll")) {
+    if (d->unlabeled && (!BSTRCMPI(d->bp, d->p - 6, "scroll")
+                         || !BSTRCMPI(d->bp, d->p - 6, "script"))) {
         d->typ = SCR_BLANK_PAPER;
         return 2; /*goto typfnd;*/
     }
-    if (d->unlabeled && !BSTRCMPI(d->bp, d->p - 9, "spellbook")) {
+    if (d->unlabeled && (!BSTRCMPI(d->bp, d->p - 9, "spellbook")
+                         || !BSTRCMPI(d->bp, d->p - 9, "spellchip"))) {
         d->typ = SPE_BLANK_PAPER;
         return 2; /*goto typfnd;*/
     }
@@ -4531,6 +4612,7 @@ readobjnam_postparse1(struct _readobjnam_data *d)
      * well in the future. (TH)
      */
     if (!BSTRCMPI(d->bp, d->p - 10, "gold piece")
+        || !BSTRCMPI(d->bp, d->p - 6, "credit") /* NeonHack's coin name */
         || !BSTRCMPI(d->bp, d->p - 7, "zorkmid")
         || !strcmpi(d->bp, "gold") || !strcmpi(d->bp, "money")
         || !strcmpi(d->bp, "coin") || *d->bp == GOLD_SYM) {
@@ -5480,9 +5562,15 @@ suit_simple_name(struct obj *suit)
         suitnm = OBJ_NAME(objects[suit->otyp]);
         esuitp = eos((char *) suitnm);
         if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " mail"))
-            return "mail"; /* most suits fall into this category */
+            return "mail"; /* dragon mails fall into this category */
         else if (strlen(suitnm) > 7 && !strcmp(esuitp - 7, " jacket"))
             return "jacket"; /* leather jacket */
+        else if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " vest"))
+            return "vest"; /* plated vest, chainlink vest */
+        else if (strlen(suitnm) > 5 && !strcmp(esuitp - 5, " coat"))
+            return "coat"; /* synthsilk coat, titanium mesh coat */
+        else if (strlen(suitnm) > 6 && !strcmp(esuitp - 6, " plate"))
+            return "plate"; /* riot plate, smartglass plate */
     }
     /* "suit" is lame but "armor" is ambiguous and "body armor" is absurd */
     return "suit";
@@ -5499,8 +5587,17 @@ cloak_simple_name(struct obj *cloak)
             return "wrapping";
         case ALCHEMY_SMOCK:
             return (objects[cloak->otyp].oc_name_known && cloak->dknown)
-                       ? "smock"
-                       : "apron";
+                       ? "lab coat"
+                       : "coat";
+        /* NeonHack: most "cloaks" are coats of some kind */
+        case LEATHER_CLOAK:
+        case CLOAK_OF_PROTECTION:
+        case OILSKIN_CLOAK:
+            return "coat";
+        case DWARVISH_CLOAK:
+            return "hoodie";
+        case ORCISH_CLOAK:
+            return "poncho";
         default:
             break;
         }

@@ -2266,7 +2266,7 @@ doseduce(struct monst *mon)
         pline("%s demands that you pay %s, but you refuse...",
               noit_Monnam(mon), noit_mhim(mon));
     } else if (u.umonnum == PM_LEPRECHAUN) {
-        pline_mon(mon, "%s tries to take your gold, but fails...",
+        pline_mon(mon, "%s tries to take your credits, but fails...",
                   noit_Monnam(mon));
     } else {
         long cost;

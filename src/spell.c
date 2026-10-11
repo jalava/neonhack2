@@ -149,11 +149,11 @@ cursed_book(struct obj *bp)
         take_gold();
         break;
     case 4:
-        pline("These runes were just too much to comprehend.");
+        pline("This code was just too much to comprehend.");
         make_confused(HConfusion + rn1(7, 16), FALSE);
         break;
     case 5:
-        pline_The("book was coated with contact poison!");
+        pline_The("chip's casing was coated with contact poison!");
         if (uarmg) {
             erode_obj(uarmg, "gloves", ERODE_CORRODE, EF_GREASE | EF_VERBOSE);
             break;
@@ -163,18 +163,18 @@ cursed_book(struct obj *bp)
         bp->in_use = FALSE;
         poison_strdmg(Poison_resistance ? rn1(2, 1) : rn1(4, 3),
                       rnd(Poison_resistance ? 6 : 10),
-                      "contact-poisoned spellbook", KILLED_BY_AN);
+                      "contact-poisoned spellchip", KILLED_BY_AN);
         bp->in_use = was_in_use;
         break;
     case 6:
         if (Antimagic) {
             shieldeff(u.ux, u.uy);
-            pline_The("book %s, but you are unharmed!", explodes);
+            pline_The("chip %s, but you are unharmed!", explodes);
         } else {
-            pline("As you read the book, it %s in your %s!", explodes,
+            pline("As you slot the chip, it %s in your %s!", explodes,
                   body_part(FACE));
             dmg = 2 * rnd(10) + 5;
-            losehp(Maybe_Half_Phys(dmg), "exploding rune", KILLED_BY_AN);
+            losehp(Maybe_Half_Phys(dmg), "exploding spellchip", KILLED_BY_AN);
         }
         return TRUE;
     default:
@@ -195,7 +195,7 @@ confused_book(struct obj *spellbook)
         pline(
          "Being confused you have difficulties in controlling your actions.");
         display_nhwindow(WIN_MESSAGE, FALSE);
-        You("accidentally tear the spellbook to pieces.");
+        You("accidentally tear the spellchip to pieces.");
         trycall(spellbook);
         useup(spellbook);
         gone = TRUE;
@@ -370,7 +370,7 @@ learn(void)
         svc.context.spbook.book = 0; /* no longer studying */
         svc.context.spbook.o_id = 0;
         nomul(svc.context.spbook.delay); /* remaining delay is uninterrupted */
-        gm.multi_reason = "reading a book";
+        gm.multi_reason = "installing a spellchip";
         gn.nomovemsg = 0;
         svc.context.spbook.delay = 0;
         return 0;
@@ -399,7 +399,7 @@ learn(void)
     } else if (spellid(i) == booktype) {
         /* normal book can be read and re-read a total of 4 times */
         if (book->spestudied > MAX_SPELL_STUDY) {
-            pline("This spellbook is too faint to be read any more.");
+            pline("The data on this spellchip is too degraded to be read any more.");
             book->otyp = booktype = SPE_BLANK_PAPER;
             faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
@@ -417,7 +417,7 @@ learn(void)
            one less reading is available than when re-learning */
         if (book->spestudied >= MAX_SPELL_STUDY) {
             /* pre-used due to being the product of polymorph */
-            pline("This spellbook is too faint to read even once.");
+            pline("The data on this spellchip is too degraded to read even once.");
             book->otyp = booktype = SPE_BLANK_PAPER;
             faded_to_blank = TRUE;
             /* reset spestudied as if polymorph had taken place */
@@ -485,7 +485,7 @@ study_book(struct obj *spellbook)
             eyes = body_part(EYE);
             if (eyecount(gy.youmonst.data) > 1)
                 eyes = makeplural(eyes);
-            pline("This book is so dull that you can't keep your %s open.",
+            pline("This code is so dull that you can't keep your %s open.",
                   eyes);
             dullbook += rnd(2 * objects[booktype].oc_level);
             fall_asleep(-dullbook, TRUE);
@@ -500,11 +500,11 @@ study_book(struct obj *spellbook)
         && booktype != SPE_BLANK_PAPER) {
         You("continue your efforts to %s.",
             (booktype == SPE_NOVEL) ? "read the novel"
-                                    : "memorize the spell");
+                                    : "install the spell");
     } else {
         /* KMH -- Simplified this code */
         if (booktype == SPE_BLANK_PAPER) {
-            pline("This spellbook is all blank.");
+            pline("This spellchip is all blank.");
             makeknown(booktype);
             return 1;
         }
@@ -553,7 +553,7 @@ study_book(struct obj *spellbook)
             svc.context.spbook.delay = -8 * objects[booktype].oc_delay;
             break;
         default:
-            impossible("Unknown spellbook level %d, book %d;",
+            impossible("Unknown spellchip level %d, book %d;",
                        objects[booktype].oc_level, booktype);
             return 0;
         }
@@ -588,7 +588,7 @@ study_book(struct obj *spellbook)
                     char qbuf[QBUFSZ];
 
                     Sprintf(qbuf,
-                    "This spellbook is %sdifficult to comprehend.  Continue?",
+                    "This spellchip is %sdifficult to comprehend.  Continue?",
                             (read_ability < 12 ? "very " : ""));
                     if (y_n(qbuf) != 'y') {
                         spellbook->in_use = FALSE;
@@ -606,12 +606,12 @@ study_book(struct obj *spellbook)
             boolean gone = cursed_book(spellbook);
 
             nomul(svc.context.spbook.delay); /* study time */
-            gm.multi_reason = "reading a book";
+            gm.multi_reason = "installing a spellchip";
             gn.nomovemsg = 0;
             svc.context.spbook.delay = 0;
             if (gone || !rn2(3)) {
                 if (!gone)
-                    pline_The("spellbook crumbles to dust!");
+                    pline_The("spellchip crumbles to dust!");
                 trycall(spellbook);
                 useup(spellbook);
             } else
@@ -622,21 +622,23 @@ study_book(struct obj *spellbook)
                 spellbook->in_use = FALSE;
             }
             nomul(svc.context.spbook.delay);
-            gm.multi_reason = "reading a book";
+            gm.multi_reason = "installing a spellchip";
             gn.nomovemsg = 0;
             svc.context.spbook.delay = 0;
             return 1;
         }
         spellbook->in_use = FALSE;
 
-        You("begin to %s the runes.",
-            spellbook->otyp == SPE_BOOK_OF_THE_DEAD ? "recite" : "memorize");
+        if (spellbook->otyp == SPE_BOOK_OF_THE_DEAD)
+            You("begin to recite the runes.");
+        else
+            You("slot the spellchip and begin to install it.");
     }
 
     svc.context.spbook.book = spellbook;
     if (svc.context.spbook.book)
         svc.context.spbook.o_id = svc.context.spbook.book->o_id;
-    set_occupation(learn, "studying", 0);
+    set_occupation(learn, "installing", 0);
     return 1;
 }
 
@@ -1722,7 +1724,7 @@ tport_spell(int what)
         if (spellid(i) == SPE_TELEPORT_AWAY || spellid(i) == NO_SPELL)
             break;
     if (i == MAXSPELL) {
-        impossible("tport_spell: spellbook full");
+        impossible("tport_spell: spellchip full");
         /* wizard mode ^T is not able to honor player's menu choice */
     } else if (spellid(i) == NO_SPELL) {
         if (what == HIDE_SPELL || what == REMOVESPELL) {

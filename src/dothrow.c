@@ -216,7 +216,7 @@ throw_obj(struct obj *obj, int shotlimit)
             /* when launcher is own quest artifact, give extra +1 with any
                type of ammo appropriate for that launcher (compensates for
                elven and orcish rangers loss of bonus for use of racial bow
-               plus racial arrows if they switch to the Longbow of Diana) */
+               plus racial arrows if they switch to the Peacemaker of Diana) */
             if (uwep && is_quest_artifact(uwep)
                 && ammo_and_launcher(obj, uwep))
                 ++multishot;

@@ -3484,6 +3484,10 @@ find_objtype(lua_State *L, const char *s, char oclass)
             { "potion of ", POTION_CLASS },
             { "scroll of ", SCROLL_CLASS },
             { "spellbook of ", SPBOOK_CLASS },
+            /* NeonHack class nouns */
+            { "vial of ", POTION_CLASS },
+            { "script of ", SCROLL_CLASS },
+            { "spellchip of ", SPBOOK_CLASS },
             { "wand of ", WAND_CLASS },
             { NULL, 0 }
         };

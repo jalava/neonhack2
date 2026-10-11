@@ -109,7 +109,7 @@ des.monster({ id = "Master of Thieves", coord = {36, 11}, inventory = function()
    des.object({ id = "dagger", spe = 2, quantity = d(2,4), buc = "not-cursed" });
 end })
 -- The treasure of Master of Thieves
-des.object("chest", 36, 11)
+des.object("strongbox", 36, 11)
 -- thug guards, room #1
 des.monster("thug", 28, 10)
 des.monster("thug", 29, 11)

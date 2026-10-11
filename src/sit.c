@@ -27,7 +27,7 @@ take_gold(void)
     if (!lost_money) {
         You_feel("a strange sensation.");
     } else {
-        You("notice you have no gold!");
+        You("notice you have no credits!");
         disp.botl = TRUE;
     }
 }
