@@ -65,8 +65,8 @@ des.monster("hunter", 21, 11)
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,40,20))
 -- Traps
-des.trap("bullet",30,09)
-des.trap("bullet",30,10)
+des.trap("arrow",30,09)
+des.trap("arrow",30,10)
 des.trap("pit",40,09)
 des.trap("spiked pit")
 des.trap("bear")

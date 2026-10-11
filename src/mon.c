@@ -1192,8 +1192,10 @@ m_calcdistress(struct monst *mtmp)
     /* regenerate hit points */
     mon_regen(mtmp, FALSE);
 
-    /* possibly polymorph shapechangers and lycanthropes */
-    if (ismnum(mtmp->cham))
+    /* possibly polymorph shapechangers and lycanthropes;
+       [NeonHack: not while off the map, e.g. during a level regeneration
+       by the fuzzer, since newcham() would update the display at <0,0>] */
+    if (ismnum(mtmp->cham) && mtmp->mx)
         decide_to_shapeshift(mtmp);
     were_change(mtmp);
 

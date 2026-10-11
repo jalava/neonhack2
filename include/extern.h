@@ -2105,6 +2105,7 @@ extern void cyber_turn(void);
 extern void cyber_enlightenment(void (*)(const char *));
 extern int use_cyberdeck(struct obj *) NONNULLARG1;
 extern int dohack(void);
+extern int alt_spelling_otyp(const char *);
 extern void heat_add(int);
 extern void heat_turn(void);
 extern void heat_enlightenment(void (*)(const char *));

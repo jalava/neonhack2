@@ -3505,6 +3505,19 @@ static const struct alt_spellings {
     { (const char *) 0, 0 },
 };
 
+/* NeonHack: object type for an alternate (e.g. NetHack) spelling of an
+   object name, or STRANGE_OBJECT; used by the special level loader */
+int
+alt_spelling_otyp(const char *name)
+{
+    const struct alt_spellings *as;
+
+    for (as = spellings; as->sp; as++)
+        if (!strcmpi(as->sp, name))
+            return as->ob;
+    return STRANGE_OBJECT;
+}
+
 staticfn short
 rnd_otyp_by_wpnskill(schar skill)
 {

@@ -101,7 +101,7 @@ themeroom_fills = {
    {
       name = "Trap room",
       contents = function(rm)
-         local traps = { "bullet", "dart", "falling rock", "bear",
+         local traps = { "arrow", "dart", "falling rock", "bear",
                         "land mine", "sleep gas", "rust",
                         "anti magic" };
          shuffle(traps);
@@ -254,7 +254,7 @@ themeroom_fills = {
             if (percent(25)) then
                des.object("strongbox");
             else
-               des.monster({ class = "m", appear_as = "obj:chest" });
+               des.monster({ class = "m", appear_as = "obj:strongbox" });
             end
          end;
          locs:iterate(func);

@@ -1,0 +1,48 @@
+#!/bin/bash
+# fuzz - run NetHack's built-in fuzzer on the playground build.
+#
+#   tools/fuzz SECONDS [ROLE] [SESSION]
+#
+# Starts a debug-mode game with --debug:fuzzer in a detached tmux
+# session (impossible() becomes a panic), lets it run, then reports
+# whether the game is still alive plus any new paniclog entries.
+top=$(cd "$(dirname "$0")/.." && pwd)
+play="$top/playground"
+secs=${1:-60}
+role=${2:-random}
+S=${3:-nhfuzz}
+home=$(mktemp -d /tmp/nhfuzz.XXXXXX)
+# every debug-mode game is named "wizard", so give each run its own copy
+# of the playground; that lets several fuzzers run at once
+pg="$home/playground"
+mkdir -p "$pg/save"
+cp "$play/nhdat" "$play/symbols" "$play/license" "$play/neonhack" "$pg/"
+touch "$pg/perm" "$pg/record" "$pg/logfile" "$pg/xlogfile" "$pg/livelog"
+log="$pg/paniclog"
+touch "$log"
+before=0
+tmux kill-session -t "$S" 2>/dev/null
+while tmux has-session -t "$S" 2>/dev/null; do sleep 0.05; done
+opts="role:$role,race:random,gender:random,align:random,!legacy,!tutorial,time,suppress_alert:5.0.0,!splash_screen"
+tmux new-session -d -s "$S" -x 80 -y 24 \
+    "cd '$pg' && HOME='$home' NETHACKDIR='$pg' TERM=xterm-256color NETHACKOPTIONS='$opts' ./neonhack -D --debug:fuzzer 2>"$home/stderr"; echo \"[game exited \$?]\"; sleep 3600"
+sleep 1; for k in 1 2 3; do tmux send-keys -t "$S" Enter; sleep 0.3; done
+end=$((SECONDS + secs)); alive=yes; prev=""
+while [ $SECONDS -lt $end ]; do
+    sleep 1
+    cur=$(tmux capture-pane -t "$S" -p)
+    if echo "$cur" | grep -q "game exited"; then alive=no; break; fi
+    prev=$cur
+done
+pane=$(tmux capture-pane -t "$S" -p)
+tmux kill-session -t "$S" 2>/dev/null
+after=$(wc -l < "$log")
+echo "role=$role alive=$alive ran=${secs}s paniclog:+$((after - before)) lines"
+[ "$after" -gt "$before" ] && tail -n $((after - before)) "$log"
+if [ "$alive" = no ]; then
+    echo "--- screen before exit ---"; echo "$prev"
+    echo "--- last screen ---"; echo "$pane"
+fi
+cp "$log" "/tmp/fuzz-paniclog-$S" 2>/dev/null
+[ -s "$home/stderr" ] && { echo "--- stderr ---"; tail -n 20 "$home/stderr"; }
+rm -rf "$home"

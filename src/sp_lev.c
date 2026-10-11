@@ -2031,6 +2031,10 @@ create_monster(monster *m, struct mkroom *croom)
                     if (OBJ_NAME(objects[i])
                         && !strcmp(OBJ_NAME(objects[i]), m->appear_as.str))
                         break;
+                /* NeonHack: NetHack's names for renamed objects */
+                if (i == NUM_OBJECTS
+                    && alt_spelling_otyp(m->appear_as.str) != STRANGE_OBJECT)
+                    i = alt_spelling_otyp(m->appear_as.str);
                 if (i == NUM_OBJECTS) {
                     impossible("create_monster: can't find object \"%s\"",
                                m->appear_as.str);
@@ -3533,6 +3537,11 @@ find_objtype(lua_State *L, const char *s, char oclass)
             if (objname && !strcmpi(s, objname))
                 return i;
         }
+
+        /* NeonHack: NetHack's names for renamed objects */
+        if ((i = alt_spelling_otyp(s)) != STRANGE_OBJECT
+            && (!class || class == objects[i].oc_class))
+            return i;
 
         nhl_error(L, "Unknown object id");
     }

@@ -112,8 +112,15 @@ def lua_apply(prs):
     for path in sorted(glob.glob(os.path.join(TOP, "dat", "*.lua"))):
         s = open(path).read()
         orig = s
-        for o, n in names:
-            s = s.replace('"%s"' % o, '"%s"' % n)
+        lines = s.split("\n")
+        for i, line in enumerate(lines):
+            # trap types share some words with objects ("arrow")
+            if "trap" in line:
+                continue
+            for o, n in names:
+                line = line.replace('"%s"' % o, '"%s"' % n)
+            lines[i] = line
+        s = "\n".join(lines)
         if s != orig:
             open(path, "w").write(s)
             changed[os.path.basename(path)] = sum(orig.count('"%s"' % o)
