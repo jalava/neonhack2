@@ -114,8 +114,8 @@ des.monster("guide", 57, 03)
 des.monster("guide", 62, 04)
 des.monster("guide", 66, 04)
 -- path guards
-des.monster("watchman", 35, 08)
-des.monster("watchman", 36, 08)
+des.monster("security guard", 35, 08)
+des.monster("security guard", 36, 08)
 -- river monsters
 des.monster("giant eel", 62, 12)
 des.monster("piranha", 47, 10)

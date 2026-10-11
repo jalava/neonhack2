@@ -53,7 +53,7 @@ des.non_diggable(selection.area(01,02,06,17))
 des.non_diggable(selection.area(60,02,73,17))
 -- Objects
 des.object({ id = "statue", x=68,y=10,buc="uncursed",
-                      montype="knight", historic=1, male=1,name="Perseus",
+                      montype="marshal", historic=1, male=1,name="Perseus",
                       contents = function()
                          if percent(25) then
                             des.object({ id = "shield of reflection", buc="cursed", spe=0 })
@@ -105,10 +105,10 @@ des.monster("electric eel",11,15)
 des.monster("jellyfish",01,01)
 des.monster("jellyfish",00,08)
 des.monster("jellyfish",04,19)
-des.monster({ id = "stone golem",x=64,y=08,asleep=1 })
-des.monster({ id = "stone golem",x=65,y=08,asleep=1 })
-des.monster({ id = "stone golem",x=64,y=09,asleep=1 })
-des.monster({ id = "stone golem",x=65,y=09,asleep=1 })
+des.monster({ id = "construction mech",x=64,y=08,asleep=1 })
+des.monster({ id = "construction mech",x=65,y=08,asleep=1 })
+des.monster({ id = "construction mech",x=64,y=09,asleep=1 })
+des.monster({ id = "construction mech",x=65,y=09,asleep=1 })
 des.monster({ id = "cobra",x=64,y=10,asleep=1 })
 des.monster({ id = "cobra",x=65,y=10,asleep=1 })
 des.monster("A",72,08)

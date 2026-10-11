@@ -145,21 +145,21 @@ des.trap()
 -- Monsters to get in the way.
 --
 -- West exit
-des.monster({ id = "leprechaun", x=01, y=12, peaceful=0 })
-des.monster({ id = "water nymph", x=02, y=12, peaceful=0 })
+des.monster({ id = "debt collector", x=01, y=12, peaceful=0 })
+des.monster({ id = "pickpocket", x=02, y=12, peaceful=0 })
 -- North exit
-des.monster({ id = "water nymph", x=33, y=01, peaceful=0 })
-des.monster({ id = "leprechaun", x=33, y=02, peaceful=0 })
+des.monster({ id = "pickpocket", x=33, y=01, peaceful=0 })
+des.monster({ id = "debt collector", x=33, y=02, peaceful=0 })
 -- East exit
-des.monster({ id = "water nymph", x=74, y=05, peaceful=0 })
-des.monster({ id = "leprechaun", x=74, y=04, peaceful=0 })
+des.monster({ id = "pickpocket", x=74, y=05, peaceful=0 })
+des.monster({ id = "debt collector", x=74, y=04, peaceful=0 })
 -- South exit
-des.monster({ id = "leprechaun", x=25, y=19, peaceful=0 })
-des.monster({ id = "water nymph", x=25, y=18, peaceful=0 })
+des.monster({ id = "debt collector", x=25, y=19, peaceful=0 })
+des.monster({ id = "pickpocket", x=25, y=18, peaceful=0 })
 -- Wandering the streets.
 for i = 1, math.random(4,7) do
-   des.monster({ id = "water nymph", coord = streets:rndcoord(1), peaceful=0 })
-   des.monster({ id = "leprechaun", coord = streets:rndcoord(1), peaceful=0 })
+   des.monster({ id = "pickpocket", coord = streets:rndcoord(1), peaceful=0 })
+   des.monster({ id = "debt collector", coord = streets:rndcoord(1), peaceful=0 })
 end
 for i = 1, math.random(7,10) do
    des.monster({ id = "chameleon", coord = streets:rndcoord(1), peaceful=0 })

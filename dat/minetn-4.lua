@@ -28,8 +28,8 @@ des.room({ type = "ordinary", lit=1, x=3,y=3,
                          contents = function()
                             des.door({ state = "closed", wall="south" })
                             des.altar({ x=2,y=1,align=align[1], type="shrine" })
-                            des.monster("gnomish wizard")
-                            des.monster("gnomish wizard")
+                            des.monster("scav techie")
+                            des.monster("scav techie")
                          end
               })
 
@@ -62,8 +62,8 @@ des.room({ type = "ordinary", lit=1, x=3,y=3,
               des.room({ type = "ordinary", x=8, y=11, w=2, h=2,
                          contents = function()
                             des.door({ state = "locked", wall="south" })
-                            des.monster("kobold shaman")
-                            des.monster("kobold shaman")
+                            des.monster("ratkin shaman")
+                            des.monster("ratkin shaman")
                             des.monster("kitten")
                             des.monster("f")
                          end
@@ -94,11 +94,11 @@ des.room({ type = "ordinary", lit=1, x=3,y=3,
                          end
               })
 
-              des.monster({ id = "watchman", peaceful = 1 })
-              des.monster({ id = "watchman", peaceful = 1 })
-              des.monster({ id = "watchman", peaceful = 1 })
-              des.monster({ id = "watchman", peaceful = 1 })
-              des.monster({ id = "watch captain", peaceful = 1 })
+              des.monster({ id = "security guard", peaceful = 1 })
+              des.monster({ id = "security guard", peaceful = 1 })
+              des.monster({ id = "security guard", peaceful = 1 })
+              des.monster({ id = "security guard", peaceful = 1 })
+              des.monster({ id = "security chief", peaceful = 1 })
            end
 })
 
@@ -112,21 +112,21 @@ des.room({ type = "ordinary",
            contents = function()
               des.stair("down")
               des.trap()
-              des.monster("gnome")
-              des.monster("gnome")
+              des.monster("scav")
+              des.monster("scav")
            end
 })
 
 des.room({ type = "ordinary",
            contents = function()
-              des.monster("dwarf")
+              des.monster("cyborg")
            end
 })
 
 des.room({ type = "ordinary",
            contents = function()
               des.trap()
-              des.monster("gnome")
+              des.monster("scav")
            end
 })
 

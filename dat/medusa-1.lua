@@ -58,7 +58,7 @@ des.levregion({ region = {01,00,79,20}, exclude = {30,06,46,13}, type = "branch"
 des.non_diggable(selection.area(30,06,46,13))
 -- Objects
 des.object({ id = "statue", x=36,y=10, buc="uncursed",
-             montype="knight", historic=1, male = 1, name="Perseus",
+             montype="marshal", historic=1, male = 1, name="Perseus",
              contents = function()
                 if percent(75) then
                    des.object({ id = "shield of reflection", buc="cursed", spe=0 })

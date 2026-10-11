@@ -54,7 +54,7 @@ des.levregion({ region = {0,0,75,19}, exclude = {65,13,75,19}, type="portal", na
 --  Some helpful monsters.  Making sure a
 --  pick axe and at least one wand of digging
 --  are available.
-des.monster("Elvenking", 67,16)
+des.monster("Synth King", 67,16)
 des.monster("minotaur", 67,14)
 --  An assortment of earth-appropriate nasties
 --  in each cavern.
@@ -66,7 +66,7 @@ des.monster("stone giant", 54,12)
 des.monster("pit viper", 70,05)
 des.monster("barbed devil", 69,06)
 des.monster("stone giant", 69,08)
-des.monster("stone golem", 71,08)
+des.monster("construction mech", 71,08)
 des.monster("pit fiend", 70,09)
 des.monster({ id = "earth elemental", x = 70, y = 08, peaceful = 0 })
 --
@@ -85,14 +85,14 @@ des.monster({ id = "earth elemental", x = 41, y = 06, peaceful = 0 })
 des.monster({ id = "earth elemental", x = 38, y = 07, peaceful = 0 })
 des.monster("stone giant", 39,07)
 des.monster({ id = "earth elemental", x = 43, y = 07, peaceful = 0 })
-des.monster("stone golem", 37,08)
+des.monster("construction mech", 37,08)
 des.monster("pit viper", 43,08)
 des.monster("pit viper", 43,09)
 des.monster("rock troll", 44,10)
 --
 des.monster({ id = "earth elemental", x = 02, y = 01, peaceful = 0 })
 des.monster({ id = "earth elemental", x = 03, y = 01, peaceful = 0 })
-des.monster("stone golem", 01,02)
+des.monster("construction mech", 01,02)
 des.monster({ id = "earth elemental", x = 02, y = 02, peaceful = 0 })
 des.monster("rock troll", 04,03)
 des.monster("rock troll", 03,03)
@@ -115,7 +115,7 @@ des.monster("rock troll", 12,11)
 des.monster({ id = "earth elemental", x = 14, y = 12, peaceful = 0 })
 des.monster({ id = "earth elemental", x = 15, y = 13, peaceful = 0 })
 des.monster("stone giant", 17,13)
-des.monster("stone golem", 18,13)
+des.monster("construction mech", 18,13)
 des.monster("pit fiend", 18,12)
 des.monster({ id = "earth elemental", x = 18, y = 11, peaceful = 0 })
 des.monster({ id = "earth elemental", x = 18, y = 10, peaceful = 0 })

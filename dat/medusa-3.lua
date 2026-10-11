@@ -80,7 +80,7 @@ des.feature("fountain", othloc);
 --
 -- same spot as Medusa plus downstairs
 des.object({ id="statue", coord=medloc, buc="uncursed",
-                      montype="knight", historic=1, male=1,name="Perseus",
+                      montype="marshal", historic=1, male=1,name="Perseus",
                       contents = function()
                          if percent(75) then
                             des.object({ id = "shield of reflection", buc="cursed", spe=0 })
@@ -126,10 +126,10 @@ des.monster("giant eel")
 des.monster("giant eel")
 des.monster("jellyfish")
 des.monster("jellyfish")
-des.monster("wood nymph")
-des.monster("wood nymph")
-des.monster("water nymph")
-des.monster("water nymph")
+des.monster("grifter")
+des.monster("grifter")
+des.monster("pickpocket")
+des.monster("pickpocket")
 
 for i=1,30 do
    des.monster({ id = "raven", peaceful = 0 })

@@ -34,11 +34,11 @@ if percent(75) then
 end
 --
 for i = 1,math.random(6, 8) do
-   des.monster("gnome")
+   des.monster("scav")
 end
-des.monster("gnome lord")
-des.monster("dwarf")
-des.monster("dwarf")
+des.monster("scav boss")
+des.monster("cyborg")
+des.monster("cyborg")
 des.monster("G")
 des.monster("G")
 des.monster(percent(50) and "h" or "G")

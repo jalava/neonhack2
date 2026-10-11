@@ -62,24 +62,24 @@ des.door("closed",45,03)
 des.door("closed",04,12)
 des.door("closed",45,12)
 -- King Arthur
-des.monster({ id = "King Arthur", coord = {09, 07}, inventory = function()
+des.monster({ id = "Commissioner Arthur", coord = {09, 07}, inventory = function()
    des.object({ id = "long sword", spe = 4, buc = "blessed", name = "Excalibur" });
    des.object({ id = "plate mail", spe = 4 });
 end })
 -- The treasure of King Arthur
 des.object("chest", 09, 07)
 -- knight guards for the watchrooms
-des.monster({ id = "knight", x=04, y=02, peaceful = 1 })
-des.monster({ id = "knight", x=04, y=13, peaceful = 1 })
-des.monster({ id = "knight", x=45, y=02, peaceful = 1 })
-des.monster({ id = "knight", x=45, y=13, peaceful = 1 })
+des.monster({ id = "marshal", x=04, y=02, peaceful = 1 })
+des.monster({ id = "marshal", x=04, y=13, peaceful = 1 })
+des.monster({ id = "marshal", x=45, y=02, peaceful = 1 })
+des.monster({ id = "marshal", x=45, y=13, peaceful = 1 })
 -- page guards for the audience chamber
-des.monster("page", 16, 06)
-des.monster("page", 18, 06)
-des.monster("page", 20, 06)
-des.monster("page", 16, 09)
-des.monster("page", 18, 09)
-des.monster("page", 20, 09)
+des.monster("cadet", 16, 06)
+des.monster("cadet", 18, 06)
+des.monster("cadet", 20, 06)
+des.monster("cadet", 16, 09)
+des.monster("cadet", 18, 09)
+des.monster("cadet", 20, 09)
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,49,15))
 -- Random traps

@@ -63,7 +63,7 @@ themeroom_fills = {
       contents = function(rm)
          local fog = selection.room();
          for i = 1, (fog:numpoints() / 4) do
-            des.monster({ id = "fog cloud", asleep = true });
+            des.monster({ id = "smog cloud", asleep = true });
          end
          des.gas_cloud({ selection = fog });
       end,
@@ -120,7 +120,7 @@ themeroom_fills = {
          local s = selection.room();
          local npts = (s:numpoints() / 6);
          for i = 1, npts do
-            des.monster({ id = "wood nymph", asleep = true });
+            des.monster({ id = "grifter", asleep = true });
             if (percent(30)) then
                des.feature("fountain");
             end
@@ -152,9 +152,9 @@ themeroom_fills = {
       contents = function(rm)
          local diff = nh.level_difficulty()
          -- start with [1..4] for low difficulty
-         local zombifiable = { "kobold", "gnome", "orc", "dwarf" };
+         local zombifiable = { "ratkin", "scav", "mutant", "cyborg" };
          if diff > 3 then          -- medium difficulty
-            zombifiable[5], zombifiable[6] = "elf", "human";
+            zombifiable[5], zombifiable[6] = "synth", "human";
             if diff > 6 then       -- high difficulty (relatively speaking)
                zombifiable[7], zombifiable[8] = "ettin", "giant";
             end
@@ -173,13 +173,13 @@ themeroom_fills = {
       name = "Massacre",
       contents = function(rm)
          local mon = { "apprentice", "warrior", "ninja", "thug",
-                     "hunter", "acolyte", "abbot", "page",
-                     "attendant", "neanderthal", "chieftain",
-                     "student", "wizard", "valkyrie", "tourist",
-                     "samurai", "rogue", "ranger", "priestess",
-                     "priest", "monk", "knight", "healer",
-                     "cavewoman", "caveman", "barbarian",
-                     "archeologist" };
+                     "hunter", "acolyte", "abbot", "cadet",
+                     "orderly", "feral elder", "clan rider",
+                     "intern", "netrunner", "valkyrie", "tourist",
+                     "ronin", "infiltrator", "gunslinger", "techpriestess",
+                     "techpriest", "monk", "marshal", "ripperdoc",
+                     "feral", "feral", "nomad",
+                     "salvager" };
          local idx = math.random(#mon);
          for i = 1, d(5,5) do
             if (percent(10)) then idx = math.random(#mon); end

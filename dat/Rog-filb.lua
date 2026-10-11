@@ -7,7 +7,7 @@ des.room({ type = "ordinary",
            contents = function()
               des.stair("up")
               des.object()
-              des.monster({ id = "leprechaun", peaceful=0 })
+              des.monster({ id = "debt collector", peaceful=0 })
            end
 })
 
@@ -15,7 +15,7 @@ des.room({ type = "ordinary",
            contents = function()
               des.object()
               des.object()
-              des.monster({ id = "leprechaun", peaceful=0 })
+              des.monster({ id = "debt collector", peaceful=0 })
               des.monster({ id = "guardian naga", peaceful=0 })
            end
 })
@@ -26,7 +26,7 @@ des.room({ type = "ordinary",
               des.trap()
               des.trap()
               des.object()
-              des.monster({ id = "water nymph", peaceful=0 })
+              des.monster({ id = "pickpocket", peaceful=0 })
            end
 })
 
@@ -47,7 +47,7 @@ des.room({ type = "ordinary",
               des.object()
               des.trap()
               des.trap()
-              des.monster({ id = "leprechaun", peaceful=0 })
+              des.monster({ id = "debt collector", peaceful=0 })
            end
 })
 
@@ -56,8 +56,8 @@ des.room({ type = "ordinary",
               des.object()
               des.trap()
               des.trap()
-              des.monster({ id = "leprechaun", peaceful=0 })
-              des.monster({ id = "water nymph", peaceful=0 })
+              des.monster({ id = "debt collector", peaceful=0 })
+              des.monster({ id = "pickpocket", peaceful=0 })
            end
 })
 

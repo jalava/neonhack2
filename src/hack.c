@@ -3680,7 +3680,7 @@ check_special_room(boolean newlev)
                 !furniture_present(THRONE, roomno) ? "" : " throne");
             break;
         case LEPREHALL:
-            You("enter a leprechaun hall!");
+            You("enter a debt collection agency!");
             break;
         case MORGUE:
             if (midnight()) {

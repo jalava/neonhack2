@@ -60,20 +60,20 @@ des.door("closed",47,08)
 des.door("closed",48,12)
 des.door("locked",50,10)
 -- Hippocrates
-des.monster({ id = "Hippocrates", coord = {37, 10}, inventory = function()
+des.monster({ id = "Doc Hippocrates", coord = {37, 10}, inventory = function()
    des.object({ id = "silver dagger", spe = 5 });
 end })
 -- The treasure of Hippocrates
 des.object("chest", 37, 10)
 -- intern guards for the audience chamber
-des.monster("attendant", 29, 08)
-des.monster("attendant", 29, 09)
-des.monster("attendant", 29, 10)
-des.monster("attendant", 29, 11)
-des.monster("attendant", 40, 09)
-des.monster("attendant", 40, 10)
-des.monster("attendant", 40, 11)
-des.monster("attendant", 40, 13)
+des.monster("orderly", 29, 08)
+des.monster("orderly", 29, 09)
+des.monster("orderly", 29, 10)
+des.monster("orderly", 29, 11)
+des.monster("orderly", 40, 09)
+des.monster("orderly", 40, 10)
+des.monster("orderly", 40, 11)
+des.monster("orderly", 40, 13)
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,75,19))
 -- Random traps

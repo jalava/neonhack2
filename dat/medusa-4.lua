@@ -82,7 +82,7 @@ des.object("crystal ball", 07,08)
 --
 -- same spot as Medusa plus downstairs
 des.object({ id="statue", coord=medloc, buc="uncursed",
-                      montype="knight", historic=1, male=1,name="Perseus",
+                      montype="marshal", historic=1, male=1,name="Perseus",
                       contents = function()
                          if percent(75) then
                             des.object({ id = "shield of reflection", buc="cursed", spe=0 })

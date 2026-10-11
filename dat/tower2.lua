@@ -31,7 +31,7 @@ des.monster("&",place[10])
 des.monster("&",place[1])
 des.monster("hell hound pup",place[2])
 des.monster("hell hound pup",place[3])
-des.monster("winter wolf",place[4])
+des.monster("cryowolf",place[4])
 des.object({ id = "chest", coord = place[5],
              contents = function()
                 des.object("amulet of life saving")

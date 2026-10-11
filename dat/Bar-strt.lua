@@ -76,14 +76,14 @@ end })
 -- The treasure of Pelias
 des.object("chest", 09, 05)
 -- chieftain guards for the audience chamber
-des.monster("chieftain", 10, 05)
-des.monster("chieftain", 10, 09)
-des.monster("chieftain", 11, 05)
-des.monster("chieftain", 11, 09)
-des.monster("chieftain", 14, 05)
-des.monster("chieftain", 14, 09)
-des.monster("chieftain", 16, 05)
-des.monster("chieftain", 16, 09)
+des.monster("clan rider", 10, 05)
+des.monster("clan rider", 10, 09)
+des.monster("clan rider", 11, 05)
+des.monster("clan rider", 11, 09)
+des.monster("clan rider", 14, 05)
+des.monster("clan rider", 14, 09)
+des.monster("clan rider", 16, 05)
+des.monster("clan rider", 16, 09)
 -- Non diggable walls
 des.non_diggable(selection.area(00,00,75,19))
 -- One trap to keep the ogres at bay.
