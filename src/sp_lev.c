@@ -1993,6 +1993,8 @@ create_monster(monster *m, struct mkroom *croom)
         /* handle specific attributes for some special monsters */
         if (m->name.str)
             mtmp = christen_monst(mtmp, m->name.str);
+        if (m->npc)
+            story_npc_made(m->npc, mtmp);
 
         /*
          * This doesn't complain if an attempt is made to give a
@@ -3246,6 +3248,7 @@ lspo_monster(lua_State *L)
     tmpmons.waiting = 0;
     tmpmons.mm_flags = NO_MM_FLAGS;
     tmpmons.m_lev_adj = 0;
+    tmpmons.npc = (char *) 0;
 
     if (argc == 1 && lua_type(L, 1) == LUA_TSTRING) {
         const char *paramstr = luaL_checkstring(L, 1);
@@ -3312,6 +3315,7 @@ lspo_monster(lua_State *L)
         tmpmons.confused = get_table_boolean_opt(L, "confused", FALSE);
         tmpmons.waiting = get_table_boolean_opt(L, "waiting", FALSE);
         tmpmons.m_lev_adj = get_table_int_opt(L, "m_lev_adj", 0);
+        tmpmons.npc = get_table_str_opt(L, "npc", NULL);
         tmpmons.seentraps = 0; /* TODO: list of trap names to bitfield */
         keep_default_invent =
             get_table_boolean_opt(L, "keep_default_invent", -1);
@@ -3360,6 +3364,22 @@ lspo_monster(lua_State *L)
             tmpmons.female = 0;
 
         tmpmons.class = get_table_monclass(L);
+        /* NeonHack 2: a story NPC brings its own type, name and mood */
+        if (tmpmons.npc) {
+            boolean fem = FALSE;
+            const char *nm = story_npc_name(tmpmons.npc);
+
+            if (tmpmons.id == NON_PM) {
+                tmpmons.id = story_npc_montype(tmpmons.npc, &fem);
+                tmpmons.female = fem;
+                tmpmons.class = -1;
+            }
+            if (!tmpmons.name.str && nm)
+                tmpmons.name.str = dupstr(nm);
+            if (tmpmons.peaceful == BOOL_RANDOM)
+                tmpmons.peaceful = !story_npc_hostile(tmpmons.npc);
+            tmpmons.asleep = 0;
+        }
 
         lua_getfield(L, 1, "inventory");
         if (!lua_isnil(L, -1)) {
@@ -3399,6 +3419,7 @@ lspo_monster(lua_State *L)
 
     Free(tmpmons.name.str);
     Free(tmpmons.appear_as.str);
+    Free(tmpmons.npc);
 
     return 0;
 }

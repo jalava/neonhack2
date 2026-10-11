@@ -1028,6 +1028,9 @@ TOOL("flashbang",          NoDes, 1, 1, 0, 0,  8, 10,  40, IRON, CLR_WHITE,
                                                           FLASHBANG),
 TOOL("EMP grenade",        NoDes, 1, 1, 0, 0,  6, 10,  80, IRON,
                                           CLR_BRIGHT_BLUE, EMP_GRENADE),
+/* NeonHack 2: quest items; the story names them (story.c), never random */
+TOOL("data shard",         NoDes, 1, 0, 0, 0,  0,  1,   0, PLASTIC,
+                                          CLR_BRIGHT_MAGENTA, STORY_ITEM),
 /* cyberware: applied to install (cyber.c); descriptions are shuffled */
 TOOL("optic implant", "chrome implant", 0, 0, 1, 0, 3, 5, 300, METAL, HI_METAL,
                                                           OPTIC_IMPLANT),

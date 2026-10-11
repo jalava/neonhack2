@@ -149,6 +149,7 @@ typedef struct {
     long seentraps;
     short has_invent;
     mmflags_nht mm_flags; /* makemon flags */
+    char *npc;            /* NeonHack 2: story NPC id */
 } monster;
 
 typedef struct {

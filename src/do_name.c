@@ -298,6 +298,10 @@ do_oname(struct obj *obj)
         pline("%s already has a published name.", Ysimple_name2(obj));
         return;
     }
+    if (obj->otyp == STORY_ITEM) { /* NeonHack 2: its name is its id */
+        pline("%s is labelled already.", Ysimple_name2(obj));
+        return;
+    }
 
     Sprintf(qbuf, "What do you want to name %s ",
             is_plural(obj) ? "these" : "this");
@@ -466,7 +470,7 @@ objtyp_is_callable(int i)
 int
 name_ok(struct obj *obj)
 {
-    if (!obj || obj->oclass == COIN_CLASS)
+    if (!obj || obj->oclass == COIN_CLASS || obj->otyp == STORY_ITEM)
         return GETOBJ_EXCLUDE;
 
     if (!obj->dknown || obj->oartifact || obj->otyp == SPE_NOVEL)

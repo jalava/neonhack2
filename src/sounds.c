@@ -1405,6 +1405,8 @@ dochat(void)
               xresponse);
         return ECMD_OK;
     }
+    if (story_chat(mtmp)) /* NeonHack 2: story NPCs */
+        return ECMD_TIME;
     return domonnoise(mtmp);
 }
 

@@ -2743,6 +2743,7 @@ m_detach(
 {
     coordxy mx = mtmp->mx, my = mtmp->my;
 
+    story_mon_gone(mtmp, due_to_death); /* NeonHack 2 */
     if (mtmp->mleashed)
         m_unleash(mtmp, FALSE);
 

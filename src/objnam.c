@@ -684,6 +684,10 @@ xname_flags(
         /*FALLTHRU*/
     case VENOM_CLASS:
     case TOOL_CLASS:
+        if (typ == STORY_ITEM) { /* NeonHack 2: named by the story */
+            Strcpy(buf, story_item_name(obj));
+            break;
+        }
         /* note: lenses or towel prefix would overwrite poisoned weapon
            prefix if both were simultaneously possible, but they aren't */
         if (typ == LENSES)
@@ -990,7 +994,7 @@ xname_flags(
         }
     }
 
-    if (has_oname(obj) && dknown) {
+    if (has_oname(obj) && dknown && typ != STORY_ITEM) {
         Concat(buf, 0, " named ");
 
         /* jump directly here if obj passes the has-personal-name test */

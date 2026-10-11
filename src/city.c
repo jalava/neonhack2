@@ -351,6 +351,7 @@ city_arrived(void)
 {
     if (In_district(&u.uz))
         cstate.visited |= 1UL << u.uz.dlevel;
+    story_arrived();
 }
 
 /* save: append the city's lines */
@@ -404,6 +405,7 @@ neon2_state_save(char ***linesp)
     int n = 0;
 
     n = city_state_lines(lines, n);
+    n = story_state_lines(lines, n, NEON2_MAXLINES);
     *linesp = lines;
     return n;
 }
@@ -412,12 +414,13 @@ void
 neon2_state_reset(void)
 {
     city_state_reset();
+    story_load(); /* the story's data, before its state is restored */
 }
 
 void
 neon2_state_line(const char *line)
 {
-    if (city_state_line(line))
+    if (city_state_line(line) || story_state_line(line))
         return;
     impossible("Unknown NeonHack 2 save line: \"%.40s\"", line);
 }
@@ -425,7 +428,7 @@ neon2_state_line(const char *line)
 void
 neon2_state_free(void)
 {
-    return; /* nothing allocated yet */
+    story_free();
 }
 
 /*
@@ -570,7 +573,7 @@ citymap_menu(int here, const char *prompt, boolean travel)
             Strcpy(note, "closed off");
         else if (!(cstate.visited & (1UL << n)))
             Strcpy(note, "not been there yet");
-        story_district_note(n, eos(note), (int) (sizeof note - strlen(note)));
+        story_district_note(n, note, (int) sizeof note);
         Snprintf(buf, sizeof buf, "%-16s %s", title, note);
         any = cg.zeroany;
         if (travel && district_open(n) && n != here) {

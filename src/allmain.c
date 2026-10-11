@@ -566,6 +566,7 @@ moveloop_core(void)
         nhl_pcall_handle(gl.luacore, 1, 0, "moveloop_core", NHLpa_panic);
         lua_settop(gl.luacore, 0);
     }
+    story_turn(); /* NeonHack 2: stages finished by what you carry, ... */
 }
 
 #ifndef NEONHACK2
@@ -803,6 +804,7 @@ newgame(void)
     u_init_misc();
     city_start_level(); /* NeonHack 2: start in the city, not the dungeon */
     city_init_state();
+    story_load();
 
     l_nhcore_init();  /* create a Lua state that lasts until end of game */
     reset_glyphmap(gm_newgame);
@@ -843,9 +845,11 @@ newgame(void)
         obj_delivery(FALSE); /* finish wizkit */
     }
 
+#ifndef NEONHACK2 /* the story's prologue is the introduction */
     if (flags.legacy) {
         com_pager(u.uroleplay.pauper ? "pauper_legacy" : "legacy");
     }
+#endif
 
     urealtime.realtime = 0L;
     urealtime.start_timing = getnow();
@@ -856,6 +860,7 @@ newgame(void)
 
     /* Success! */
     welcome(TRUE);
+    story_new_game(); /* NeonHack 2: the prologue begins */
     notice_mon_on(); /* now we can notice monsters */
     if (a11y.glyph_updates)
         (void) dolookaround();

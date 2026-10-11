@@ -1754,6 +1754,8 @@ m_move(struct monst *mtmp, int after)
         && can_hide_under_obj(svl.level.objects[mtmp->mx][mtmp->my])
         && rn2(10))
         return MMOVE_NOTHING; /* do not leave hiding place */
+    if (story_npc_stays(mtmp))
+        return MMOVE_NOTHING; /* NeonHack 2: fixers keep their seats */
 
     /* set up pre-move visibility flags */
     seenflgs = (canseemon(mtmp) ? 1 : 0) | (canspotmon(mtmp) ? 2 : 0);

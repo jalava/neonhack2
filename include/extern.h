@@ -3250,8 +3250,27 @@ extern boolean parsesymbols(char *, int) NONNULLARG1;
 
 /* ### story.c ### */
 
+extern void story_load(void);
+extern void story_free(void);
+extern const char *story_item_name(struct obj *) NONNULLARG1;
+extern int story_npc_montype(const char *, boolean *) NONNULLARG1;
+extern const char *story_npc_name(const char *) NONNULLARG1;
+extern boolean story_npc_hostile(const char *) NONNULLARG1;
+extern void story_npc_made(const char *, struct monst *) NONNULLARG12;
+extern boolean story_npc_stays(struct monst *) NONNULLARG1;
+extern void story_mon_gone(struct monst *, boolean) NONNULLARG1;
+extern void story_effects(void *);
+extern void story_new_game(void);
+extern void story_turn(void);
+extern void story_arrived(void);
+extern boolean story_chat(struct monst *) NONNULLARG1;
+extern int dojournal(void);
 extern boolean story_district_marker(int);
 extern void story_district_note(int, char *, int) NONNULLARG2;
+extern int story_state_lines(char **, int, int) NONNULLARG1;
+extern boolean story_state_line(const char *) NONNULLARG1;
+extern int wiz_story(void);
+extern int wiz_storycheck(void);
 
 /* ### sys.c ### */
 
