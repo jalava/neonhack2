@@ -1994,7 +1994,8 @@ wiz_story(void)
         return ECMD_OK;
     }
     getlin("Story command? (list, start/next/finish/fail/track <quest>, "
-           "flag/rep <name> <n>, spawn/goto/kill <npc>, item <id>)", buf);
+           "flag/rep <name> <n>, spawn/goto/kill <npc>, item <id>, tp <x> <y>)",
+           buf);
     if (*buf == '\033' || !*buf)
         return ECMD_OK;
     cmd[0] = arg[0] = '\0';
@@ -2036,6 +2037,16 @@ wiz_story(void)
         putstr(win, 0, buf);
         display_nhwindow(win, TRUE);
         destroy_nhwindow(win);
+        return ECMD_OK;
+    }
+    if (!strcmp(cmd, "tp")) { /* "tp <x> <y>": level coordinates */
+        int tx = atoi(arg), ty = (int) num;
+
+        if (n < 3 || !isok(tx, ty) || !goodpos(tx, ty, &gy.youmonst, 0)) {
+            pline("Can't go to <%d,%d>.", tx, ty);
+            return ECMD_OK;
+        }
+        teleds(tx, ty, TELEDS_TELEPORT);
         return ECMD_OK;
     }
     if (!strcmp(cmd, "mons")) { /* every monster on the level */

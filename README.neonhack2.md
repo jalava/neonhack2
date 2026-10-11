@@ -42,8 +42,12 @@ A new game asks for story mode or hardcore. Put `OPTIONS=hardcore` or
 
 ## For developers
 
-- Districts: edit the layouts in `tools/neon2/districts/`, then run
-  `tools/neon2/district.py` to regenerate `dat/nc-*.lua`.
+- Districts are hand-drawn maps in `tools/neon2/districts/*.py`, with a
+  legend for shops, NPCs, signs and random variations. Run
+  `tools/neon2/district.py --check` to validate them and see where the
+  lighting falls, then `tools/neon2/district.py` to regenerate
+  `dat/nc-*.lua`.
+- Plans: `doc/neonhack2-plan.md` (phases 0–6) and `doc/neonhack2-next-phases.md` (7–10).
 - Story: `dat/story.lua`. The format is in `doc/story-format.md`. Check it
   with `#wizstorycheck` in a debug game (`./playground/neonhack2 -D`).
 - Tests: `tools/neon2/slice-test` plays the slice through and checks it;

@@ -1,65 +1,91 @@
 # Lantern Market: the night market, Jade Circuit turf.
 #
-# North side: Dr. Sato's clinic and back room, Benny Two-Tone's stall,
-# the Jade Circuit's den (locked; its stairs go down to the den), and
-# three market stalls.  South side: the Church of the Signal, four more
-# stalls.  The metro station is at the east end.
+# North: Dr. Sato's clinic and back room, Benny Two-Tone's stall, the
+# Jade Circuit's den (locked; its stairs go down to the den), the Church
+# of the Signal and the dumpling cart.  The middle is a warren of stalls
+# around a fountain square; the south is back lanes, homes and more
+# shops.  The metro station is at the east end.
 
-
-def build():
-    d = District("nc-lantern", "Lantern Market", """
+PROTO = "nc-lantern"
+TITLE = "Lantern Market"
+BLURB = """
 The night market under paper lanterns and pirate holo-ads.  The Jade
 Circuit keeps the peace here, for a price.
-""")
+"""
 
-    # --- north side ---------------------------------------------------
-    clinic = d.building(1, 1, 9, 6, doors=[(5, 6)])
-    d.shop(clinic, "clinic")
-    d.sign(5, 7, "DR. SATO - IMPLANTS, REPAIRS, NO QUESTIONS")
-    back = d.building(9, 1, 8, 6, doors=[(12, 6)])
-    d.room(back)
-    d.npc(14, 3, "sato")
+MAP = r"""
+ ----------------  --------------------------------  -------------------------
+ |.......|......|..|........|.....................|..|............|..........|
+ |...1...|....s.|..|.2...b..|........3........>...|..|..4.........|....5.....|
+ |.......|.z....|..|........|....y................|..|....._......|..........|
+ |.......|......|..----/-----..............y......|..|............|..........|
+ ----+------+----......e....|.....................|..|............-----/------
+F....c......d...............-----------%-----------..------+-------....o......F
+F....q............------...............f.............E.....g..................F
+F..--+---.........|.8..|....u.....------..........---+---.....................F
+F..|.6..|.------..|....+t.--+---..|.h..|..------..|..j..|..------...........a.F
+F..|....|.|.7..|..------..|.9..|.v+....|..|.i..|..|.....|..|.k..|.......@@..=.F
+F..------.|....|QQ........|....|..------..|....|..-------.G+....|.....{.@@....F
+F.........--+---..........------..........--+---...........------.............F
+F...........r.....M.........................D...........RR....................F
+F.....J.......----+----.................N.....................O...............F
+F-----+------.|.......|.............----/-----............----+-----..........F
+F|..........|.|.......|..----+----..|........|..---+----..|........|..---+----F
+F|....l.....|.|...m...|..|.......|..|...n....|..|......|..|...p....|..|......|F
+F|..........|.|.......|..|.......|..|........|..|......|..|........|..|......|F
+F|..........|.|.......|..|.......|..|........|..|......|..|........|..|......|F
+-------------------------------------------------------------------------------
+"""
 
-    stall = d.building(18, 1, 8, 6, doors=[(21, 6, "open")])
-    d.room(stall)
-    d.npc(23, 3, "benny")
-    d.sign(21, 7, "BENNY'S - BUY / SELL / NO REFUNDS")
 
-    den = d.building(27, 1, 20, 6, doors=[(36, 6, "locked")])
-    d.room(den)
-    d.sign(36, 7, "JADE CIRCUIT - MEMBERS ONLY")
-    d.stair(44, 3, up=False, dest="Jade Den")
-    d.mon(31, 3, "yakuza", peaceful=True)
-    d.mon(40, 4, "yakuza", peaceful=True)
-
-    # three stalls sharing walls
-    s1 = d.building(48, 1, 9, 6, doors=[(52, 6, "open")])
-    d.shop(s1, "food shop")
-    d.sign(52, 7, "DUMPLING CART")
-    s2 = d.building(56, 1, 10, 6, doors=[(60, 6, "open")])
-    d.shop(s2, "potion shop")
-    d.sign(60, 7, "STIMS & TONICS")
-    s3 = d.building(65, 1, 11, 6, doors=[(70, 6, "open")])
-    d.shop(s3, "wand shop")
-    d.sign(70, 7, "GADGET GRANNY")
-
-    # --- the market street --------------------------------------------
-    d.mon(30, 9, "yakuza", peaceful=True)
-    d.mon(50, 10, "urchin", peaceful=True)
-    d.metro(74, 9)
-    d.sign(74, 8, "METRO - LANTERN MARKET")
-
-    # --- south side ---------------------------------------------------
-    church = d.building(1, 12, 13, 6, doors=[(7, 12)])
-    d.room(church, "temple", filled=1)
-    d.lua('des.altar({ x = 7, y = 14, align = "neutral", type = "shrine" })')
-    d.sign(7, 11, "CHURCH OF THE SIGNAL - ALL FREQUENCIES WELCOME")
-    for i, (kind, name) in enumerate((("ring shop", "MODS & MOODS"),
-                                      ("scroll shop", "WAREZ"),
-                                      ("book shop", "DATA BROKER"),
-                                      ("candle shop", "LUMEN"))):
-        x = 16 + 11 * i
-        s = d.building(x, 12, 10, 6, doors=[(x + 4, 12, "open")])
-        d.shop(s, kind)
-        d.sign(x + 4, 11, name)
-    return d
+def legend(d):
+    d.metro("=")
+    d.arrive("@")                       # by the station
+    d.sign("a", "METRO - LANTERN MARKET")
+    # north side
+    d.room("1", "clinic")
+    d.sign("c", "DR. SATO - IMPLANTS, REPAIRS, NO QUESTIONS")
+    d.lit("z")                          # Sato's back room
+    d.npc("s", "sato")
+    d.sign("d", "PRIVATE - KNOCK")
+    d.lit("2")                          # Benny's stall
+    d.npc("b", "benny")
+    d.sign("e", "BENNY'S - BUY / SELL / NO REFUNDS")
+    d.lit("3")                          # the Jade Circuit's den
+    d.mon("y", "yakuza", peaceful=True)
+    d.stair(">", up=False, dest="Jade Den")
+    d.sign("f", "JADE CIRCUIT - MEMBERS ONLY")
+    d.room("4", "temple")
+    d.altar("_", "neutral")
+    d.sign("g", "CHURCH OF THE SIGNAL - ALL FREQUENCIES WELCOME")
+    d.room("5", "food shop")
+    d.sign("o", "DUMPLING CART")
+    # the stalls
+    d.room("6", "potion shop")
+    d.sign("q", "STIMS & TONICS")
+    d.room("7", "wand shop")
+    d.sign("r", "GADGET GRANNY")
+    d.room("8", "ring shop")
+    d.sign("t", "MODS & MOODS")
+    d.room("9", "scroll shop")
+    d.sign("u", "WAREZ")
+    d.room("h", "book shop")
+    d.sign("v", "DATA BROKER")
+    d.room("i", "candle shop")
+    d.sign("D", "LUMEN")
+    d.lit("j")                          # the tea house
+    d.sign("E", "TEA - HOT - CHEAP")
+    d.lit("k")                          # the fortune teller
+    d.sign("G", "MADAME QUBIT - FUTURES READ")
+    # south side
+    d.lit("l")                          # the noodle house
+    d.sign("J", "NOODLES")
+    d.room("m", "shop")                 # the pawn shop
+    d.sign("M", "PAWN")
+    d.room("n", "tool shop")            # the junk dealer
+    d.sign("N", "JUNK - SCRAP - SALVAGE")
+    d.room("p", "armor shop")           # the tailor
+    d.sign("O", "TAILOR - KEVLAR LININGS")
+    # each game is a little different
+    d.variant("Q", 50, "F")             # crates block a lane
+    d.variant("R", 50, "F")
