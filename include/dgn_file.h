@@ -35,6 +35,7 @@ struct tmplevel {
     int chance, rndlevs, chain, flags;
     char boneschar;
     int danger;            /* NeonHack 2 */
+    boolean locked;
     char *title, *shortname;
 };
 

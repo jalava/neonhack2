@@ -802,6 +802,7 @@ newgame(void)
                        * any artifacts */
     u_init_misc();
     city_start_level(); /* NeonHack 2: start in the city, not the dungeon */
+    city_init_state();
 
     l_nhcore_init();  /* create a Lua state that lasts until end of game */
     reset_glyphmap(gm_newgame);
@@ -819,6 +820,7 @@ newgame(void)
         u_on_rndspot(0); /* the district's arrival region */
     else
         u_on_upstairs();
+    city_arrived();
     vision_reset();          /* set up internals for level (after mklev) */
     check_special_room(FALSE);
 

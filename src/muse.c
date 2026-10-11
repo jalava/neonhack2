@@ -559,6 +559,8 @@ find_defensive(struct monst *mtmp, boolean tryescape)
         ; /* fleeing by stairs or traps is not possible */
     } else if (levl[x][y].typ == STAIRS) {
         stway = stairway_at(x,y);
+        if (stway && stway->kind == STWAY_METRO)
+            stway = 0; /* NeonHack 2: monsters don't ride the metro */
         if (stway && !stway->up && stway->tolev.dnum == u.uz.dnum) {
             if (!is_floater(mtmp->data))
                 gm.m.has_defense = MUSE_DOWNSTAIRS;

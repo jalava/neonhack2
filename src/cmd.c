@@ -1692,6 +1692,8 @@ struct ext_func_tab extcmdlist[] = {
               dotalk, IFBURIED | AUTOCOMPLETE, NULL },
     { 'v',    "chronicle", "show journal of major events",
               do_gamelog, IFBURIED | AUTOCOMPLETE | GENERALCMD, NULL },
+    { 'M',    "citymap", "show the city map; ride the metro or call a cab",
+              docitymap, AUTOCOMPLETE, NULL },
     { 'c',    "close", "close a door",
               doclose, 0, NULL },
     { M('C'), "conduct", "list voluntary challenges you have maintained",
@@ -1950,6 +1952,8 @@ struct ext_func_tab extcmdlist[] = {
 #endif
     { '\0',   "wizcast", "cast any spell",
               dowizcast, IFBURIED | WIZMODECMD, NULL },
+    { '\0',   "wizcity", "open every district of the city",
+              wiz_city, IFBURIED | AUTOCOMPLETE | WIZMODECMD, NULL },
     { '\0',   "wizcustom", "show customized glyphs",
               wiz_custom, IFBURIED | WIZMODECMD | NOFUZZERCMD, NULL },
     { C('e'), "wizdetect", "reveal hidden things within a small radius",

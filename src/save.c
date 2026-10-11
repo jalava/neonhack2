@@ -28,6 +28,7 @@ staticfn void savemon(NHFILE *, struct monst *);
 staticfn void savemonchn(NHFILE *, struct monst *) NO_NNARGS;
 staticfn void savetrapchn(NHFILE *, struct trap *) NO_NNARGS;
 staticfn void save_gamelog(NHFILE *);
+staticfn void save_neon2state(NHFILE *);
 staticfn void savegamestate(NHFILE *);
 staticfn void savelev_core(NHFILE *, xint16);
 staticfn void save_msghistory(NHFILE *);
@@ -261,6 +262,30 @@ save_gamelog(NHFILE *nhfp)
         gg.gamelog = NULL;
 }
 
+/* NeonHack 2: the city and story state, as text lines */
+staticfn void
+save_neon2state(NHFILE *nhfp)
+{
+    char **lines = 0;
+    int i, n, slen;
+
+    if (nhfp->mode & (COUNTING | WRITING)) {
+        n = neon2_state_save(&lines);
+        for (i = 0; i < n; i++) {
+            slen = Strlen(lines[i]);
+            Sfo_int(nhfp, &slen, "neon2-length");
+            Sfo_char(nhfp, lines[i], "neon2-line", slen);
+            free((genericptr_t) lines[i]);
+        }
+        if (lines)
+            free((genericptr_t) lines);
+        slen = -1;
+        Sfo_int(nhfp, &slen, "neon2-length");
+    }
+    if (nhfp->mode & FREEING)
+        neon2_state_free();
+}
+
 staticfn void
 savegamestate(NHFILE *nhfp)
 {
@@ -325,6 +350,7 @@ savegamestate(NHFILE *nhfp)
     savenames(nhfp);
     save_msghistory(nhfp);
     save_gamelog(nhfp);
+    save_neon2state(nhfp);
     save_luadata(nhfp);
     if (nhfp->structlevel)
         bflush(nhfp->fd);
@@ -1101,6 +1127,7 @@ freedynamicdata(void)
 #define free_light_sources(R) save_light_sources(tnhfp, R)
 #define free_animals() mon_animal_list(FALSE)
 #define discard_gamelog() save_gamelog(tnhfp);
+#define free_neon2state() neon2_state_free()
 
     /* move-specific data */
     dmonsfree(); /* release dead monsters */
@@ -1133,6 +1160,7 @@ freedynamicdata(void)
     cmdq_clear(CQ_REPEAT);
     cmdbind_freeall();
     free_tutorial(); /* (only needed if quitting while in tutorial) */
+    free_neon2state();
     wish_history_flush();
 
     /* per-turn data, but might get added to when freeing other stuff */

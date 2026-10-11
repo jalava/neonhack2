@@ -1950,6 +1950,8 @@ down_gate(coordxy x, coordxy y)
     if (on_level(&u.uz, &qstart_level) && !ok_to_quest()) {
         return MIGR_NOWHERE;
     }
+    if (stway && stway->kind == STWAY_METRO)
+        stway = 0; /* NeonHack 2: things don't fall into the metro */
     if (stway && !stway->up && !stway->isladder) {
         gg.gate_str = "down the stairs";
         return (stway->tolev.dnum == u.uz.dnum) ? MIGR_STAIRS_UP

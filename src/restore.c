@@ -36,6 +36,7 @@ staticfn void rest_bubbles(NHFILE *);
 staticfn void restore_gamelog(NHFILE *);
 staticfn void restore_msghistory(NHFILE *);
 #endif
+staticfn void restore_neon2state(NHFILE *);
 
 /*
  * Save a mapping of IDs from ghost levels to the current level.  This
@@ -726,6 +727,7 @@ restgamestate(NHFILE *nhfp)
     restnames(nhfp);
     restore_msghistory(nhfp);
     restore_gamelog(nhfp);
+    restore_neon2state(nhfp);
     restore_luadata(nhfp);
 #ifndef SFCTOOL
     /* must come after all mons & objs are restored */
@@ -1414,6 +1416,30 @@ restore_gamelog(NHFILE *nhfp)
 #ifndef SFCTOOL
         gamelog_add(tmp.flags, tmp.turn, msg);
 #endif  /* !SFCTOOL */
+    }
+}
+
+/* NeonHack 2: the city and story state, as text lines */
+staticfn void
+restore_neon2state(NHFILE *nhfp)
+{
+    int slen = 0;
+    char line[BUFSZ * 4];
+
+#ifndef SFCTOOL
+    neon2_state_reset();
+#endif
+    while (1) {
+        Sfi_int(nhfp, &slen, "neon2-length");
+        if (slen == -1)
+            break;
+        if (slen < 0 || slen > (int) sizeof line - 1)
+            panic("restore_neon2state: line too long (%d)", slen);
+        Sfi_char(nhfp, line, "neon2-line", slen);
+        line[slen] = '\0';
+#ifndef SFCTOOL
+        neon2_state_line(line);
+#endif
     }
 }
 

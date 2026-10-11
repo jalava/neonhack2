@@ -1341,6 +1341,24 @@ toggle_menu_attr(boolean on, int color, int attr)
     }
 }
 
+/* NeonHack 2: menus and text windows measure UTF-8 by display columns
+   (box drawing on the city map; tty_strwidth() is in topl.c); while
+   drawing, a continuation byte takes no column */
+#define TTY_UTF8_CONT(c) ((((unsigned char) (c)) & 0xC0) == 0x80)
+
+/* byte offset where 's' reaches 'cols' columns */
+static int
+tty_widthcut(const char *s, int cols)
+{
+    int i, w = 0;
+
+    for (i = 0; s[i]; i++) {
+        if (!TTY_UTF8_CONT(s[i]) && w++ == cols)
+            break;
+    }
+    return i;
+}
+
 static void
 process_menu_window(winid window, struct WinDesc *cw)
 {
@@ -1472,7 +1490,9 @@ process_menu_window(winid window, struct WinDesc *cw)
                     for (n = 0, cp = curr->str;
                          *cp &&
 #ifndef WIN32CON
-                            (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
+                            (TTY_UTF8_CONT(*cp)
+                             || (int) ++ttyDisplay->curx
+                                    < (int) ttyDisplay->cols);
 #else
                             (int) ttyDisplay->curx < (int) ttyDisplay->cols;
                          ttyDisplay->curx++,
@@ -1823,7 +1843,9 @@ process_text_window(winid window, struct WinDesc *cw)
             term_start_attr(attr);
             for (cp = &cw->data[i][1], linestart = TRUE;
 #ifndef WIN32CON
-                 *cp && (int) ++ttyDisplay->curx < (int) ttyDisplay->cols;
+                 *cp && (TTY_UTF8_CONT(*cp)
+                         || (int) ++ttyDisplay->curx
+                                < (int) ttyDisplay->cols);
                  cp++
 #else
                  *cp && (int) ttyDisplay->curx < (int) ttyDisplay->cols;
@@ -2419,6 +2441,7 @@ tty_putstr(winid window, int attr, const char *str)
         *ob++ = (char) (attr + 1); /* avoid nuls, for convenience */
         Strcpy(ob, str);
 
+        n0 = (long) tty_strwidth(str) + 1L; /* columns, not bytes */
         if (n0 > cw->maxcol)
             cw->maxcol = n0;
         if (++cw->cury > cw->maxrow)
@@ -2742,9 +2765,9 @@ tty_end_menu(
         }
 
         /* cut off any lines that are too long */
-        len = strlen(curr->str) + 2; /* extra space at beg & end */
+        len = tty_strwidth(curr->str) + 2; /* extra space at beg & end */
         if (len > (int) ttyDisplay->cols) {
-            curr->str[ttyDisplay->cols - 2] = 0;
+            curr->str[tty_widthcut(curr->str, ttyDisplay->cols - 2)] = 0;
             len = ttyDisplay->cols;
         }
         if (len > cw->cols)

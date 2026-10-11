@@ -527,7 +527,7 @@ HACKCSRC = allmain.c alloc.c apply.c artifact.c attrib.c ball.c bones.c \
 	   options.c pager.c pickup.c pline.c polyself.c potion.c pray.c \
 	   priest.c quest.c questpgr.c read.c rect.c region.c report.c restore.c \
 	   rip.c rnd.c role.c rumors.c save.c selvar.c sfbase.c sfstruct.c \
-	   shk.c shknam.c sit.c sounds.c sp_lev.c spell.c stairs.c steal.c steed.c \
+	   shk.c shknam.c sit.c sounds.c sp_lev.c spell.c stairs.c steal.c steed.c story.c \
 	   strutil.c symbols.c sys.c teleport.c \
 	   timeout.c topten.c track.c trap.c u_init.c utf8map.c \
 	   uhitm.c vault.c version.c vision.c weapon.c were.c wield.c \
@@ -625,7 +625,8 @@ HOBJ = $(TARGETPFX)allmain.o $(TARGETPFX)alloc.o \
 	$(TARGETPFX)shk.o $(TARGETPFX)shknam.o $(TARGETPFX)sit.o \
 	$(TARGETPFX)sounds.o $(TARGETPFX)sp_lev.o $(TARGETPFX)spell.o \
 	$(TARGETPFX)stairs.o $(TARGETPFX)symbols.o $(TARGETPFX)sys.o \
-	$(TARGETPFX)steal.o $(TARGETPFX)steed.o $(TARGETPFX)strutil.o \
+	$(TARGETPFX)steal.o $(TARGETPFX)steed.o $(TARGETPFX)story.o \
+	$(TARGETPFX)strutil.o \
 	$(TARGETPFX)teleport.o $(TARGETPFX)timeout.o $(TARGETPFX)topten.o \
 	$(TARGETPFX)track.o $(TARGETPFX)trap.o $(TARGETPFX)u_init.o \
 	$(TARGETPFX)uhitm.o $(TARGETPFX)utf8map.o $(TARGETPFX)vault.o \
@@ -1266,6 +1267,7 @@ $(TARGETPFX)spell.o: spell.c $(HACK_H)
 $(TARGETPFX)stairs.o: stairs.c $(HACK_H)
 $(TARGETPFX)steal.o: steal.c $(HACK_H)
 $(TARGETPFX)steed.o: steed.c $(HACK_H)
+$(TARGETPFX)story.o: story.c $(HACK_H)
 $(TARGETPFX)strutil.o: strutil.c $(HACK_H)
 $(TARGETPFX)symbols.o: symbols.c $(HACK_H) ../include/tcap.h
 $(TARGETPFX)sys.o: sys.c $(HACK_H)

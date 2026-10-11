@@ -561,6 +561,8 @@ mon_arrive(struct monst *mtmp, int when)
             /* debugfuzzer returns from or enters another branch */
             xlocale = stway->sx, ylocale = stway->sy;
             break;
+        } else if (iflags.debug_fuzzer && In_city(&u.uz)) {
+            ; /* NeonHack 2: a city level has neither; random spot */
         } else if (!(u.uevent.qexpelled
                      && (Is_qstart(&u.uz0) || Is_qstart(&u.uz)))) {
             impossible("mon_arrive: no corresponding portal?");

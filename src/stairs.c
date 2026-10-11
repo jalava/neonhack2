@@ -208,14 +208,14 @@ stairs_description(
         char place[BUFSZ];
 
         Sprintf(outbuf, "%s %s to %s", stairs, updown,
-                city_place_name(&tolev, place, FALSE));
+                city_place_phrase(&tolev, place));
         return outbuf;
     } else if (u.uz.dnum == 0 && u.uz.dlevel == 1 && sway->up
                && !u.uhave.amulet && ashfall_level.dlevel > 0) {
         char place[BUFSZ];
 
         Sprintf(outbuf, "%s %s the shaft to %s", stairs, updown,
-                city_place_name(&ashfall_level, place, FALSE));
+                city_place_phrase(&ashfall_level, place));
         return outbuf;
     } else if (In_city(&u.uz) && tolev.dnum == 0 && tolev.dlevel == 1) {
         Sprintf(outbuf, "%s %s the shaft to the Undercity", stairs, updown);

@@ -34,6 +34,7 @@ typedef struct s_level { /* special dungeon level element */
     xint16 danger;      /* difficulty, used instead of depth */
     char title[24];     /* "Lantern Market" */
     char shortname[12]; /* for the status line: "Lantern Mkt" */
+    boolean locked;     /* closed off until the story opens it */
 } s_level;
 
 /* NeonHack 2: how the hero arrives after a city journey */

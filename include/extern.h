@@ -385,6 +385,7 @@ extern boolean In_district(d_level *) NONNULLARG1;
 extern boolean city_district_of(d_level *, d_level *) NONNULLARG12;
 extern int city_difficulty(d_level *) NONNULLARG1;
 extern char *city_place_name(d_level *, char *, boolean) NONNULLARG12;
+extern char *city_place_phrase(d_level *, char *) NONNULLARG12;
 extern boolean city_resolve_dest(const char *, d_level *) NONNULLARG12;
 extern void city_start_level(void);
 extern boolean city_shaft_level(d_level *) NONNULLARG1;
@@ -392,6 +393,21 @@ extern boolean city_no_shortcuts(d_level *) NONNULLARG1;
 extern void city_set_arrival(int, coordxy, coordxy);
 extern boolean city_place_arrival(void);
 extern void city_lost_stairs(void);
+extern void city_init_state(void);
+extern void city_unlock(int, boolean);
+extern int city_district_num(const char *) NONNULLARG1;
+extern void city_arrived(void);
+extern int city_state_lines(char **, int) NONNULLARG1;
+extern boolean city_state_line(const char *) NONNULLARG1;
+extern void city_state_reset(void);
+extern int neon2_state_save(char ***) NONNULLARG1;
+extern void neon2_state_reset(void);
+extern void neon2_state_line(const char *) NONNULLARG1;
+extern void neon2_state_free(void);
+extern int city_metro(void);
+extern int docitymap(void);
+extern boolean neon2_pay(long);
+extern int wiz_city(void);
 
 /* ### cmd.c ### */
 
@@ -3231,6 +3247,11 @@ extern const struct symparse *match_sym(char *) NONNULLARG1;
 extern void savedsym_free(void);
 extern void savedsym_strbuf(strbuf_t *) NONNULLARG1;
 extern boolean parsesymbols(char *, int) NONNULLARG1;
+
+/* ### story.c ### */
+
+extern boolean story_district_marker(int);
+extern void story_district_note(int, char *, int) NONNULLARG2;
 
 /* ### sys.c ### */
 

@@ -607,6 +607,7 @@ init_level(int dgn, int proto_index, struct proto_dungeon *pd)
     /* NeonHack 2 */
     new_level->flags.city = !!(pd->tmpdungeon[dgn].flags & CITY);
     new_level->danger = (xint16) tlevel->danger;
+    new_level->locked = tlevel->locked;
     if (tlevel->title)
         copynchars(new_level->title, tlevel->title,
                    (int) sizeof new_level->title - 1);
@@ -851,6 +852,7 @@ init_dungeon_levels(
             tmpl->danger = get_table_int_opt(L, "danger", 0);
             tmpl->title = get_table_str_opt(L, "title", NULL);
             tmpl->shortname = get_table_str_opt(L, "short", NULL);
+            tmpl->locked = get_table_boolean_opt(L, "locked", FALSE);
             /* array index is offset by cumulative number of levels
                defined for preceding branches (iterations of 'while'
                loop we're inside, not branch connections below) */

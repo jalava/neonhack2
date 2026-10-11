@@ -1221,6 +1221,10 @@ dodown(void)
     if (u_stuck_cannot_go("down"))
         return ECMD_TIME;
 
+    /* NeonHack 2: '>' on a metro station opens the city map */
+    if (stway && stway->kind == STWAY_METRO && stairs_down)
+        return city_metro();
+
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
         if (trap && (uteetering_at_seen_pit(trap) || uescaped_shaft(trap))) {
@@ -1920,6 +1924,7 @@ goto_level(
         familiar_level_msg();
 
     /* special location arrival messages/events */
+    city_arrived(); /* NeonHack 2: districts visited, story arrivals */
     if (In_endgame(&u.uz)) {
         if (newdungeon)
             record_achievement(ACH_ENDG); /* reached endgame */
