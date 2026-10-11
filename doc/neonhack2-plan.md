@@ -1,5 +1,8 @@
 # NeonHack 2: Neo Yendor
 
+Status (2026-10-12): phases P0-P6 done; the vertical slice (prologue and
+act 1) is playable.  Next: user playtest, then P7 onwards.
+
 ## Context
 
 NeonHack (NetHack 5.0 + a cyberpunk layer) plays well, but it
