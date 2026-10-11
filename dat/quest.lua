@@ -126,7 +126,7 @@ Go now!  You are banished from this place.]],
          "\"Why search for the Amulet?  Thou wouldst but lose it, cretin.\"",
          "\"Thou ought to be a comedian, thy skills are so laughable!\"",
          "\"Thy gaze is so vacant, I thought thee a floating eye!\"",
-         "\"Thy head is unfit for a mind flayer to munch upon!\"",
+         "\"Thy head is unfit for a brainjacker to munch upon!\"",
          "\"Only thy reflection could love thee!\"",
          "\"Hast thou considered masking thine odour?\"",
          "\"Hold! Thy face is a most exquisite torture!\"",
@@ -201,9 +201,10 @@ You couldn't quite make out that last message.]],
       assignquest = {
          synopsis = "[%nC has stolen %o.  Locate %i, defeat %ni, and return %O.]",
          output = "text",
-         text = [["Grave times have befallen the college, for %na has
-stolen %o.  Without it, the board of directors of
-the university will soon have no choice but to revoke our research grants.
+         text = [["Grave times have befallen the Guild, for %na has
+stolen %o.  Without it our survey of the old network is blind, and the
+corporations will strip-mine the ruins before we can save anything of
+value from them.
 
 "You must locate the entrance to %i.  Within it,
 you will find %n.
@@ -211,10 +212,9 @@ you will find %n.
 "You must then defeat %n and return %o
 to me.
 
-"Only in this way will we be able to prevent the budget cuts that could
-close this college.
+"Only in this way will the Guild keep its charter to the deep ruins.
 
-"May the wisdom of %d be your guide."]],
+"May the memory of %d be your guide."]],
       },
       badalign = {
          synopsis = "[\"%pC, you have strayed from the %a path.  Purify yourself!\"]",
@@ -260,13 +260,12 @@ taught you."]],
       firsttime = {
          synopsis = "[You arrive at %H, but all is not well.]",
          output = "text",
-         text = [[You are suddenly in familiar surroundings.  The buildings in the distance
-seem to be those of your old alma mater, but something is wrong.  It feels
-as if there has been a riot recently, or %H has
-been under siege.
+         text = [[You are suddenly in familiar surroundings.  The prefab towers in the
+distance are the halls of %H, but something is wrong.  It looks as if
+there has been a riot recently, or the Guild has been under siege.
 
-All of the windows are boarded up, and there are objects scattered around
-the entrance.
+The windows are shuttered with scrap metal, and salvage is scattered
+around the entrance.
 
 Strange forbidding shapes seem to be moving in the distance.]],
       },
@@ -292,18 +291,18 @@ as if you could now take on the Wizard of Yendor himself and win, but
 you know you must return %o to %l.]],
       },
       guardtalk_after = {
-         "\"Did you see Lash LaRue in 'Song of Old Wyoming' the other night?\"",
-         "\"Hey man, got any potions of hallucination for sale?\"",
-         "\"I guess you are guaranteed to make full professor now.\"",
-         "\"So, what was worse, %n or your entrance exams?\"",
-         "\"%oC is impressive, but nothing like the bones I dug up!\"",
+         "\"I bet the corporations would pay a fortune for that.\"",
+         "\"Hey, got any vials of hallucination for sale?\"",
+         "\"I guess you're guaranteed a seat on the Guild council now.\"",
+         "\"So, what was worse, %n or your licensing exams?\"",
+         "\"%oC is impressive, but nothing like the mainframe I dug up!\"",
       },
       guardtalk_before = {
-         "\"Did you see Lash LaRue in 'Song of Old Wyoming' the other night?\"",
-         "\"Hey man, got any potions of hallucination for sale?\"",
-         "\"Did you see the artifact %l brought back from the last dig?\"",
-         "\"So what species do *you* think we evolved from?\"",
-         "\"So you're %ls prize pupil!  I don't know what he sees in you.\"",
+         "\"Did you see the old flat-screen we dug out last week?  It still lights up!\"",
+         "\"Hey, got any vials of hallucination for sale?\"",
+         "\"Did you see the drive %l brought back from the last dig?\"",
+         "\"So what do *you* think the old net was for?\"",
+         "\"So you're %ls prize digger!  I don't know what he sees in you.\"",
       },
       hasamulet = {
          synopsis = "[Take the Amulet to the Astral Plane and sacrifice it at the altar of %d.]",
@@ -325,14 +324,14 @@ Amulet on that altar to fulfill your destiny.
          synopsis = "[\"You have returned, %p, to a difficult task.\"]",
          output = "text",
          text = [["Finally you have returned, %p.  You were always
-my most promising student.  Allow me to see if you are ready for the
-most difficult task of your career."]],
+my most promising digger.  Allow me to see if you are ready for the
+most difficult job of your career."]],
       },
       leader_last = {
          synopsis = "[\"%pC, you have failed us.  Begone!\"]",
          output = "text",
          text = [["%p, you have failed us.  All of my careful training has been in
-vain.  Begone!  Your tenure at this college has been revoked!
+vain.  Begone!  Your Guild license has been revoked!
 
 "You are a disgrace to the profession!"]],
       },
@@ -347,7 +346,8 @@ Are you finally ready for the task that must be accomplished?"]],
       locate_first = {
          synopsis = "[This foreboding edifice must hide the entrance to %i.]",
          output = "text",
-         text = [[A plain opens before you.  Beyond the plain lies a foreboding edifice.
+         text = [[A field of rubble opens before you.  Beyond it lies the sealed
+concrete bulk of a pre-collapse datacenter, humming faintly.
 
 You have the feeling that you will soon find the entrance to
 %i.]],
@@ -359,9 +359,10 @@ You have the feeling that you will soon find the entrance to
          synopsis = "[\"Come, %p, I shall destroy you!\"]",
          output = "text",
          text = [["So, %p, you think that you can succeed in recovering
-%o, when your teacher, %l, has already failed.
+%o, when your mentor, %l, has already failed.
 
-"Come, try your best!  I shall destroy you, and gnaw on your bones."]],
+"Come, try your best!  Everything rusts, everything rots.  I shall
+erase you, and the Guild will forget your name."]],
       },
       nemesis_next = {
          synopsis = "[\"Again you try to best me, %p?  You shall never recover %o.\"]",
@@ -402,7 +403,7 @@ May the blessings of %d follow you and guard you."]],
          output = "text",
          text = [["Careful, %p!  %oC might break, and that would be
 a tragic loss.  You are its keeper now, and the time has come to
-resume your search for the Amulet.  %Z await your
+resume your search for the Amulet.  %Z awaits your
 return through the magic portal that brought you here."]],
       },
       othertime = {
@@ -420,29 +421,29 @@ regain the Amulet of Yendor for %d?"]],
       assignquest = {
          synopsis = "[\"Find %n, defeat %ni, and return %o to us.\"]",
          output = "text",
-         text = [["The world is in great need of your assistance, %p.
+         text = [["The wastes are in great need of your assistance, %p.
 
-"About six months ago, I learned that a mysterious sorcerer, known
-as %n, had begun to gather a large group of cutthroats and brigands
+"About six months ago, I learned that a mysterious technomancer, known
+as %n, had begun to gather a large band of raiders and road gangs
 about %ni.
 
 "At about the same time, these people you once rode with `liberated' a
-potent magical talisman, %o, from a Turanian caravan.
+potent artifact, %o, from a corporate armored convoy.
 
-"%nC and %nj Black Horde swept down upon %i and defeated
-the people there, driving them out into the desert.  He has taken
+"%nC and %nj Black Convoy swept down upon %i and defeated
+the clans there, driving them out into the dunes.  He has taken
 %o, and seeks to bend it to %nj will.  I detected the
 subtle changes in the currents of fate, and joined these people.
 Then I sent forth a summons for you.
 
 "If %n can bend %o to %nj will, he will become
 almost indestructible.  He will then be able to enslave the minds of
-men across the world.  You are the only hope.  The gods smile upon you,
-and with %d behind you, you alone can defeat %n.
+everyone in the wastes and the arcology alike.  You are the only hope.
+With %d behind you, you alone can defeat %n.
 
 "You must go to %i.  From there, you can track down
 %n, defeat %ni, and return %o to us.  Only
-then will the world be safe."]],
+then will the road be safe."]],
       },
       badalign = {
          synopsis = "[\"You have wandered from the path of the %a.  Come back when you have atoned.\"]",
@@ -488,14 +489,14 @@ defeat %ni."]],
          output = "text",
          text = [[Warily you scan your surroundings, all of your senses alert for signs
 of possible danger.  Off in the distance, you can %x the familiar shapes
-of %H.
+of %H: battered rigs circled against the dust.
 
 But why, you think, should %l be there?
 
-Suddenly, the hairs on your neck stand on end as you detect the aura of
-evil magic in the air.
+Suddenly, the hairs on your neck stand on end as you detect a hum of
+hostile machinery in the air.
 
-Without thought, you ready your weapon, and mutter under your breath:
+Without thought, you rev up your weapon, and mutter under your breath:
 
     "By %d, there will be blood spilt today."]],
       },
@@ -517,17 +518,17 @@ flowing through your hands.  It seems to be in two or more places
 at once, even though you are holding it.]],
       },
       guardtalk_after = {
-         "\"The battles here have been good -- our enemies' blood soaks the soil!\"",
-         "\"Remember that glory is crushing your enemies beneath your feet!\"",
-         "\"Times will be good again, now that the horde is vanquished.\"",
+         "\"The raids here have been good -- our enemies' fuel feeds our rigs!\"",
+         "\"Remember that glory is crushing your enemies beneath your wheels!\"",
+         "\"Times will be good again, now that the Black Convoy is scattered.\"",
          "\"You have brought our clan much honor in defeating %n.\"",
          "\"You will be a worthy successor to %l.\"",
       },
       guardtalk_before = {
-         "\"The battles here have been good -- our enemies' blood soaks the soil!\"",
-         "\"Remember that glory is crushing your enemies beneath your feet!\"",
-         "\"There has been little treasure to loot, since the horde arrived.\"",
-         "\"The horde is mighty in numbers, but they have little courage.\"",
+         "\"The raids here have been good -- our enemies' fuel feeds our rigs!\"",
+         "\"Remember that glory is crushing your enemies beneath your wheels!\"",
+         "\"There has been little salvage to loot, since the Black Convoy arrived.\"",
+         "\"The Black Convoy is mighty in numbers, but they have little courage.\"",
          "\"%lC is a strange one, but he has helped defend us.\"",
       },
       hasamulet = {
@@ -643,7 +644,7 @@ will be waiting.]],
          text = [[%l gazes reverently at %o, then back at you.
 
 "You are its keeper now, and the time has come to resume your search
-for the Amulet.  %Z await your return through the
+for the Amulet.  %Z awaits your return through the
 magic portal which brought you here."]],
       },
       othertime = {
@@ -661,19 +662,19 @@ magic portal which brought you here."]],
          text = [["You are indeed ready now, %p.  I shall tell you a tale of
 great suffering among your people:
 
-"Shortly after you left on your vision quest, the caves were invaded by
-the creatures sent against us by %n.
+"Shortly after you left on your vision quest, the sewers were invaded
+by the creatures sent against us by %n.
 
-"She, herself, could not attack us due to her great size, but her minions
-have harassed us ever since.  In the first attacks, many died, and the
-minions of %n managed to steal %o.
+"She, herself, could not reach us through the narrow pipes due to her
+great size, but her minions have harassed us ever since.  In the first
+attacks, many died, and the minions of %n managed to steal %o.
 They took it to %i and there, none of our
 %g warriors have been able to go.
 
 "You must find %i, and within it wrest
 %o from %n.  She guards it as
 jealously as she guards all treasures she attains.  But with it,
-we can make our caves safe once more.
+we can make our tunnels safe once more.
 
 "Please, %p, recover %o for us, and return it here."]],
       },
@@ -724,12 +725,12 @@ a difficult quest as that I propose to give you.
       firsttime = {
          synopsis = "[You arrive back at %H, but something is wrong here.]",
          output = "text",
-         text = [[You descend through a barely familiar stairwell that you remember
+         text = [[You climb down through a barely familiar storm drain that you remember
 %l showing you when you embarked upon your vision quest.
 
 You arrive back at %H, but something seems
-wrong here.  The usual smoke and glowing light of the fires of the
-outer caves are absent, and an uneasy quiet fills the damp air.]],
+wrong here.  The usual smoke and glow of the trash fires in the
+outer tunnels are absent, and an uneasy quiet fills the damp air.]],
       },
       goal_first = {
          synopsis = "[You enter a large cavern.  %nC is present.]",
@@ -762,10 +763,10 @@ in your path.]],
          "\"%lC grows old.  Perhaps you will guide us after he ascends.\"",
       },
       guardtalk_before = {
-         "\"We have not been able to gather as much food since the Giants sealed off our access to the outer world.\"",
+         "\"We have not been able to scavenge as much food since the giants sealed the storm drains.\"",
          "\"Since %n sent her minions, we have been constantly fighting.\"",
          "\"I have heard your vision quest was successful.  Is this so?\"",
-         "\"So, tell me, %p, how have you fared?\"",
+         "\"So, tell me, %p, how have you fared up in the light?\"",
          "\"%lC grows old.  We know not who will guide us after he ascends.\"",
       },
       hasamulet = {
@@ -865,7 +866,7 @@ He smiles and says:
          text = [[%l grasps %o proudly for a moment, then looks at you.
 
 "You are its keeper now, and the time has come to resume your search
-for the Amulet.  %Z await your return through the
+for the Amulet.  %Z awaits your return through the
 magic portal which brought you here."]],
       },
       othertime = {
@@ -945,15 +946,15 @@ with good conscience.
       firsttime = {
          synopsis = "[You arrive back at %H and must find %l.]",
          output = "text",
-         text = [[What sorcery has brought you back to %H?  The smell
-of fresh funeral pyres tells you that something is amiss with the healing
-powers that used to practice here.
+         text = [[What strange routing has brought you back to %H?  The smell of the
+clinic's incinerator, running day and night, tells you that something
+is amiss with the healers who used to practice here.
 
-No rhizotomists are tending the materia medica gardens, and where are the
-common folk who used to come for the cures?
+No orderlies are tending the chem lab, and where are the street folk
+who used to queue at the door for patching up?
 
-You know that you must quickly make your way to the collegium, and
-%ls iatreion, and find out what has happened in your absence.]],
+You know that you must quickly make your way to the clinic, and
+%ls surgery, and find out what has happened in your absence.]],
       },
       goal_first = {
          synopsis = "[You have reached the lair of %n.  Take %o away from %ni.]",
@@ -977,18 +978,18 @@ but at least you hope that %l can put it to good use once
 again.]],
       },
       guardtalk_after = {
-         "\"Did you read that new treatise on the therapeutic use of leeches?\"",
-         "\"Paint a red caduceus on your shield and monsters won't hit you.\"",
-         "\"How are you feeling?  Perhaps a good bleeding will improve your spirits.\"",
-         "\"Have you heard the absurd new theory that diseases are caused by microscopic organisms, and not ill humors?\"",
+         "\"Did you read that new paper on nanite-assisted suturing?\"",
+         "\"Paint a red cross on your riot shield and monsters won't hit you.\"",
+         "\"How are you feeling?  Perhaps a good blood scrub will improve your spirits.\"",
+         "\"Have you heard the absurd new theory that chrome rot is caused by bad firmware?\"",
          "\"I see that you bring %o, now you can cure this plague!\"",
       },
       guardtalk_before = {
-         "\"Did you read that new treatise on the therapeutic use of leeches?\"",
-         "\"Paint a red caduceus on your shield and monsters won't hit you.\"",
-         "\"I passed handwriting so they are demoting me a rank.\"",
-         "\"I've heard that even %l has not been able to cure Chiron.\"",
-         "\"We think %n has used %nj alchemists, and %o, to unleash a new disease we call 'the cold' on Gehennom.\"",
+         "\"Did you read that new paper on nanite-assisted suturing?\"",
+         "\"Paint a red cross on your riot shield and monsters won't hit you.\"",
+         "\"I failed handwriting so they are demoting me to filing.\"",
+         "\"I've heard that even %l has not been able to cure the chrome rot.\"",
+         "\"We think %n has used %nj chemists, and %o, to unleash a new strain of flu on the undercity.\"",
       },
       hasamulet = {
          synopsis = "[\"You have recovered the Amulet.  Travel to the Astral Plane and return it to %d.\"]",
@@ -1025,7 +1026,7 @@ I need your fresh strength to carry on our work.
 the skills necessary to accomplish this mission."]],
       },
       leader_last = {
-         synopsis = "[You are a failure as a healer.]",
+         synopsis = "[You are a failure as a Ripperdoc.]",
          output = "text",
          text = [["You have failed us, %p.  You are a quack!  A charlatan!
 
@@ -1098,7 +1099,7 @@ has finished %lh speaks to you.
          text = [[%l cautiously handles %o while watching you.
 
 "You are its keeper now, and the time has come to resume your search
-for the Amulet.  %Z await your return through the
+for the Amulet.  %Z awaits your return through the
 magic portal which brought you here."]],
       },
       othertime = {
@@ -1116,26 +1117,26 @@ absence, yes?  How fare you upon your quest for the Amulet?"]],
       assignquest = {
          synopsis = "[Pass through %i to reach %n.  Destroy %ni and return with %o.]",
          output = "text",
-         text = [["Ah, %p.  Thou art truly ready, as no %c before thee hath
-been.  Hear now Our words:
+         text = [["Ah, %p.  You are truly ready, as no %c before you has
+been.  Hear me, and remember the Code:
 
-"As thou noticed as thou approached %H, a great battle hath
-been fought recently in these fields.  Know thou that Merlin himself
-came to aid Us here as We battled the foul %n.  In the midst of that
-battle, %n struck Merlin a great blow, felling him.  Then, as Our
-forces were pressed back, %n stole %o.
+"As you saw on your way in, a great battle has been fought recently in
+the streets around %H.  Merlin, the precinct's old netrunner, came to
+aid us as we fought the beast %n.  In the midst of that battle,
+%n struck Merlin a great blow, felling him.  Then, as our line was
+pushed back, %n stole %o.
 
 "We eventually turned the tide, but lost many %cP in doing so.
-Merlin was taken off by his apprentice, but hath not recovered.  We have
-been told that so long as %n possesseth %o,
+Merlin was carried off by his apprentice, but has not recovered.  We
+have been told that so long as %n possesses %o,
 Merlin will not regain his health.
 
-"We hereby charge thee with this most important of duties:
+"I hereby charge you with this most important of duties:
 
-"Go forth from this place, to the fens, and there thou wilt find
-%i.  From there, thou must track down %n.  Destroy the
-beast, and return to Us %o.  Only then can
-We restore Merlin to health."]],
+"Ride out from here into the flooded lowlands, and there you will find
+%i.  From there, you must track down %n.  Bring the
+beast to justice, and return %o to me.  Only then can
+we restore Merlin to health."]],
       },
       badalign = {
          synopsis = "[Go and do penance.  Return when you are truly %a.]",
@@ -1183,10 +1184,10 @@ Our presence when thou hast attained the noble title of %R."]],
          synopsis = "[Signs of battle include long gouges in the walls of %H.]",
          output = "text",
          text = [[You materialize in the shadows of %H.  Immediately, you notice
-that something is wrong.  The fields around the castle are trampled and
-withered, as if some great battle has been recently fought.
+that something is wrong.  The streets around the precinct are cratered
+and burnt out, as if some great battle has been recently fought.
 
-Exploring further, you %x long gouges in the walls of %H.
+Exploring further, you %x long gouges in the armored walls of %H.
 You know of only one creature that makes those kinds of marks...]],
       },
       goal_first = {
@@ -1210,18 +1211,18 @@ if you are in two places at once, and in the second, you are waking from
 a long sleep.]],
       },
       guardtalk_after = {
-         "\"Hail, %p!  Verily, thou lookest well.\"",
-         "\"So, %p, didst thou find %n in the fens near %i?\"",
-         "\"Worthy %p, hast thou proven thy right purpose on the body of %n?\"",
-         "\"Verily, %l could have no better champion, %p.\"",
-         "\"Hast thou indeed recovered %o?\"",
+         "\"Hello, %p!  You're looking well.\"",
+         "\"So, %p, did you find %n in the lowlands near %i?\"",
+         "\"Did you bring %n to justice, %p?\"",
+         "\"%lC couldn't ask for a better marshal, %p.\"",
+         "\"Did you really recover %o?\"",
       },
       guardtalk_before = {
-         "\"Hail, %p!  Verily, thou lookest well.\"",
-         "\"There is word, %p, that %n hath been sighted in the fens near %i.\"",
-         "\"Thou art our only hope now, %p.\"",
-         "\"Verily, %l could have no better champion, %p.\"",
-         "\"Many brave %cP died when %n attacked.\"",
+         "\"Hello, %p!  You're looking well.\"",
+         "\"Word on the wire, %p, is that %n has been sighted in the lowlands near %i.\"",
+         "\"You're our only hope now, %p.\"",
+         "\"%lC couldn't ask for a better marshal, %p.\"",
+         "\"Many good %cP died when %n attacked.\"",
       },
       hasamulet = {
          synopsis = "[Take the Amulet to the Astral Plane and deliver it to %d.]",
@@ -1528,7 +1529,7 @@ then returns his gaze to you.
 
 "%oC must remain with you.  Use %oi
 as you resume your search for the Amulet.
-%Z await your return through the magic portal
+%Z awaits your return through the magic portal
 that brought you here."]],
       },
       othertime = {
@@ -1546,18 +1547,18 @@ may be the final time you come here.]],
          text = [["Yes, %p.  You are truly ready now.  Attend to me and I shall
 tell you of what has transpired:
 
-"At one of the Great Festivals a short time ago, %n and a legion
+"During one of the Great Uplinks a short time ago, %n and a legion
 of undead invaded %H.  Many %gP were killed, including
 the one carrying %o.
 
-"As a final act of vengefulness, %n desecrated the altar here.
+"As a final act of vengefulness, %n desecrated the server altar here.
 Without it, we could not mount a counter-attack.  Now, there are
 barely enough %gP left to keep the undead at bay.
 
 "We need you to find %i, then, from there, travel
 to %ns lair.  If you can manage to defeat %n and return
 %o here, we can then drive off the legions of
-undead that befoul the land.
+undead that befoul the machine.
 
 "Go with %d as your guide, %p."]],
       },
@@ -1748,7 +1749,7 @@ of Yendor.
          text = [[%lC reiterates that %o is yours now.
 
 "The time has come to resume your search for the Amulet.
-%Z await your return through the magic portal
+%Z awaits your return through the magic portal
 that brought you here."]],
       },
       othertime = {
@@ -1766,17 +1767,17 @@ the final time you come here.]],
          text = [["You are indeed ready, %p.  I shall tell you what has transpired,
 and why we so desperately need your help:
 
-"A short time ago, the mountain centaurs to the east invaded
-and enslaved the plains centaurs in this area.  The local
+"A short time ago, the mountain centaur clans to the east rode in
+and enslaved the plains centaurs in this territory.  The local
 leader is now only a figurehead, and serves %n.
 
-"During our last gathering of worship here, we were beset by hordes of
-hostile centaurs, as you witnessed.  In the first onslaught a group,
-headed by %n %niself, managed to breach the grove and steal
+"During our last gathering here, we were beset by hordes of hostile
+centaurs, as you witnessed.  In the first onslaught a gang,
+headed by %n %niself, managed to breach the camp and steal
 %o.
 
 "Since then, we have been besieged.  We do not know how much longer
-we will be able to maintain our magical barriers.
+our shield generators will hold.
 
 "If we are to survive, you, %p, must infiltrate
 %i.  There, you will find a pathway down, to the
@@ -1829,10 +1830,10 @@ which we need you to do.  %RA might just be able to do this thing.
          synopsis = "[The ancient forest grove is surrounded by centaurs.]",
          output = "text",
          text = [[You arrive in familiar surroundings.  In the distance, you %x the
-ancient forest grove, the place of worship to %d.
+old forest grove of the frontier camp, where the faithful of %d gather.
 
-Something is wrong, though.  Surrounding the grove are centaurs!
-And they've noticed you!]],
+Something is wrong, though.  Surrounding the grove are centaurs, and
+they're armed!  And they've noticed you!]],
       },
       goal_first = {
          synopsis = "[You descend into a subterranean complex.  Hooves clatter in the distance.]",
@@ -1979,7 +1980,7 @@ the Amulet."]],
 
 "With this wondrous bow, one need never run out of arrows.
 You are its keeper now, and the time has come to resume your
-search for the Amulet.  %Z await your return
+search for the Amulet.  %Z awaits your return
 through the magic portal that brought you here."]],
       },
       othertime = {
@@ -2049,8 +2050,8 @@ leave you, %p?  Oh yeah, I remember, I was going to kill you!"]],
          synopsis = "[You are in Ransmannsby, where you trained.  Find %l.]",
          output = "text",
          text = [[Unexpectedly, you find yourself back in Ransmannsby, where you trained to
-be a thief.  Quickly you make the guild sign, hoping that you AND word
-of your arrival reach %ls den.]],
+be an infiltrator.  Quickly you flash the syndicate sign, hoping that you
+AND word of your arrival reach %ls den.]],
       },
       goal_first = {
          synopsis = "[You sense %o.]",
@@ -2070,16 +2071,16 @@ willing to die to keep it out of %ls hands.  Somehow
 you know that you must do likewise.]],
       },
       guardtalk_after = {
-         "\"I was sure wrong about Lady Tyvefelle's house; I barely got away with my life and lost my lock pick in the process.\"",
+         "\"I was sure wrong about Lady Tyvefelle's penthouse; I barely got away with my life and lost my cyberdeck in the process.\"",
          "\"You're back?  Even the Twain don't come back anymore.\"",
-         "\"Can you spare an old cutpurse a zorkmid for some grog?\"",
+         "\"Can you spare an old cutpurse a credit for some synthahol?\"",
          "\"Fritz tried to join the other side, and now he's hell-hound chow.\"",
          "\"Be careful what you steal, I hear the boss has perfected turning rocks into worthless pieces of glass.\"",
       },
       guardtalk_before = {
-         "\"I hear that Lady Tyvefelle's household is lightly guarded.\"",
+         "\"I hear that Lady Tyvefelle's penthouse runs on an old security build.\"",
          "\"You're back?  Even the Twain don't come back anymore.\"",
-         "\"Can you spare an old cutpurse a zorkmid for some grog?\"",
+         "\"Can you spare an old cutpurse a credit for some synthahol?\"",
          "\"Fritz tried to join the other side, and now he's hell-hound chow.\"",
          "\"Be careful what you steal, I hear the boss has perfected turning rocks into worthless pieces of glass.\"",
       },
@@ -2204,19 +2205,19 @@ is yours for the asking."]],
          synopsis = "[You must enter %i, then regain %o from %n.]",
          output = "text",
          text = [["Domo %p-san, indeed you are ready.  I can now tell you what
-it is that I require of you.
+it is that I require of you, though you serve no lord now.
 
-"The daimyo, %n, has betrayed us.  He has stolen from us
-%o and taken it to his donjon deep within
+"The rival executive, %n, has betrayed us.  He has stolen from us
+%o and taken it to his fortress deep within
 %i.
 
-"If I cannot show the emperor %o when he comes
-for the festival he will know that I have failed in my duty, and
-request that I commit seppuku.
+"If I cannot show the chairman %o when he comes
+for the shareholders' festival he will know that I have failed in my
+duty, and request that I commit seppuku.
 
 "You must gain entrance to %i and retrieve the
-emperor's property.  Be quick!  The emperor will be here for the
-cha-no-you in 5 sticks.
+corporation's property.  Be quick!  The chairman will be here for the
+board meeting in five hours.
 
 "Wakarimasu ka?"]],
       },
@@ -2226,7 +2227,7 @@ cha-no-you in 5 sticks.
          text = [["%p-san, you would do better to join the kyokaku.
 
 "You have skills, but until you can call upon the bushido to know when and
-how to use them you are not samurai.  When you can think %a and
+how to use them you are not Samurai.  When you can think %a and
 act %a then return."]],
       },
       badlevel = {
@@ -2256,7 +2257,7 @@ are ready, return to me."]],
          "\"Sayonara.\"",
          "\"There can be honor in defeat, but no gain.\"",
          "\"Your kami must be strong in order to succeed.\"",
-         "\"You are indeed a worthy %R, but now you must be a worthy samurai.\"",
+         "\"You are indeed a worthy %R, but now you must be a worthy Samurai.\"",
          "\"If you fail, %n will be like a tai-fun on the land.\"",
          "\"If you are truly %a, %d will listen.\"",
          "\"Sharpen your swords and your wits for the task before you.\"",
@@ -2267,12 +2268,12 @@ are ready, return to me."]],
          text = [[Even before your senses adjust, you recognize the kami of
 %H.
 
-You %x the standard of your teki, %n, flying above
-the town.  How could such a thing have happened?  Why are ninja
-wandering freely; where are the samurai of your daimyo, %l?
+You %x the corporate banner of your teki, %n, projected above
+the tower.  How could such a thing have happened?  Why are ninja
+wandering freely; where are the samurai of your old daimyo, %l?
 
 You quickly say a prayer to Izanagi and Izanami and walk towards
-town.]],
+the tower.]],
       },
       goal_alt = {
          text = "As you arrive once again at the home of %n.",
@@ -2294,7 +2295,7 @@ turn only to %o.]],
          synopsis = "[You feel the power of %o and are humbled.]",
          output = "text",
          text = [[As you pick up %o, you feel the strength of its karma.
-You realize at once why so many good samurai had to die to defend it.
+You realize at once why so many good Samurai had to die to defend it.
 You are humbled knowing that you hold one of the artifacts of the
 sun goddess.]],
       },
@@ -2328,23 +2329,23 @@ for saki and stories when you have finished.
          text = [[Your healing skills tell you that %ns wounds are mortal.
 
 You know that the bushido tells you to finish him and let his kami
-die with honor, but the thought of so many samurai dead due to this
+die with honor, but the thought of so many Samurai dead due to this
 man's dishonor prevents you from giving the final blow.
 
 You order that his unwashed head be given to the crows and his body
 thrown into the sea.]],
       },
       leader_first = {
-         synopsis = "[%lC needs someone to lead %lj samurai against %n.  Are you ready?]",
+         synopsis = "[%lC needs someone to lead %lj Samurai against %n.  Are you ready?]",
          output = "text",
          text = [["Ah, %p-san, it is good to see you again.  I need someone who can
-lead my samurai against %n.  If you are ready, you will be
+lead my Samurai against %n.  If you are ready, you will be
 that person."]],
       },
       leader_last = {
          synopsis = "[Leave and do not come back.]",
          output = "text",
-         text = [["You are no longer my samurai, %p.
+         text = [["You are no longer my Samurai, %p.
 
 "Hara-kiri is denied.  You are ordered to shave your head and then to
 become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"]],
@@ -2354,11 +2355,11 @@ become a monk.  Your fief and family are forfeit.  Wakarimasu ka?"]],
 being my vassal?"]],
       },
       leader_other = {
-         synopsis = "[Are you truly a samurai?]",
+         synopsis = "[Are you truly a Samurai?]",
          output = "text",
          text = [["You begin to test my matsu, %p-san.
-If you cannot determine what I want in a samurai, how can I rely on you
-to figure out what I need from a samurai?"]],
+If you cannot determine what I want in a Samurai, how can I rely on you
+to figure out what I need from a Samurai?"]],
       },
       locate_first = {
          text = [[You instinctively reach for your swords.  You do not recognize the
@@ -2380,7 +2381,7 @@ head to send unwashed to %l."]],
          text = "\"After I have dispatched you, I will curse your kami.\"",
       },
       nemesis_wantsit = {
-         text = [["You have fought my samurai; surely you must know that you
+         text = [["You have fought my Samurai; surely you must know that you
 will not be able to take %o back to
 %H."]],
       },
@@ -2395,7 +2396,7 @@ will not be able to take %o back to
     "You have brought your family great honor, %p-sama.
 
     "While you have been gone the emperor's advisors have discovered in
-    the ancient texts that the karma of the samurai who seeks to recover
+    the ancient texts that the karma of the Samurai who seeks to recover
     the Amulet and the karma of %o are joined
     as the seasons join to make a year.
 
@@ -2523,14 +2524,14 @@ weight has been lifted from your shoulders.  Your only thoughts are
 to quickly return to %H and find %l.]],
       },
       guardtalk_after = {
-         "\"Gehennom on 5 zorkmids a day -- more like 500 a day if you ask me.\"",
+         "\"Gehennom on 5 credits a day -- more like 500 a day if you ask me.\"",
          "\"Do you know where I could find some nice postcards of The Old Metro?\"",
          "\"Have you tried the weird toilets?\"",
          "\"If you stick around, I'll show you the pictures from my latest trip.\"",
          "\"Did you bring me back any souvenirs?\"",
       },
       guardtalk_before = {
-         "\"Gehennom on 5 zorkmids a day -- more like 500 a day if you ask me.\"",
+         "\"Gehennom on 5 credits a day -- more like 500 a day if you ask me.\"",
          "\"Do you know where I could find some nice postcards of The Old Metro?\"",
          "\"Have you tried the weird toilets?\"",
          "\"Don't stay at the Inn, I hear the food is terrible and it has rats.\"",
@@ -2851,7 +2852,7 @@ May your steps be guided by %d, my %S."]],
          output = "text",
          text = [["Careful, %p!  %oC might break, and that would be
 a tragic loss.  You are its keeper now, and the time has come to
-resume your search for the Amulet.  %Z await your
+resume your search for the Amulet.  %Z awaits your
 return through the magic portal that brought you here."]],
       },
       othertime = {
@@ -2870,19 +2871,19 @@ your search for the Amulet as I have wished.  How do you fare?"]],
          text = [["Yes, %p, you truly are ready for this dire task.  Listen,
 carefully, for what I tell you now will be of vital importance.
 
-"Since you left us to hone your skills in the world, we unexpectedly came
+"Since you left us to hone your skills on the Grid, we unexpectedly came
 under attack by the forces of %n.  As you know, we thought
-%n had perished at the end of the last age, but, alas, this was
-not the case.
+%n had been deleted at the end of the last age, but, alas, a
+backup survived.
 
 "%nC sent an army of abominations against us.  Among them was a
-minion, mindless and ensorcelled, and thus, in the confusion, it was
-able to penetrate our defenses.  Alas, this creature has stolen
-%o and I fear has delivered %oh to %n.
+minion, mindless and running a single stolen credential, and thus, in
+the confusion, it was able to slip past our firewalls.  Alas, this
+creature has stolen %o and I fear has delivered %oh to %n.
 
-"Over the years, I had woven most of my power into this amulet, and thus,
-without it, I have but a shadow of my former power, and I fear that I
-shall soon perish.
+"Over the years, I had compiled most of my code into that amulet, and
+thus, without it, I am a shadow of my former self, and I fear that my
+processes will soon be terminated.
 
 "You must travel to %i, and within its dungeons,
 find and overcome %n, and return %o to me.
@@ -2935,14 +2936,14 @@ renown as %Ra."]],
          synopsis = "[You have arrived at %ls tower but something is very wrong.]",
          output = "text",
          text = [[You are suddenly in familiar surroundings.  You notice what appears to
-be a large, squat stone structure nearby.  Wait!  That looks like the
-tower of your former teacher, %l.
+be a large, squat concrete server tower nearby.  Wait!  That looks like
+the tower of your old sysop, %l.
 
-However, things are not the same as when you were last here.  Mists and
-areas of unexplained darkness surround the tower.  There is movement in
-the shadows.
+However, things are not the same as when you were last here.  Static
+and areas of dead signal surround the tower.  There is movement in the
+shadows.
 
-Your teacher would never allow such unaesthetic forms to surround the
+Your old sysop would never allow such unaesthetic forms to surround the
 tower...  unless something were dreadfully wrong!]],
       },
       goal_alt = {
@@ -2964,18 +2965,18 @@ attack the Wizard of Yendor, you know you must return it to its rightful
 owner, %l.]],
       },
       guardtalk_after = {
-         "\"I have some eye of newt to trade, do you have a spare blind-worm's sting?\"",
-         "\"The magic portal now seems like it will remain stable for quite some time.\"",
-         "\"Have you noticed how much stronger %l is since %o was recovered?\"",
+         "\"I have some old floppies to trade, do you have a spare bootloader?\"",
+         "\"The portal now seems like it will stay up for quite some time.\"",
+         "\"Have you noticed how much faster %l runs since %o was recovered?\"",
          "\"Thank %d!  We weren't positive you would defeat %n.\"",
-         "\"I, too, will venture into the world, because %n was but one of many evils to be vanquished.\"",
+         "\"I, too, will jack out into the world, because %n was but one of many evils to be deleted.\"",
       },
       guardtalk_before = {
-         "\"Would you happen to have some eye of newt in that overstuffed pack, %s?\"",
-         "\"Ah, the spell to create the magic portal worked.  Outstanding!\"",
-         "\"Hurry!  %lC may not survive that casting of the portal spell!\"",
-         "\"The spells of %n were just too powerful for us to withstand.\"",
-         "\"I, too, will venture into the world, because %n is but one of many evils to be vanquished.\"",
+         "\"Would you happen to have some spare RAM in that overstuffed pack, %s?\"",
+         "\"Ah, the portal routine compiled on the first try.  Outstanding!\"",
+         "\"Hurry!  %lC may not survive running the portal routine!\"",
+         "\"The exploits of %n were just too powerful for our firewalls.\"",
+         "\"I, too, will jack out into the world, because %n is but one of many evils to be deleted.\"",
       },
       hasamulet = {
          synopsis = "[Take the Amulet to %ds altar on the Astral Plane.]",
@@ -3076,7 +3077,7 @@ beams at you and says:
          synopsis = "[Keep %o, return through the portal to %Z; find the other Amulet.]",
          output = "text",
          text = [["You are the keeper of %o now.  It is time to
-recover the /other/ Amulet.  %Z await your return through
+recover the /other/ Amulet.  %Z awaits your return through
 the magic portal which brought you here."]],
       },
       othertime = {
