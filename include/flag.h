@@ -37,6 +37,7 @@ struct flag {
     boolean help;            /* look in data file for info about stuff */
     boolean tips;            /* show helpful hints? */
     boolean tutorial;        /* ask if player wants tutorial level? */
+    boolean hardcore;        /* NeonHack 2: one life, no waking up */
     boolean ignintr;         /* ignore interrupts */
     boolean implicit_uncursed; /* maybe omit "uncursed" status in inventory */
     boolean ins_chkpt;       /* checkpoint as appropriate; INSURANCE */

@@ -24,7 +24,6 @@ staticfn void sort_valuables(struct valuable_data *, int);
 staticfn void artifact_score(struct obj *, boolean, winid);
 staticfn boolean fuzzer_savelife(int);
 ATTRNORETURN staticfn void really_done(int) NORETURN;
-staticfn void savelife(int);
 staticfn boolean should_query_disclose_option(int, char *);
 #ifdef DUMPLOG
 staticfn void dump_plines(void);
@@ -700,7 +699,8 @@ disclose(int how, boolean taken)
 }
 
 /* try to get the player back in a viable state after being killed */
-staticfn void
+/* NeonHack 2: also used by city_flatline() */
+void
 savelife(int how)
 {
     int uhpmin;
@@ -1101,6 +1101,9 @@ done(int how)
             survive = TRUE;
         }
     }
+    /* NeonHack 2: story mode wakes you up at a clinic */
+    if (!survive && how < GENOCIDED && city_flatline(how))
+        survive = TRUE;
     /* explore and wizard modes offer player the option to keep playing */
     if (!survive && (wizard || discover) && how <= GENOCIDED
 #ifdef HANGUPHANDLING

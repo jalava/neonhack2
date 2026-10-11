@@ -354,6 +354,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(guicolor, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &iflags.wc2_guicolor, Term_False,
            "use color for UI")
+    NHOPTB(hardcore, Advanced, 0, opt_in, set_in_config,
+           Off, Yes, No, No, NoAlias, &flags.hardcore, Term_False,
+           "one life: no waking up at a clinic when you flatline")
     NHOPTB(help, Advanced, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &flags.help, Term_False,
            "show all available info when using whatis-command")

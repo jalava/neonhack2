@@ -782,6 +782,10 @@ u_entered_shop(char *enterstring)
         return;
     }
     record_achievement(ACH_SHOP);
+    /* NeonHack 2: a city clinic patches you up when you flatline */
+    if (svr.rooms[*enterstring - ROOMOFFSET].rtype == CLINICSHOP
+        && In_city(&u.uz) && !ANGRY(shkp))
+        city_clinic_visit(shkp);
 
     eshkp->bill_p = &(eshkp->bill[0]);
 

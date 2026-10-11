@@ -823,6 +823,7 @@ newgame(void)
     else
         u_on_upstairs();
     city_arrived();
+    city_set_respawn(FALSE); /* until a clinic says otherwise */
     vision_reset();          /* set up internals for level (after mklev) */
     check_special_room(FALSE);
 
@@ -860,6 +861,7 @@ newgame(void)
 
     /* Success! */
     welcome(TRUE);
+    ask_death_mode(); /* NeonHack 2: story mode or hardcore */
     story_new_game(); /* NeonHack 2: the prologue begins */
     notice_mon_on(); /* now we can notice monsters */
     if (a11y.glyph_updates)

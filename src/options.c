@@ -478,6 +478,49 @@ ask_do_tutorial(void)
     return dotut;
 }
 
+/* NeonHack 2: story mode or hardcore, unless the config file says */
+void
+ask_death_mode(void)
+{
+    winid win;
+    menu_item *sel;
+    anything any;
+    char buf[BUFSZ];
+    const char *rc;
+    boolean norc;
+    int n;
+
+    if (opt_set_in_config[opt_hardcore] || iflags.debug_fuzzer)
+        return;
+    rc = nh_basename(get_configfile(), TRUE);
+    norc = !strcmp(get_configfile(), "/dev/null");
+    Snprintf(buf, sizeof buf,
+             "Put \"OPTIONS=hardcore\" or \"OPTIONS=!hardcore\" in %s"
+             " to skip this.",
+             (rc && *rc && !norc) ? rc : "your configuration file");
+    do {
+        win = create_nhwindow(NHW_MENU);
+        start_menu(win, MENU_BEHAVE_STANDARD);
+        any = cg.zeroany;
+        any.a_char = 's';
+        add_menu(win, &nul_glyphinfo, &any, 's', 0, ATR_NONE, NO_COLOR,
+                 "Story mode: if you flatline, you wake up at the last clinic"
+                 " you used", MENU_ITEMFLAGS_NONE);
+        any.a_char = 'h';
+        add_menu(win, &nul_glyphinfo, &any, 'h', 0, ATR_NONE, NO_COLOR,
+                 "Hardcore: one life, as in NetHack", MENU_ITEMFLAGS_NONE);
+        add_menu_str(win, "");
+        add_menu_str(win, "Story mode charges you the ripperdoc's bill"
+                          " (a quarter of your credits).");
+        add_menu_str(win, buf);
+        end_menu(win, "How do you want to play?");
+        n = select_menu(win, PICK_ONE, &sel);
+        destroy_nhwindow(win);
+    } while (n <= 0);
+    flags.hardcore = (sel[0].item.a_char == 'h');
+    free((genericptr_t) sel);
+}
+
 /*
  **********************************
  *

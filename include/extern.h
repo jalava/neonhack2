@@ -408,6 +408,10 @@ extern int city_metro(void);
 extern int docitymap(void);
 extern boolean neon2_pay(long);
 extern int wiz_city(void);
+extern void city_set_respawn(boolean);
+extern void city_clinic_visit(struct monst *) NONNULLARG1;
+extern int city_flatlines(void);
+extern boolean city_flatline(int);
 
 /* ### cmd.c ### */
 
@@ -1025,6 +1029,7 @@ ATTRNORETURN extern void panic(const char *, ...) PRINTF_F(1, 2) NORETURN;
 #endif
 #if !defined(MAKEDEFS_C) && !defined(MDLIB_C) && !defined(CPPREGEX_C)
 extern void done(int);
+extern void savelife(int);
 extern void container_contents(struct obj *, boolean, boolean, boolean);
 ATTRNORETURN extern void nh_terminate(int) NORETURN;
 extern void delayed_killer(int, int, const char *);
@@ -2365,6 +2370,7 @@ extern int shiny_obj(char);
 /* ### options.c ### */
 
 extern boolean ask_do_tutorial(void);
+extern void ask_death_mode(void);
 extern boolean match_optname(const char *, const char *, int, boolean) NONNULLARG12;
 extern uchar txt2key(char *) NONNULLARG1;
 extern void initoptions(void);

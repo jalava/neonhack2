@@ -38,6 +38,9 @@ static struct city_arrival {
 static struct city_state {
     unsigned long unlocked; /* districts you can travel to */
     unsigned long visited;  /* districts you have been to */
+    d_level respawn;        /* where you wake up after flatlining */
+    coordxy rx, ry;
+    int flatlines;          /* times you have woken up there */
 } cstate;
 
 /* where each district sits on the city map: column, row */
@@ -313,6 +316,9 @@ city_init_state(void)
     s_level *sp;
 
     cstate.unlocked = cstate.visited = 0UL;
+    cstate.respawn.dnum = cstate.respawn.dlevel = 0;
+    cstate.rx = cstate.ry = 0;
+    cstate.flatlines = 0;
     for (n = 1; n <= district_count(); n++)
         if ((sp = district_level(n)) != 0 && !sp->locked)
             cstate.unlocked |= 1UL << n;
@@ -364,6 +370,10 @@ city_state_lines(char **lines, int n)
 
         Sprintf(buf, "districts %lx %lx", cstate.unlocked, cstate.visited);
         lines[n++] = dupstr(buf);
+        Sprintf(buf, "respawn %d %d %d %d %d", cstate.respawn.dnum,
+                cstate.respawn.dlevel, cstate.rx, cstate.ry,
+                cstate.flatlines);
+        lines[n++] = dupstr(buf);
     }
     return n;
 }
@@ -381,6 +391,18 @@ city_state_line(const char *line)
         cstate.visited = vis;
         return TRUE;
     }
+    if (!strncmp(line, "respawn ", 8)) {
+        int dn, dl, x, y, fl;
+
+        if (sscanf(line, "respawn %d %d %d %d %d", &dn, &dl, &x, &y, &fl)
+            == 5) {
+            cstate.respawn.dnum = (xint16) dn;
+            cstate.respawn.dlevel = (xint16) dl;
+            cstate.rx = (coordxy) x, cstate.ry = (coordxy) y;
+            cstate.flatlines = fl;
+        }
+        return TRUE;
+    }
     return FALSE;
 }
 
@@ -388,7 +410,110 @@ void
 city_state_reset(void)
 {
     cstate.unlocked = cstate.visited = 0UL;
+    cstate.respawn.dnum = cstate.respawn.dlevel = 0;
+    cstate.rx = cstate.ry = 0;
+    cstate.flatlines = 0;
     arrival.kind = CITY_ARRIVE_NONE;
+}
+
+/*
+ * Flatlining (story mode)
+ */
+
+/* wake up here after flatlining */
+void
+city_set_respawn(boolean verbose)
+{
+    if (!In_city(&u.uz))
+        return;
+    assign_level(&cstate.respawn, &u.uz);
+    cstate.rx = u.ux, cstate.ry = u.uy;
+    if (verbose && !flags.hardcore)
+        pline("If you flatline, you'll wake up here.");
+}
+
+/* walking into a city clinic signs you up */
+void
+city_clinic_visit(struct monst *shkp)
+{
+    if (flags.hardcore)
+        return;
+    if (on_level(&cstate.respawn, &u.uz)
+        && distmin(cstate.rx, cstate.ry, u.ux, u.uy) <= 8) {
+        cstate.rx = u.ux, cstate.ry = u.uy; /* same clinic */
+        return;
+    }
+    city_set_respawn(FALSE);
+    if (!Deaf)
+        pline("%s scans your biometrics.  If you flatline, you'll wake up"
+              " here.", Shknam(shkp));
+}
+
+int
+city_flatlines(void)
+{
+    return cstate.flatlines;
+}
+
+static char wakemsg[BUFSZ];
+
+/* story mode: instead of dying, wake up at the last clinic you used;
+   False if death is final (hardcore, the endgame, genocide, ...) */
+boolean
+city_flatline(int how)
+{
+    char kbuf[BUFSZ], pbuf[BUFSZ], buf[BUFSZ * 2];
+    long bill;
+    coordxy x = cstate.rx, y = cstate.ry;
+
+    if (flags.hardcore || program_state.panicking || how >= GENOCIDED
+        || cstate.respawn.dlevel <= 0 || In_endgame(&u.uz)
+        || !district_count())
+        return FALSE;
+
+    formatkiller(kbuf, sizeof kbuf, how, FALSE);
+    /* "You flatline." has been said; this is what happens next */
+    pline("Somewhere across the city, a ripperdoc's monitor starts"
+          " beeping.");
+    display_nhwindow(WIN_MESSAGE, FALSE);
+    savelife(how);
+    u.uhp = u.uhpmax;
+    if (Upolyd)
+        rehumanize();
+    cstate.flatlines++;
+    /* the ripperdoc's bill */
+    if ((bill = money_cnt(gi.invent) / 4L) > 0L)
+        (void) neon2_pay(bill);
+    /* nobody is looking for a corpse */
+    if (u.uheat) {
+        u.uheat = 0L;
+        disp.botl = TRUE;
+    }
+    Snprintf(buf, sizeof buf, "flatlined (%s), woke up in %s", kbuf,
+             city_place_phrase(&cstate.respawn, pbuf));
+    gamelog_add(LL_LIFESAVE, svm.moves, buf);
+    livelog_printf(LL_LIFESAVE, "%s", buf);
+    /* shown when savelife()'s turn of helplessness ends */
+    if (bill > 0L)
+        Sprintf(wakemsg, "You wake up on a ripperdoc's table, %ld %s poorer.",
+                bill, currency(bill));
+    else
+        Strcpy(wakemsg, "You wake up on a ripperdoc's table.");
+    gn.nomovemsg = wakemsg;
+    if (on_level(&cstate.respawn, &u.uz)) {
+        if (!goodpos(x, y, &gy.youmonst, 0)) {
+            coord cc;
+
+            if (enexto(&cc, x, y, gy.youmonst.data))
+                x = cc.x, y = cc.y;
+        }
+        teleds(x, y, TELEDS_TELEPORT);
+    } else {
+        city_set_arrival(CITY_ARRIVE_XY, x, y);
+        schedule_goto(&cstate.respawn, UTOTYPE_NONE, (char *) 0,
+                      (char *) 0);
+    }
+    return TRUE;
 }
 
 /*
