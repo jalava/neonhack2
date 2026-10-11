@@ -28,20 +28,20 @@
 /* NUM_ROLES is defined in hack.h */
 
 const struct Role roles[NUM_ROLES+1] = {
-    { { "Archeologist", 0 },
-      { { "Digger", 0 },
-        { "Field Worker", 0 },
-        { "Investigator", 0 },
-        { "Exhumer", 0 },
+    { { "Salvager", 0 },
+      { { "Scrapper", 0 },
+        { "Picker", 0 },
+        { "Rummager", 0 },
+        { "Digger", 0 },
+        { "Wreck Diver", 0 },
         { "Excavator", 0 },
-        { "Spelunker", 0 },
-        { "Speleologist", 0 },
-        { "Collector", 0 },
+        { "Deep Diver", 0 },
+        { "Relic Hunter", 0 },
         { "Curator", 0 } },
-      "Quetzalcoatl", "Camaxtli", "Huhetotl", /* Central American */
+      "Ozymandias", "_Mnemosyne", "Entropy", /* salvage cult */
       "Arc",
-      "the College of Archeology",
-      "the Tomb of the Toltec Kings",
+      "the Salvagers' Guild",
+      "the Buried Datacenter",
       PM_ARCHEOLOGIST,
       NON_PM,
       PM_LORD_CARNARVON,
@@ -69,19 +69,19 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_MAGIC_MAPPING,
       -4 },
-    { { "Barbarian", 0 },
-      { { "Plunderer", "Plunderess" },
-        { "Pillager", 0 },
-        { "Bandit", 0 },
-        { "Brigand", 0 },
+    { { "Nomad", 0 },
+      { { "Drifter", 0 },
+        { "Outrider", 0 },
         { "Raider", 0 },
+        { "Road Warrior", 0 },
+        { "Convoy Rider", 0 },
         { "Reaver", 0 },
-        { "Slayer", 0 },
+        { "Wasteland Slayer", 0 },
         { "Chieftain", "Chieftainess" },
         { "Conqueror", "Conqueress" } },
-      "Mitra", "Crom", "Set", /* Hyborian */
+      "Saint Diesel", "_Mother Road", "Burnout", /* road saints */
       "Bar",
-      "the Camp of the Duali Tribe",
+      "the Duali Clan Convoy",
       "the Duali Oasis",
       PM_BARBARIAN,
       NON_PM,
@@ -110,19 +110,19 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_HASTE_SELF,
       -4 },
-    { { "Caveman", "Cavewoman" },
-      { { "Troglodyte", 0 },
-        { "Aborigine", 0 },
-        { "Wanderer", 0 },
+    { { "Feral", 0 },
+      { { "Gutter Rat", 0 },
+        { "Sewer Dweller", 0 },
+        { "Scrounger", 0 },
         { "Vagrant", 0 },
-        { "Wayfarer", 0 },
-        { "Roamer", 0 },
-        { "Nomad", 0 },
-        { "Rover", 0 },
+        { "Pipe Crawler", 0 },
+        { "Vent Runner", 0 },
+        { "Ruin Stalker", 0 },
+        { "Tunnel Lord", "Tunnel Lady" },
         { "Pioneer", 0 } },
-      "Anu", "_Ishtar", "Anshar", /* Babylonian */
+      "Old Concrete", "_Rat Mother", "Big Noise", /* undercity spirits */
       "Cav",
-      "the Caves of the Ancestors",
+      "the Sewers of the Ancestors",
       "the Dragon's Lair",
       PM_CAVE_DWELLER,
       PM_LITTLE_DOG,
@@ -151,20 +151,20 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_DIG,
       -4 },
-    { { "Healer", 0 },
-      { { "Rhizotomist", 0 },
-        { "Empiric", 0 },
-        { "Embalmer", 0 },
-        { "Dresser", 0 },
-        { "Medicus ossium", "Medica ossium" },
-        { "Herbalist", 0 },
-        { "Magister", "Magistra" },
-        { "Physician", 0 },
-        { "Chirurgeon", 0 } },
-      "_Athena", "Hermes", "Poseidon", /* Greek */
+    { { "Ripperdoc", 0 },
+      { { "Orderly", 0 },
+        { "Medic", 0 },
+        { "Paramedic", 0 },
+        { "Trauma Tech", 0 },
+        { "Bonesetter", 0 },
+        { "Chemist", 0 },
+        { "Street Surgeon", 0 },
+        { "Chromesmith", 0 },
+        { "Ripperdoc", 0 } },
+      "_Asklepia", "Galen", "Pestis", /* medical saints */
       "Hea",
-      "the Temple of Epidaurus",
-      "the Temple of Coeus",
+      "the Epidaurus Free Clinic",
+      "the Coeus Pharmaceuticals Lab",
       PM_HEALER,
       NON_PM,
       PM_HIPPOCRATES,
@@ -191,19 +191,19 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_CURE_SICKNESS,
       -4 },
-    { { "Knight", 0 },
-      { { "Gallant", 0 },
-        { "Esquire", 0 },
-        { "Bachelor", 0 },
+    { { "Marshal", 0 },
+      { { "Recruit", 0 },
+        { "Deputy", 0 },
+        { "Patrolman", "Patrolwoman" },
+        { "Officer", 0 },
         { "Sergeant", 0 },
-        { "Knight", 0 },
-        { "Banneret", 0 },
-        { "Chevalier", "Chevaliere" },
-        { "Seignieur", "Dame" },
-        { "Paladin", 0 } },
-      "Lugh", "_Brigit", "Manannan Mac Lir", /* Celtic */
+        { "Detective", 0 },
+        { "Lieutenant", 0 },
+        { "Captain", 0 },
+        { "High Marshal", 0 } },
+      "Lex", "_Justicia", "Black Badge", /* the Code */
       "Kni",
-      "Camelot Castle",
+      "Camelot Precinct",
       "the Isle of Glass",
       PM_KNIGHT,
       PM_PONY,
@@ -238,7 +238,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Student of Stones", 0 },
         { "Student of Waters", 0 },
         { "Student of Metals", 0 },
-        { "Student of Winds", 0 },
+        { "Student of Circuits", 0 },
         { "Student of Fire", 0 },
         { "Master", 0 } },
       "Shan Lai Ching", "Chih Sung-tzu", "Huan Ti", /* Chinese */
@@ -272,19 +272,19 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_RESTORE_ABILITY,
       -4 },
-    { { "Priest", "Priestess" },
+    { { "Techpriest", "Techpriestess" },
       { { "Aspirant", 0 },
         { "Acolyte", 0 },
         { "Adept", 0 },
-        { "Priest", "Priestess" },
+        { "Techpriest", "Techpriestess" },
         { "Curate", 0 },
         { "Canon", "Canoness" },
-        { "Lama", 0 },
+        { "Archivist", 0 },
         { "Patriarch", "Matriarch" },
-        { "High Priest", "High Priestess" } },
+        { "Machine Pontiff", 0 } },
       0, 0, 0, /* deities from a randomly chosen other role will be used */
       "Pri",
-      "the Great Temple",
+      "the Great Cathedral of the Machine",
       "the Temple of Nalzok",
       PM_CLERIC,
       NON_PM,
@@ -315,17 +315,17 @@ const struct Role roles[NUM_ROLES+1] = {
       -4 },
     /* Note:  Rogue precedes Ranger so that use of `-R' on the command line
        retains its traditional meaning. */
-    { { "Rogue", 0 },
+    { { "Infiltrator", 0 },
       { { "Footpad", 0 },
         { "Cutpurse", 0 },
-        { "Rogue", 0 },
+        { "Sneak", 0 },
         { "Pilferer", 0 },
-        { "Robber", 0 },
         { "Burglar", 0 },
-        { "Filcher", 0 },
-        { "Magsman", "Magswoman" },
-        { "Thief", 0 } },
-      "Issek", "Mog", "Kos", /* Nehwon */
+        { "Cracksman", "Crackswoman" },
+        { "Shadow", 0 },
+        { "Phantom", 0 },
+        { "Ghost", 0 } },
+      "Syndicate", "_Nightshade", "Kingpin", /* underworld powers */
       "Rog",
       "the Thieves' Guild Hall",
       "the Assassins' Guild Hall",
@@ -355,7 +355,7 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_DETECT_TREASURE,
       -4 },
-    { { "Ranger", 0 },
+    { { "Gunslinger", 0 },
       {
 #if 0 /* OBSOLETE */
         {"Edhel",   "Elleth"},
@@ -371,15 +371,15 @@ const struct Role roles[NUM_ROLES+1] = {
         "Solonor Thelandira", "Aerdrie Faenya", "Lolth", /* Elven */
 #endif
         { "Tenderfoot", 0 },
-        { "Lookout", 0 },
-        { "Trailblazer", 0 },
-        { "Reconnoiterer", "Reconnoiteress" },
-        { "Scout", 0 },
-        { "Arbalester", 0 }, /* One skilled at crossbows */
-        { "Archer", 0 },
+        { "Plinker", 0 },
+        { "Shooter", 0 },
+        { "Gunhand", 0 },
+        { "Pistolero", "Pistolera" },
+        { "Gunfighter", 0 },
         { "Sharpshooter", 0 },
+        { "Deadeye", 0 },
         { "Marksman", "Markswoman" } },
-      "Mercury", "_Venus", "Mars", /* Roman/planets */
+      "High Noon", "_Lady Luck", "Desperado", /* frontier saints */
       "Ran",
       "Orion's camp",
       "the cave of the wumpus",
@@ -410,9 +410,9 @@ const struct Role roles[NUM_ROLES+1] = {
       A_INT,
       SPE_INVISIBILITY,
       -4 },
-    { { "Samurai", 0 },
+    { { "Ronin", 0 },
       { { "Hatamoto", 0 },       /* Banner Knight */
-        { "Ronin", 0 },          /* no allegiance */
+        { "Kenshi", 0 },         /* sword saint */
         { "Ninja", "Kunoichi" }, /* secret society */
         { "Joshu", 0 },          /* heads a castle */
         { "Ryoshu", 0 },         /* has a territory */
@@ -422,7 +422,7 @@ const struct Role roles[NUM_ROLES+1] = {
         { "Shogun", 0 } },       /* supreme commander, warlord */
       "_Amaterasu Omikami", "Raijin", "Susanowo", /* Japanese */
       "Sam",
-      "the Castle of the Taro Clan",
+      "the Taro Corporation Tower",
       "the Shogun's Castle",
       PM_SAMURAI,
       PM_LITTLE_DOG,
@@ -491,12 +491,12 @@ const struct Role roles[NUM_ROLES+1] = {
       SPE_CHARM_MONSTER,
       -4 },
     { { "Valkyrie", 0 },
-      { { "Stripling", 0 },
+      { { "Rookie", 0 },
         { "Skirmisher", 0 },
-        { "Fighter", 0 },
-        { "Man-at-arms", "Woman-at-arms" },
-        { "Warrior", 0 },
-        { "Swashbuckler", 0 },
+        { "Merc", 0 },
+        { "Operator", 0 },
+        { "Solo", 0 },
+        { "Shock Trooper", 0 },
         { "Hero", "Heroine" },
         { "Champion", 0 },
         { "Lord", "Lady" } },
@@ -530,17 +530,17 @@ const struct Role roles[NUM_ROLES+1] = {
       A_WIS,
       SPE_CONE_OF_COLD,
       -4 },
-    { { "Wizard", 0 },
-      { { "Evoker", 0 },
-        { "Conjurer", 0 },
-        { "Thaumaturge", 0 },
-        { "Magician", 0 },
-        { "Enchanter", "Enchantress" },
-        { "Sorcerer", "Sorceress" },
-        { "Necromancer", 0 },
+    { { "Netrunner", 0 },
+      { { "Script Kiddie", 0 },
+        { "Coder", 0 },
+        { "Phreaker", 0 },
+        { "Cracker", 0 },
+        { "Hacker", 0 },
+        { "Decker", 0 },
+        { "Console Cowboy", "Console Cowgirl" },
         { "Wizard", 0 },
-        { "Mage", 0 } },
-      "Ptah", "Thoth", "Anhur", /* Egyptian */
+        { "Technomancer", 0 } },
+      "Root", "_Ada", "Glitch", /* machine minds */
       "Wiz",
       "the Lonely Tower",
       "the Tower of Darkness",
@@ -601,9 +601,9 @@ const struct Race races[NUM_RACES + 1] = {
         { 1, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
-        "elf",
-        "elven",
-        "elvenkind",
+        "synth",
+        "synth",
+        "synthkind",
         "Elf",
         { 0, 0 },
         PM_ELF,
@@ -621,9 +621,9 @@ const struct Race races[NUM_RACES + 1] = {
         { 2, 0, 3, 0, 3, 0 }  /* Energy */
     },
     {
-        "dwarf",
-        "dwarven",
-        "dwarvenkind",
+        "cyborg",
+        "cyborg",
+        "cyborgkind",
         "Dwa",
         { 0, 0 },
         PM_DWARF,
@@ -641,9 +641,9 @@ const struct Race races[NUM_RACES + 1] = {
         { 0, 0, 0, 0, 0, 0 }  /* Energy */
     },
     {
-        "gnome",
-        "gnomish",
-        "gnomehood",
+        "scav",
+        "scav",
+        "scavkind",
         "Gno",
         { 0, 0 },
         PM_GNOME,
@@ -661,9 +661,9 @@ const struct Race races[NUM_RACES + 1] = {
         { 2, 0, 2, 0, 2, 0 }  /* Energy */
     },
     {
-        "orc",
-        "orcish",
-        "orcdom",
+        "mutant",
+        "mutant",
+        "mutantkind",
         "Orc",
         { 0, 0 },
         PM_ORC,
@@ -743,6 +743,39 @@ randrole_filtered(void)
     return n ? set[rn2(n)] : randrole(FALSE);
 }
 
+struct vanilla_alias;
+staticfn const char *vanilla_alias(const char *, const struct vanilla_alias *);
+
+/* NeonHack renamed most roles and races; keep accepting the NetHack names
+   (in options, config files and prompts) so existing setups still work */
+static const struct vanilla_alias {
+    const char *name;   /* NetHack name */
+    const char *filecode;
+} vanilla_role_names[] = {
+    { "Archeologist", "Arc" }, { "Barbarian", "Bar" }, { "Caveman", "Cav" },
+    { "Cavewoman", "Cav" },    { "Healer", "Hea" },    { "Knight", "Kni" },
+    { "Priest", "Pri" },       { "Priestess", "Pri" }, { "Ranger", "Ran" },
+    { "Rogue", "Rog" },        { "Samurai", "Sam" },   { "Wizard", "Wiz" },
+    { 0, 0 }
+}, vanilla_race_names[] = {
+    { "elf", "Elf" },     { "elven", "Elf" },  { "dwarf", "Dwa" },
+    { "dwarven", "Dwa" }, { "gnome", "Gno" },  { "gnomish", "Gno" },
+    { "orc", "Orc" },     { "orcish", "Orc" },
+    { 0, 0 }
+};
+
+/* map a full NetHack role or race name to its filecode, or return str */
+staticfn const char *
+vanilla_alias(const char *str, const struct vanilla_alias *aliases)
+{
+    int i;
+
+    for (i = 0; aliases[i].name; i++)
+        if (!strcmpi(str, aliases[i].name))
+            return aliases[i].filecode;
+    return str;
+}
+
 int
 str2role(const char *str)
 {
@@ -751,6 +784,7 @@ str2role(const char *str)
     /* Is str valid? */
     if (!str || !str[0])
         return ROLE_NONE;
+    str = vanilla_alias(str, vanilla_role_names);
 
     /* Match as much of str as is provided */
     len = Strlen(str);
@@ -817,6 +851,7 @@ str2race(const char *str)
     /* Is str valid? */
     if (!str || !str[0])
         return ROLE_NONE;
+    str = vanilla_alias(str, vanilla_race_names);
 
     /* Match as much of str as is provided */
     len = Strlen(str);
@@ -2190,6 +2225,8 @@ genl_player_selection(void)
 staticfn boolean reset_role_filtering(void);
 staticfn winid plsel_startmenu(int, int);
 staticfn int maybe_skip_seps(int, int);
+staticfn void reset_menu_accels(boolean);
+staticfn char pick_menu_accel(const char *, boolean, boolean);
 staticfn void setup_rolemenu(winid, boolean, int, int, int);
 staticfn void setup_racemenu(winid, boolean, int, int, int);
 staticfn void setup_gendmenu(winid, boolean, int, int, int);
@@ -2849,7 +2886,55 @@ plsel_startmenu(int ttyrows, int aspect)
 #undef GEND
 #undef ALGN
 
-/* add entries a-Archeologist, b-Barbarian, &c to menu being built in 'win' */
+/* NeonHack's role and race names don't have distinct initials, so pick
+   menu accelerators that are unique within the menu being built:  the
+   first letter if possible, then (optionally) its other case, then the
+   rest of the name, then any free letter */
+static char menu_accels_used[2 * 26 + 2];
+
+staticfn void
+reset_menu_accels(boolean filtering)
+{
+    int i;
+
+    /* 'q' is the Quit entry of the individual pick menus; the combined
+       filter menu uses capital letters for genders and alignments */
+    Strcpy(menu_accels_used, "q");
+    if (!filtering) {
+        for (i = 0; i < ROLE_GENDERS; i++)
+            (void) strkitten(menu_accels_used, highc(*genders[i].adj));
+        for (i = 0; i < ROLE_ALIGNS; i++)
+            (void) strkitten(menu_accels_used, highc(*aligns[i].adj));
+    }
+}
+
+staticfn char
+pick_menu_accel(const char *name, boolean upper, boolean othercase)
+{
+    const char *p;
+    char c, cands[2 * 26 * 2 + 2];
+    int i;
+
+    cands[0] = '\0';
+    (void) strkitten(cands, upper ? highc(*name) : lowc(*name));
+    if (othercase)
+        (void) strkitten(cands, upper ? lowc(*name) : highc(*name));
+    for (p = name + 1; *p; p++)
+        if (letter(*p))
+            (void) strkitten(cands, upper ? highc(*p) : lowc(*p));
+    for (i = 0; i < 26; i++)
+        (void) strkitten(cands, upper ? 'A' + i : 'a' + i);
+    for (p = cands; *p; p++) {
+        c = *p;
+        if (!strchr(menu_accels_used, c)) {
+            (void) strkitten(menu_accels_used, c);
+            return c;
+        }
+    }
+    return 0;
+}
+
+/* add entries s-Salvager, n-Nomad, &c to menu being built in 'win' */
 staticfn void
 setup_rolemenu(
     winid win,
@@ -2860,10 +2945,12 @@ setup_rolemenu(
     anything any;
     int i;
     boolean role_ok;
-    char thisch, lastch = '\0', rolenamebuf[50];
+    char thisch, rolenamebuf[50];
     int clr = NO_COLOR;
 
     any = cg.zeroany; /* zero out all bits */
+    /* the combined filter menu starts with roles */
+    reset_menu_accels(filtering);
     for (i = 0; roles[i].name.m; i++) {
         /* role can be constrained by any of race, gender, or alignment */
         role_ok = (ok_role(i, race, gend, algn)
@@ -2876,9 +2963,8 @@ setup_rolemenu(
             any.a_int = i + 1;
         else
             any.a_string = roles[i].name.m;
-        thisch = lowc(*roles[i].name.m);
-        if (thisch == lastch)
-            thisch = highc(thisch);
+        /* capitals are taken by races &c in the combined filter menu */
+        thisch = pick_menu_accel(roles[i].name.m, FALSE, filtering);
         Strcpy(rolenamebuf, roles[i].name.m);
         if (roles[i].name.f) {
             /* role has distinct name for female (C,P) */
@@ -2897,7 +2983,6 @@ setup_rolemenu(
                  ATR_NONE, clr, an(rolenamebuf),
                  (!filtering && !role_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);
-        lastch = thisch;
     }
 }
 
@@ -2914,6 +2999,8 @@ setup_racemenu(
     int clr = NO_COLOR;
 
     any = cg.zeroany;
+    if (filtering) /* otherwise this continues the combined filter menu */
+        reset_menu_accels(TRUE);
     for (i = 0; races[i].noun; i++) {
         /* no ok_gend(); race isn't constrained by gender */
         race_ok = (ok_race(role, i, gend, algn)
@@ -2925,14 +3012,11 @@ setup_racemenu(
             any.a_int = i + 1;
         else
             any.a_string = races[i].noun;
-        this_ch = *races[i].noun;
-        /* filtering: picking race, so choose by first letter, with
-           capital letter as unseen accelerator;
+        /* filtering: picking race, so choose by (unique) letter;
            !filtering: resetting filter rather than picking, choose by
            capital letter since lowercase role letters will be present */
-        add_menu(win, &nul_glyphinfo, &any,
-                 filtering ? this_ch : highc(this_ch),
-                 filtering ? highc(this_ch) : 0,
+        this_ch = pick_menu_accel(races[i].noun, !filtering, filtering);
+        add_menu(win, &nul_glyphinfo, &any, this_ch, 0,
                  ATR_NONE, clr, races[i].noun,
                  (!filtering && !race_ok)
                     ? MENU_ITEMFLAGS_SELECTED : MENU_ITEMFLAGS_NONE);

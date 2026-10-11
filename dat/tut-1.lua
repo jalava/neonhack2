@@ -80,8 +80,8 @@ local diagmovekeys = tut_key("movesouthwest") .. " " ..
 des.engraving({ coord = { 9,3 }, type = "engrave", text = "Move around with " .. movekeys, degrade = false });
 des.engraving({ coord = { 5,2 }, type = "engrave", text = "Move diagonally with " .. diagmovekeys, degrade = false });
 
-if (u.role == "Knight") then
-   des.engraving({ coord = { 12,1 }, type = "engrave", text = "Knights can jump with '" .. tut_key("jump") .. "'", degrade = false });
+if (u.role == "Marshal") then
+   des.engraving({ coord = { 12,1 }, type = "engrave", text = "Marshals can jump with '" .. tut_key("jump") .. "'", degrade = false });
 end
 
 --
