@@ -698,6 +698,11 @@ fixup_special(void)
     if ((sp = Is_special(&u.uz)) != 0 && sp->flags.town) /* Mine Town */
         svl.level.flags.has_town = 1;
 
+    /* NeonHack 2: a city site floor made from a fill file still needs
+       its way out; hand-made floors without rooms place it themselves */
+    if (svn.nroom)
+        place_site_exit();
+
     if (gl.lregions)
         free((genericptr_t) gl.lregions), gl.lregions = 0;
     gn.num_lregions = 0;

@@ -3617,7 +3617,9 @@ print_mapseen(
     if (printdun) {
         if (svd.dungeons[dnum].dunlev_ureached == svd.dungeons[dnum].entry_lev
             /* suppress the negative numbers in the endgame */
-            || In_endgame(&mptr->lev))
+            || In_endgame(&mptr->lev)
+            /* NeonHack 2: city levels are named, not numbered */
+            || svd.dungeons[dnum].flags.city)
             Sprintf(buf, "%s:", svd.dungeons[dnum].dname);
         else if (builds_up(&mptr->lev))
             Sprintf(buf, "%s: levels %d up to %d",
@@ -3637,6 +3639,9 @@ print_mapseen(
     if (In_endgame(&mptr->lev))
         Sprintf(buf, "%s%s:", (final != -1) ? TAB : "",
                 endgamelevelname(tmpbuf, i));
+    else if (In_city(&mptr->lev)) /* NeonHack 2: "Neon Mile:" */
+        Sprintf(buf, "%s%s:", (final != -1) ? TAB : "",
+                city_place_name(&mptr->lev, tmpbuf, FALSE));
     else
         Sprintf(buf, "%sLevel %d:", (final != -1) ? TAB : "", i);
 

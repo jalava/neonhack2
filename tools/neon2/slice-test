@@ -1,0 +1,140 @@
+#!/bin/bash
+# slice-test - play the prologue and act 1 in a debug-mode game, checking
+# the screen at each step.  Uses tools/nhdrive (tmux).  Wizard commands
+# move the hero around; every conversation and stage is played for real.
+#
+#   tools/neon2/slice-test          run it; exit status 0 if all passed
+#   NHDELAY=1 tools/neon2/slice-test   slower, for a loaded machine
+top=$(cd "$(dirname "$0")/../.." && pwd)
+drive="$top/tools/nhdrive"
+export NHSESSION=${NHSESSION:-slicetest}
+export NHDELAY=${NHDELAY:-0.5}
+export NHOPTS='name:Tester,role:Netrunner,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore'
+fails=0
+
+screen() { "$drive" screen; }
+keys() { "$drive" keys "$@"; }
+key() { "$drive" key "$@"; }
+# expect TEXT [what]: the screen must show TEXT
+expect() {
+    if screen | grep -qF -- "$1"; then
+        echo "ok   ${2:-$1}"
+    else
+        echo "FAIL ${2:-$1}"; screen | sed 's/^/     | /'; fails=$((fails + 1))
+    fi
+}
+# expect_msg TEXT [what]: TEXT shows up in the next few messages
+expect_msg() {
+    local i
+    for i in 1 2 3 4 5 6; do
+        if screen | grep -qF -- "$1"; then echo "ok   ${2:-$1}"; return; fi
+        screen | grep -q -e '--More--' || break
+        key Enter
+    done
+    echo "FAIL ${2:-$1}"; screen | sed 's/^/     | /'; fails=$((fails + 1))
+}
+# dismiss --More-- and menus until the map is back
+clear_msgs() {
+    local i
+    for i in 1 2 3 4 5 6 7 8; do
+        if screen | grep -q -e '--More--' -e '(end)' -e '([0-9]* of [0-9]*)'; then
+            key Enter
+        else
+            break
+        fi
+    done
+}
+ext() { keys "#$1"; key Enter; }
+wizstory() { ext wizstory; keys "$1"; key Enter; }
+# talk NPC: stand next to it and #chat
+talk() {
+    local dir
+    wizstory "goto $1"
+    dir=$(screen | sed -n 's/.*Chat direction: \(.\)\..*/\1/p' | head -1)
+    clear_msgs
+    [ -z "$dir" ] && { echo "FAIL can't get next to $1"; fails=$((fails + 1)); return; }
+    ext chat; keys "$dir"
+}
+levelport() { key C-v; keys "$1"; key Enter; clear_msgs; }
+
+"$drive" start -D
+screen | grep -q -e '--More--' && key Enter   # the welcome
+expect "Neo Yendor, 2188" "intro text"
+key Enter; sleep 0.3
+expect "Objective: Talk to Doc Okoye." "first objective"
+clear_msgs
+
+# prologue
+talk okoye
+expect "The bill is 300 credits." "Okoye wakes you"
+keys a; expect "SPLINTER" "Okoye on the chip"
+keys a; keys c; expect "Tell her Okoye sent you." "Okoye sends you to Mags"
+keys a; clear_msgs
+talk mags
+expect "cold case for Dr. Sato" "Mags offers the job"
+keys b; sleep 0.3
+expect "frosted case" "Mags hands over the case"
+clear_msgs
+key Tab
+expect "Street Cred: Deliver the cold case" "journal: act 1"
+expect "Rent Day" "journal: gig"
+key Escape; clear_msgs
+
+# act 1: Lantern Market
+key C-f; clear_msgs              # map Neon Mile, ride the metro
+key C-t; keys '>.'; clear_msgs
+keys '>'; expect "Ride the metro to where?" "metro map"
+expect "Lantern Market" "metro lists Lantern Market"
+keys b; clear_msgs
+expect "Lantern Mkt" "arrived in Lantern Market"
+talk sato
+expect "That isn't cyberware." "Sato scans you"
+keys a; clear_msgs
+expect "150" "Sato pays"
+key Tab; expect "Find the netrunner Hex" "journal: Hex"; key Escape; clear_msgs
+
+# the gig: Benny pays up (the kind way)
+talk benny
+expect "business is dead" "Benny pleads"
+keys b; clear_msgs
+key Tab; expect "Bring Benny's envelope to Mags" "gig stage 2"; key Escape
+clear_msgs
+
+# Block 7: the roof, then the fourth floor
+ext wizcity; clear_msgs
+levelport "Block 7:1"
+expect "Block 7 5F" "on the roof"
+talk hex
+expect "you're the splinter" "Hex meets you"
+keys b; clear_msgs
+levelport "Block 7:2"
+expect "Block 7 4F" "fourth floor"
+wizstory list; expect "lazarus    alive" "Saint Lazarus is here"; clear_msgs
+wizstory "kill lazarus"; sleep 0.3
+expect_msg "scorched deck core" "Lazarus drops the core"
+clear_msgs
+levelport "Block 7:1"
+talk hex
+expect "Amulet of Yendor" "Hex reads the splinter"
+keys a; sleep 0.3
+expect "Street Cred" "act 1 complete"
+clear_msgs
+key Tab; expect "Three Splinters" "act 2 begins"; key Escape; clear_msgs
+
+# save and restore keep it all
+keys S; keys y; sleep 1
+tmux kill-session -t "$NHSESSION" 2>/dev/null
+home=$(mktemp -d /tmp/nhhome.XXXXXX)
+tmux new-session -d -s "$NHSESSION" -x 80 -y 24 \
+    "cd '$top/playground' && HOME='$home' TERM=xterm-256color NETHACKOPTIONS='$NHOPTS' ./neonhack2 -D; sleep 600"
+sleep 1.5; clear_msgs
+screen | grep -q 'keep the save file' && keys n
+clear_msgs
+key Tab
+expect "Three Splinters" "journal after restore"
+expect "Rent Day" "gig after restore"
+key Escape
+"$drive" stop
+rm -rf "$home"
+echo "slice-test: $fails failure(s)"
+exit $((fails > 0))

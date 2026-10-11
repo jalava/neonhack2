@@ -1015,7 +1015,9 @@ st_spawn(struct st_npc *np, boolean now)
         return;
     }
     pm = story_npc_montype(np->id, &fem);
-    mtmp = makemon(&mons[pm], 0, 0, MM_NOMSG | (fem ? MM_FEMALE : MM_MALE));
+    mtmp = makemon(&mons[pm], 0, 0,
+                   MM_NOMSG | (fem ? MM_FEMALE : MM_MALE)
+                   | (np->hostile ? 0 : NO_MINVENT));
     if (!mtmp) {
         np->pending = TRUE;
         return;
@@ -1136,7 +1138,7 @@ st_wrap_menu(winid win, const char *text)
 {
     char line[BUFSZ], word[BUFSZ];
     const char *p = text;
-    int len = 0, wl;
+    int len = 0, wl, nsp = 0;
     boolean pending_blank = FALSE;
 
     line[0] = '\0';
@@ -1156,10 +1158,12 @@ st_wrap_menu(winid win, const char *text)
                 p = q + 1;
                 continue;
             }
+            nsp++;
             p++;
             continue;
         }
         if (*p == ' ' || *p == '\t') {
+            nsp++;
             p++;
             continue;
         }
@@ -1176,14 +1180,12 @@ st_wrap_menu(winid win, const char *text)
             line[0] = '\0', len = 0;
         }
         if (len) {
-            /* two spaces after a sentence, as NetHack writes */
-            char last = line[len - 1];
-
+            /* keep the two spaces the writer put after a sentence */
             Strcat(line, " "), len++;
-            if ((last == '.' || last == '!' || last == '?')
-                && len + 1 + wl <= 72)
+            if (nsp >= 2 && len + 1 + wl <= 72)
                 Strcat(line, " "), len++;
         }
+        nsp = 0;
         if (len + wl < (int) sizeof line - 1)
             Strcat(line, word), len += wl;
     }
@@ -1908,7 +1910,7 @@ story_state_line(const char *line)
 
 /* #wizstory: "list", "start <quest>", "next <quest>", "finish <quest>",
    "fail <quest>", "flag <name> <n>", "rep <faction> <n>", "track <quest>",
-   "spawn <npc>" */
+   "spawn <npc>", "goto <npc>", "kill <npc>", "item <id>" */
 int
 wiz_story(void)
 {
@@ -1924,7 +1926,7 @@ wiz_story(void)
         return ECMD_OK;
     }
     getlin("Story command? (list, start/next/finish/fail/track <quest>, "
-           "flag/rep <name> <n>, spawn <npc>)", buf);
+           "flag/rep <name> <n>, spawn/goto/kill <npc>, item <id>)", buf);
     if (*buf == '\033' || !*buf)
         return ECMD_OK;
     cmd[0] = arg[0] = '\0';
@@ -1962,6 +1964,27 @@ wiz_story(void)
                     st.npcs[i].pending ? " (pending)" : "");
             putstr(win, 0, buf);
         }
+        city_respawn_info(buf);
+        putstr(win, 0, buf);
+        display_nhwindow(win, TRUE);
+        destroy_nhwindow(win);
+        return ECMD_OK;
+    }
+    if (!strcmp(cmd, "mons")) { /* every monster on the level */
+        struct monst *mtmp;
+
+        win = create_nhwindow(NHW_TEXT);
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+            if (DEADMONSTER(mtmp))
+                continue;
+            Sprintf(buf, "<%d,%d> m_id %u %s%s%s", mtmp->mx, mtmp->my,
+                    mtmp->m_id, noit_mon_nam(mtmp),
+                    mtmp->isshk ? " (shopkeeper)" : "",
+                    m_at(mtmp->mx, mtmp->my) == mtmp ? "" : " (NOT on map)");
+            putstr(win, 0, buf);
+        }
+        Sprintf(buf, "you <%d,%d>", u.ux, u.uy);
+        putstr(win, 0, buf);
         display_nhwindow(win, TRUE);
         destroy_nhwindow(win);
         return ECMD_OK;
@@ -1986,6 +2009,49 @@ wiz_story(void)
         st.factions[i].rep = num;
     } else if (!strcmp(cmd, "spawn") && (i = st_npc_idx(arg)) >= 0) {
         st_spawn(&st.npcs[i], TRUE);
+    } else if (!strcmp(cmd, "item") && st_item_idx(arg) >= 0) {
+        st_give_item(arg);
+    } else if (!strcmp(cmd, "kill") && (i = st_npc_idx(arg)) >= 0) {
+        struct monst *mtmp = st_npc_mon(&st.npcs[i]);
+
+        if (!mtmp) {
+            pline("%s isn't on this level.", st.npcs[i].name);
+            return ECMD_OK;
+        }
+        xkilled(mtmp, XKILL_GIVEMSG); /* as if you had done it */
+    } else if (!strcmp(cmd, "goto") && (i = st_npc_idx(arg)) >= 0) {
+        struct monst *mtmp = st_npc_mon(&st.npcs[i]);
+        coord cc;
+
+        if (!mtmp) {
+            pline("%s isn't on this level.", st.npcs[i].name);
+            return ECMD_OK;
+        }
+        {
+            /* prefer standing south of the NPC, then the other sides;
+               say which way to #chat, for scripted tests */
+            static const int dxy[8][2] = { { 0, 1 }, { 0, -1 }, { 1, 0 },
+                                           { -1, 0 }, { 1, 1 }, { -1, 1 },
+                                           { 1, -1 }, { -1, -1 } };
+            int k;
+
+            for (k = 0; k < 8; k++) {
+                cc.x = mtmp->mx + dxy[k][0], cc.y = mtmp->my + dxy[k][1];
+                if (isok(cc.x, cc.y) && goodpos(cc.x, cc.y, &gy.youmonst, 0)
+                    && !m_at(cc.x, cc.y))
+                    break;
+            }
+            if (k == 8) {
+                pline("No room next to %s.", st.npcs[i].name);
+                return ECMD_OK;
+            }
+            teleds(cc.x, cc.y, TELEDS_TELEPORT);
+            pline("Chat direction: %c.",
+                  xytodir(mtmp->mx - u.ux, mtmp->my - u.uy) >= 0
+                      ? gc.Cmd.dirchars[xytodir(mtmp->mx - u.ux,
+                                              mtmp->my - u.uy)]
+                      : '.');
+        }
     } else {
         pline("Story command not understood.");
         return ECMD_OK;

@@ -411,6 +411,7 @@ extern int wiz_city(void);
 extern void city_set_respawn(boolean);
 extern void city_clinic_visit(struct monst *) NONNULLARG1;
 extern int city_flatlines(void);
+extern void city_respawn_info(char *) NONNULLARG1;
 extern boolean city_flatline(int);
 
 /* ### cmd.c ### */

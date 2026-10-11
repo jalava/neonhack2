@@ -3396,6 +3396,11 @@ lspo_monster(lua_State *L)
              * But if it was explicitly set to false, provide *no* inventory. */
             if (keep_default_invent == FALSE)
                 tmpmons.has_invent = NO_INVENT;
+            /* NeonHack 2: peaceful story NPCs don't carry potions and
+               wands to fiddle with in the middle of a conversation */
+            else if (tmpmons.npc && keep_default_invent != TRUE
+                     && !story_npc_hostile(tmpmons.npc))
+                tmpmons.has_invent = NO_INVENT;
         }
     }
 

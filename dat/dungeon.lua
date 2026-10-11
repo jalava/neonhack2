@@ -363,6 +363,17 @@ dungeon = {
       flags = { "unconnected", "city" },
       parent = "nc-stacks",
       danger = 5,
-      themerooms = "themerms.lua",
+      lvlfill = "nc-b7fill",
+      levels = {
+         { name = "nc-b7roof", base = 1 },
+      }
+   },
+   {
+      name = "Jade Den",
+      base = 3,
+      flags = { "unconnected", "city" },
+      parent = "nc-lantern",
+      danger = 4,
+      lvlfill = "nc-jadefill",
    },
 }

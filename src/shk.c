@@ -782,10 +782,6 @@ u_entered_shop(char *enterstring)
         return;
     }
     record_achievement(ACH_SHOP);
-    /* NeonHack 2: a city clinic patches you up when you flatline */
-    if (svr.rooms[*enterstring - ROOMOFFSET].rtype == CLINICSHOP
-        && In_city(&u.uz) && !ANGRY(shkp))
-        city_clinic_visit(shkp);
 
     eshkp->bill_p = &(eshkp->bill[0]);
 
@@ -856,6 +852,9 @@ u_entered_shop(char *enterstring)
                 eshkp->visitct++ ? " again" : "");
         }
     }
+    /* NeonHack 2: a city clinic patches you up when you flatline */
+    if (rt == CLINICSHOP && In_city(&u.uz) && !ANGRY(shkp))
+        city_clinic_visit(shkp);
     /* can't do anything about blocking if teleported in */
     if (!inside_shop(u.ux, u.uy)) {
         boolean should_block, not_upset = !eshkp->surcharge;

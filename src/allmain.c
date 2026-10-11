@@ -96,7 +96,10 @@ moveloop_preamble(boolean resuming)
         see_monsters();
     }
 
-    u.uz0.dlevel = u.uz.dlevel;
+    /* NeonHack 2: the whole level, not just its number; a game can start
+       outside dungeon 0, and a stale u.uz0 makes u_on_newpos() treat
+       every move as a level change (no room entry, shops, traps) */
+    assign_level(&u.uz0, &u.uz);
     svc.context.move = 0;
 
     /* finish processing "--debug:fuzzer" from the command line */

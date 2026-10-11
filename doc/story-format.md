@@ -146,6 +146,6 @@ this order:
   - `list` shows quests, reputation, flags and NPCs;
   - `start`, `next`, `finish`, `fail` or `track` followed by a quest id;
   - `flag <name> <n>` or `rep <faction> <n>`;
-  - `spawn <npc>`.
+  - `spawn <npc>`, `goto <npc>` (teleport next to it), `kill <npc>` or `item <id>`.
 - `#wizstorycheck` checks every reference in story.lua.
 - `#wizcity` opens every district.

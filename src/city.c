@@ -439,10 +439,10 @@ city_clinic_visit(struct monst *shkp)
     if (flags.hardcore)
         return;
     if (on_level(&cstate.respawn, &u.uz)
-        && distmin(cstate.rx, cstate.ry, u.ux, u.uy) <= 8) {
-        cstate.rx = u.ux, cstate.ry = u.uy; /* same clinic */
-        return;
-    }
+        && *in_rooms(cstate.rx, cstate.ry, SHOPBASE)
+        && *in_rooms(cstate.rx, cstate.ry, SHOPBASE)
+               == ESHK(shkp)->shoproom)
+        return; /* signed up here already */
     city_set_respawn(FALSE);
     if (!Deaf)
         pline("%s scans your biometrics.  If you flatline, you'll wake up"
@@ -453,6 +453,20 @@ int
 city_flatlines(void)
 {
     return cstate.flatlines;
+}
+
+/* for #wizstory list */
+void
+city_respawn_info(char *buf)
+{
+    char pbuf[BUFSZ];
+
+    if (cstate.respawn.dlevel <= 0)
+        Strcpy(buf, "respawn: none");
+    else
+        Snprintf(buf, BUFSZ, "respawn: %s <%d,%d>, flatlines %d",
+                 city_place_phrase(&cstate.respawn, pbuf), cstate.rx,
+                 cstate.ry, cstate.flatlines);
 }
 
 static char wakemsg[BUFSZ];
