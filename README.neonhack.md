@@ -34,6 +34,30 @@ make all              # builds and installs into ./playground
   hints file uses Homebrew's ncurses headers and links the system's
   runtime libraries; nothing extra needs to be installed.
 
+## Controls
+
+NetHack's keys all still work (`hjklyubn`, or digits with `number_pad`),
+but you don't need them to move:
+
+| Key | Moves |
+|---|---|
+| Arrow keys | west, east, north, south |
+| Home / PgUp | northwest / northeast |
+| End / PgDn | southwest / southeast |
+| Shift + any of those | run |
+| Ctrl + any of those | rush |
+| Left click on the map | travel there (next to you: step, open, kick) |
+| Right click | look at what's there |
+
+On a laptop without a numpad, Home/PgUp/End/PgDn are usually Fn+Left/Up/
+Right/Down. The keys work wherever NetHack asks for a direction or a
+map position (firing, farlook `;`, travel `_`); in menus they turn pages.
+
+The mouse is on by default (`mouse_support` option) in both tty and curses.
+While it is on, most terminals select text with Shift+drag. Turn it off
+with `OPTIONS=!mouse_support`; get NetHack's right-click menu back with
+`BIND=mouse1:therecmdmenu`.
+
 ## What's different
 
 **World.** The Dungeons of Doom are the Undercity, the Gnomish Mines are the

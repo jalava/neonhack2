@@ -2,7 +2,7 @@
 # nhdrive - drive the game inside a detached tmux session (for testing).
 #
 #   nhdrive start [game args...]   start a fresh game (e.g. -D for debug mode)
-#   nhdrive keys 'text'            type text literally
+#   nhdrive keys 'text'            type text literally (escape sequences ok)
 #   nhdrive key Enter|Escape|C-x   send named tmux keys
 #   nhdrive screen                 print the current 80x24 screen
 #   nhdrive cursor                 print the cursor's column and row
@@ -31,7 +31,8 @@ start)
     tmux new-session -d -s "$S" -x "${NHCOLS:-80}" -y "${NHROWS:-24}" \
         "cd '$play' && HOME='$home' TERM=xterm-256color NETHACKOPTIONS='$opts' '$game' $*; echo '[game exited]'; sleep 600"
     sleep "${NHSTARTDELAY:-0.8}" ;;
-keys)   tmux send-keys -t "$S" -l -- "$*"; sleep "$D" ;;
+keys)   # as hex bytes: tmux would take a lone ';' as a command separator
+        tmux send-keys -t "$S" -H $(printf '%s' "$*" | od -An -tx1); sleep "$D" ;;
 key)    tmux send-keys -t "$S" "$@"; sleep "$D" ;;
 screen) tmux capture-pane -t "$S" -p ;;
 cursor) tmux display -p -t "$S" '#{cursor_x} #{cursor_y}' ;;

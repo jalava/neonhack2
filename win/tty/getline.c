@@ -230,13 +230,15 @@ void
 xwaitforspace(const char *s) /* chars allowed besides return */
 {
     int c, x = ttyDisplay ? (int) ttyDisplay->dismiss_more : '\n';
+    /* NeonHack: in menus, cursor keys turn pages */
+    boolean menu = (s && strchr(s, MENU_NEXT_PAGE) != 0);
 
     morc = 0;
     while (
 #ifdef HANGUPHANDLING
         !program_state.done_hup &&
 #endif
-        (c = tty_nhgetch()) != EOF) {
+        (c = (menu ? tty_nhgetch_menu() : tty_nhgetch())) != EOF) {
         if (c == '\n' || c == '\r')
             break;
 

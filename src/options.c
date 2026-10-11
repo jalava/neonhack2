@@ -7264,6 +7264,10 @@ initoptions_init(void)
     iflags.wc2_petattr = ATR_INVERSE;
     /* only used by curses */
     iflags.wc2_windowborders = 2; /* 'Auto' */
+#ifdef NEONHACK
+    /* clicking on the map travels there (tty on Unix terminals, curses) */
+    iflags.wc_mouse_support = 1;
+#endif
 
     /*
      * A few menus have certain items (typically operate-on-everything or

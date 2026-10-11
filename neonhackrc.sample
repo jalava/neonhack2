@@ -15,5 +15,12 @@ OPTIONS=symset:NeonGrid
 # the curses interface instead of tty
 #OPTIONS=windowtype:curses
 
+# arrows and Home/PgUp/End/PgDn (Fn+arrows) always move; mouse clicks
+# travel (left) and look (right).  Turn the mouse off (then text can be
+# selected without holding Shift):
+#OPTIONS=!mouse_support
+# NetHack's left-click menu of actions instead of travel:
+#BIND=mouse1:therecmdmenu
+
 # NeonHack status conditions are on by default; turn them off with
 #OPTIONS=!cond_cyberpsycho,!cond_wanted

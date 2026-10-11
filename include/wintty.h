@@ -271,6 +271,7 @@ extern void tty_print_glyph(winid, coordxy, coordxy, const glyph_info *,
 extern void tty_raw_print(const char *);
 extern void tty_raw_print_bold(const char *);
 extern int tty_nhgetch(void);
+extern int tty_nhgetch_menu(void);
 extern int tty_nh_poskey(coordxy *, coordxy *, int *);
 extern void tty_nhbell(void);
 extern int tty_doprev_message(void);
@@ -278,6 +279,7 @@ extern char tty_yn_function(const char *, const char *, char);
 extern void tty_getlin(const char *, char *);
 extern int tty_get_ext_cmd(void);
 extern void tty_number_pad(int);
+extern void tty_mouse_reporting(boolean);
 extern void tty_delay_output(void);
 #ifdef CHANGE_COLOR
 extern void tty_change_color(int color, long rgb, int reverse);

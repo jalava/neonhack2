@@ -2759,7 +2759,12 @@ commands_init(void)
         if (extcmd->key)
             cmdbind_add(extcmd->key, extcmd, FALSE);
 
+#ifdef NEONHACK
+    /* left click travels to, steps onto or acts on the spot */
+    (void) bind_mousebtn(1, "mouseaction");
+#else
     (void) bind_mousebtn(1, "therecmdmenu");
+#endif
     (void) bind_mousebtn(2, "clicklook");
 
     /* number_pad */

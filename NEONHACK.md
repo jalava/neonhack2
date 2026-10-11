@@ -12,7 +12,7 @@ Player-facing overview: `README.neonhack.md`.
 
 ## Status (2026-10-11)
 
-All twelve phases below are implemented and committed.  Notes on where
+All thirteen phases below are implemented and committed.  Notes on where
 the result differs from the plan:
 
 * **Racial names.** dwarf -> cyborg, gnome -> scav, orc -> mutant and
@@ -108,6 +108,13 @@ wherever they already fit ("grid bug", "quantum mechanic", "mail daemon",
   break wrapping or `--More--` placement.
 * The game is called **NeonHack**: welcome line, version, tombstone
   ("FLATLINED"), death message ("You flatline..."), intro legacy text.
+* **Laptop-friendly controls**: arrows move orthogonally, Home/PgUp/End/
+  PgDn (Fn+arrows) diagonally, Shift runs, Ctrl rushes; in menus they turn
+  pages. The tty port decodes the terminal's escape sequences itself
+  (it used to see an arrow as ESC, `[`, `A`), and reports xterm mouse
+  clicks. `mouse_support` is on by default; left click = `mouseaction`
+  (travel/step/act), right click = look. The curses port already knew the
+  keys; its clicks were dropped as out-of-range keys and now work.
 
 ## 3. Races and roles
 
@@ -341,6 +348,8 @@ Each phase is one or more commits that build and pass the smoke tests.
 12. **Hardening** — scripted tmux play-tests, debug-mode wishing and
     monster creation for every new thing, the built-in fuzzer, and a
     `sanity_check` run.
+13. **Controls** — cursor keys and mouse clicks in tty, mouse clicks in
+    curses, mouse on by default.
 
 ## 10. Testing
 

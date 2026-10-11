@@ -54,6 +54,11 @@ extern void msmsg(const char *, ...);
 #endif /* DLB */
 #endif /* DEF_PAGER */
 
+#ifdef UNIX
+#include <errno.h>
+#include <poll.h>
+#endif
+
 #if defined(TTY_TILES_ESCCODES) || defined(TTY_SOUND_ESCCODES)
 #define VT_ANSI_COMMAND 'z'
 #endif
@@ -104,7 +109,7 @@ struct window_procs tty_procs = {
 #ifdef MSDOS
      | WC_TILED_MAP | WC_ASCII_MAP
 #endif
-#if defined(WIN32CON)
+#if defined(WIN32CON) || defined(UNIX)
      | WC_MOUSE_SUPPORT
 #endif
      | WC_COLOR | WC_HILITE_PET | WC_INVERSE | WC_EIGHT_BIT_IN),
@@ -222,6 +227,13 @@ static void process_menu_window(winid, struct WinDesc *);
 static void process_text_window(winid, struct WinDesc *);
 static tty_menu_item *reverse(tty_menu_item *);
 static const char *compress_str(const char *);
+static int tty_getkey(coordxy *, coordxy *, int *, boolean);
+#ifdef UNIX
+static int ttykey_byte(int);
+static int ttykey_escape(void);
+static boolean ttykey_click(coordxy *, coordxy *, int *);
+static int ttykey_read(coordxy *, coordxy *, int *, boolean);
+#endif
 #ifndef STATUS_HILITES
 static void tty_putsym(winid, int, int, char);
 #endif
@@ -607,6 +619,10 @@ tty_preference_update(const char *pref)
     consoletty_preference_update(pref);
 #else
     genl_preference_update(pref);
+#endif
+#ifdef UNIX
+    if (!strcmp(pref, "mouse_support") && iflags.window_inited)
+        tty_mouse_reporting(iflags.wc_mouse_support != 0);
 #endif
 #ifdef TTY_PERM_INVENT
     /* the boundary box around persistent inventory is drawn with wall
@@ -4041,10 +4057,287 @@ tty_raw_print_bold(const char *str)
 #endif
 }
 
+#ifdef UNIX
+/*
+ * NeonHack: cursor keys and mouse clicks on Unix terminals.
+ *
+ * Terminals send cursor keys as escape sequences ("ESC [ A" for Up,
+ * "ESC [ 5 ~" for PgUp, "ESC [ 1 ; 2 A" for Shift+Up) and, with xterm
+ * mouse reporting on, clicks as "ESC [ < button ; column ; row M".  A
+ * lone ESC is told apart from the start of a sequence by waiting briefly
+ * for the rest of it, so we read the terminal ourselves instead of using
+ * stdio's buffered getchar().
+ *
+ * When the core wants a command, a direction or a map position the
+ * arrows move west/east/north/south and Home/PgUp/End/PgDn (Fn+arrows on
+ * most laptops) move northwest/northeast/southwest/southeast, like the
+ * curses interface; Shift runs and Ctrl rushes.  In menus the keys turn
+ * pages.  Anywhere else they are ignored.
+ */
+
+#define TTYKEY_WAIT 50      /* msec to wait for the rest of a sequence */
+#define TTYKEY_TIMEOUT (-2) /* ttykey_byte(): nothing arrived in time */
+
+/* ttykey_escape() results above the byte range */
+enum ttykey_codes {
+    TK_IGNORE = 0x100, /* unknown or unwanted sequence */
+    TK_CLICK,          /* mouse click; details in ttykey_mouse[] */
+    TK_DIR             /* + DIR_xxx: cursor key; Shift/Ctrl in ttykey_mods */
+};
+
+static unsigned char ttykey_buf[64]; /* bytes read but not yet used */
+static int ttykey_len = 0, ttykey_pos = 0;
+static int ttykey_mods;      /* xterm modifier bits: 1 Shift, 2 Alt, 4 Ctrl */
+static int ttykey_mouse[3];  /* button bits, column, row (1-based) */
+static boolean ttykey_clicked = FALSE; /* ttykey_read() returned a click */
+
+/* next byte of keyboard input; waits up to 'msec' milliseconds for it
+   (forever if negative); TTYKEY_TIMEOUT if none came, EOF on hangup */
+static int
+ttykey_byte(int msec)
+{
+    int n;
+
+    if (ttykey_pos < ttykey_len)
+        return ttykey_buf[ttykey_pos++];
+    if (msec >= 0) {
+        struct pollfd pfd;
+
+        pfd.fd = fileno(stdin);
+        pfd.events = POLLIN;
+        pfd.revents = 0;
+        do {
+            n = poll(&pfd, 1, msec);
+        } while (n < 0 && errno == EINTR);
+        if (n <= 0)
+            return TTYKEY_TIMEOUT;
+    }
+    n = (int) read(fileno(stdin), (genericptr_t) ttykey_buf,
+                   sizeof ttykey_buf);
+    if (n <= 0)
+        return EOF;
+    ttykey_len = n;
+    ttykey_pos = 1;
+    return ttykey_buf[0];
+}
+
+/* an ESC has been read; consume the rest of an escape sequence and say
+   what it was, or give back ESC (leaving whatever followed it unread) */
+static int
+ttykey_escape(void)
+{
+    int c, i, nparm, parm[4];
+    char first = '\0';
+
+    c = ttykey_byte(TTYKEY_WAIT);
+    if (c != '[' && c != 'O') {
+        /* lone ESC, or ESC prefixing an ordinary key ('altmeta') */
+        if (c >= 0)
+            ttykey_pos--;
+        return '\033';
+    }
+    if (c == 'O') { /* SS3: ESC O A..D, H, F for cursor keys */
+        c = ttykey_byte(TTYKEY_WAIT);
+        if (c < 0) {
+            ttykey_pos--; /* the 'O'; it was Alt+O */
+            return '\033';
+        }
+        ttykey_mods = 0;
+        switch (c) {
+        case 'A': return TK_DIR + DIR_N;
+        case 'B': return TK_DIR + DIR_S;
+        case 'C': return TK_DIR + DIR_E;
+        case 'D': return TK_DIR + DIR_W;
+        case 'H': return TK_DIR + DIR_NW;
+        case 'F': return TK_DIR + DIR_SW;
+        }
+        return TK_IGNORE;
+    }
+
+    /* CSI: ESC [ parameters final */
+    c = ttykey_byte(TTYKEY_WAIT);
+    if (c < 0) {
+        ttykey_pos--; /* the '['; it was Alt+[ */
+        return '\033';
+    }
+    if (c == 'M') { /* old-style mouse report: three bytes, each + 32 */
+        for (i = 0; i < 3; i++) {
+            if ((c = ttykey_byte(TTYKEY_WAIT)) < 0)
+                return TK_IGNORE;
+            ttykey_mouse[i] = c - 32;
+        }
+        /* button bits 3 mean "released" in this encoding */
+        return ((ttykey_mouse[0] & 3) == 3) ? TK_IGNORE : TK_CLICK;
+    }
+    if (c == '[') { /* Linux console F1..F5: ESC [ [ A..E */
+        (void) ttykey_byte(TTYKEY_WAIT);
+        return TK_IGNORE;
+    }
+    if (c == '<' || c == '?' || c == '=' || c == '>') {
+        first = (char) c;
+        c = ttykey_byte(TTYKEY_WAIT);
+    }
+    nparm = 0;
+    parm[0] = parm[1] = parm[2] = parm[3] = 0;
+    while (c >= 0x20 && c <= 0x3f) { /* parameter and intermediate bytes */
+        if (c >= '0' && c <= '9') {
+            if (nparm == 0)
+                nparm = 1;
+            if (nparm <= 4 && parm[nparm - 1] < 10000)
+                parm[nparm - 1] = parm[nparm - 1] * 10 + (c - '0');
+        } else if (c == ';') {
+            nparm = (nparm == 0) ? 2 : nparm + 1;
+        }
+        c = ttykey_byte(TTYKEY_WAIT);
+    }
+    if (c < 0x40 || c > 0x7e) {
+        /* sequence cut short; keep the byte that interrupted it */
+        if (c >= 0)
+            ttykey_pos--;
+        return TK_IGNORE;
+    }
+    if (first == '<') { /* SGR mouse report: button;column;row M or m */
+        if (c != 'M' || nparm < 3)
+            return TK_IGNORE; /* button release */
+        for (i = 0; i < 3; i++)
+            ttykey_mouse[i] = parm[i];
+        return TK_CLICK;
+    }
+    if (first)
+        return TK_IGNORE;
+
+    /* modifiers come as the second parameter: 1 + bits */
+    ttykey_mods = (nparm >= 2 && parm[1] > 1) ? parm[1] - 1 : 0;
+    switch (c) {
+    case 'A': return TK_DIR + DIR_N;  /* Up */
+    case 'B': return TK_DIR + DIR_S;  /* Down */
+    case 'C': return TK_DIR + DIR_E;  /* Right */
+    case 'D': return TK_DIR + DIR_W;  /* Left */
+    case 'H': return TK_DIR + DIR_NW; /* Home */
+    case 'F': return TK_DIR + DIR_SW; /* End */
+    case '~':
+        switch (parm[0]) {
+        case 1: case 7: return TK_DIR + DIR_NW; /* Home */
+        case 4: case 8: return TK_DIR + DIR_SW; /* End */
+        case 5: return TK_DIR + DIR_NE;         /* PgUp */
+        case 6: return TK_DIR + DIR_SE;         /* PgDn */
+        }
+        break;
+    }
+    return TK_IGNORE;
+}
+
+/* turn the last mouse report into a click on the map, if it was one */
+static boolean
+ttykey_click(coordxy *x, coordxy *y, int *mod)
+{
+    struct WinDesc *cw;
+    int btn = ttykey_mouse[0], mx, my;
+
+    if (!x || !y || !mod
+        || (program_state.input_state != commandInp
+            && program_state.input_state != getposInp))
+        return FALSE;
+    /* motion (32) and wheel (64, 128) reports aren't clicks */
+    if ((btn & (32 | 64 | 128)) != 0)
+        return FALSE;
+    if (WIN_MAP == WIN_ERR || (cw = wins[WIN_MAP]) == 0)
+        return FALSE;
+    /* inverse of tty_curs(): screen column 0 is unused map column 0 */
+    mx = (ttykey_mouse[1] - 1) - (int) cw->offx + 1;
+    my = (ttykey_mouse[2] - 1) - (int) cw->offy;
+#ifdef CLIPPING
+    if (clipping) {
+        mx += clipx;
+        my += clipy;
+    }
+#endif
+    if (!isok(mx, my))
+        return FALSE;
+    *x = (coordxy) mx;
+    *y = (coordxy) my;
+    /* left button without Ctrl is click 1; right or middle is click 2 */
+    *mod = ((btn & 3) == 0 && !(btn & 16)) ? CLICK_1 : CLICK_2;
+    return TRUE;
+}
+
+/* read a key, decoding cursor key and mouse sequences for the current
+   kind of input; returns 0 for a map click (with x, y, mod set) */
+static int
+ttykey_read(coordxy *x, coordxy *y, int *mod, boolean menu)
+{
+    int c, dir;
+
+    for (;;) {
+        if ((c = ttykey_byte(-1)) != '\033')
+            return c;
+        if ((c = ttykey_escape()) < TK_IGNORE)
+            return c;
+        if (c == TK_CLICK) {
+            if (ttykey_click(x, y, mod)) {
+                ttykey_clicked = TRUE;
+                return 0;
+            }
+            continue;
+        }
+        if (c < TK_DIR)
+            continue;
+        dir = c - TK_DIR;
+
+        if (menu) {
+            switch (dir) {
+            case DIR_N: case DIR_W: case DIR_NE: /* Up, Left, PgUp */
+                return MENU_PREVIOUS_PAGE;
+            case DIR_S: case DIR_E: case DIR_SE: /* Down, Right, PgDn */
+                return MENU_NEXT_PAGE;
+            case DIR_NW: /* Home */
+                return MENU_FIRST_PAGE;
+            case DIR_SW: /* End */
+                return MENU_LAST_PAGE;
+            }
+            continue;
+        }
+        if (program_state.input_state == otherInp)
+            continue; /* text entry, y/n question, --More-- */
+
+        c = gc.Cmd.dirchars[dir];
+        if ((ttykey_mods & 1) != 0
+            && program_state.input_state != getdirInp) {
+            /* Shift: run (or move the getpos cursor 8 squares) */
+            if (!gc.Cmd.num_pad)
+                c = highc(c);
+            else if (program_state.input_state == commandInp)
+                c = M(c);
+        } else if ((ttykey_mods & 4) != 0
+                   && program_state.input_state == commandInp) {
+            /* Ctrl: rush */
+            c = !gc.Cmd.num_pad ? C(c) : M(c);
+        }
+        return c;
+    }
+}
+#endif /* UNIX */
+
+/* menus: like tty_nhgetch() but cursor keys turn pages */
+int
+tty_nhgetch_menu(void)
+{
+    return tty_getkey((coordxy *) 0, (coordxy *) 0, (int *) 0, TRUE);
+}
+
 int
 tty_nhgetch(void)
 {
+    return tty_getkey((coordxy *) 0, (coordxy *) 0, (int *) 0, FALSE);
+}
+
+static int
+tty_getkey(
+    coordxy *x UNUSED, coordxy *y UNUSED, int *mod UNUSED,
+    boolean menu UNUSED)
+{
     int i;
+    boolean click = FALSE; /* mouse click on the map */
 #ifdef UNIX
     /* kludge alert: Some Unix variants return funny values if getc() is
      * called, interrupted, and then called again.  There is non-reentrant
@@ -4073,10 +4366,12 @@ tty_nhgetch(void)
 #endif
         program_state.getting_char++;
 #ifdef UNIX
+        ttykey_clicked = FALSE;
         i = (program_state.getting_char == 1)
-              ? tgetch()
+              ? ttykey_read(x, y, mod, menu)
               : ((read(fileno(stdin), (genericptr_t) &nestbuf, 1) == 1)
                  ? (int) nestbuf : EOF);
+        click = (i == 0 && ttykey_clicked); /* x, y and mod are set */
 #else
         i = tgetch();
 #endif
@@ -4090,7 +4385,7 @@ tty_nhgetch(void)
 #endif
     }
     term_curs_set(0);
-    if (!i)
+    if (!i && !click)
         i = '\033'; /* map NUL to ESC since nethack doesn't expect NUL */
     else if (i == EOF) {
         iflags.term_gone = 1;
@@ -4114,15 +4409,11 @@ tty_nhgetch(void)
 /*
  * return a key, or 0, in which case a mouse button was pressed
  * mouse events should be returned as character postitions in the map window.
- * Since normal tty's don't have mice, just return a key.
+ * (NeonHack: Unix terminals report clicks when 'mouse_support' is on.)
  */
 /*ARGSUSED*/
 int
-#if defined(WIN32CON)
 tty_nh_poskey(coordxy *x, coordxy *y, int *mod)
-#else
-tty_nh_poskey(coordxy *x UNUSED, coordxy *y UNUSED, int *mod UNUSED)
-#endif
 {
     int i;
 
@@ -4143,7 +4434,7 @@ tty_nh_poskey(coordxy *x UNUSED, coordxy *y UNUSED, int *mod UNUSED)
     if (ttyDisplay && ttyDisplay->toplin == TOPLINE_NEED_MORE)
         ttyDisplay->toplin = TOPLINE_NON_EMPTY;
 #else /* !WIN32CON */
-    i = tty_nhgetch();
+    i = tty_getkey(x, y, mod, FALSE);
 #endif /* ?WIN32CON */
     return i;
 }

@@ -537,14 +537,35 @@ term_start_screen(void)
 
     if (gc.Cmd.num_pad)
         tty_number_pad(1); /* make keypad send digits */
+    tty_mouse_reporting(iflags.wc_mouse_support != 0);
 }
 
 void
 term_end_screen(void)
 {
+    tty_mouse_reporting(FALSE);
     term_clear_screen();
     xputs(VE);
     xputs(TE);
+}
+
+/* NeonHack: ask an xterm-compatible terminal to report mouse clicks
+   (button presses and releases, SGR coordinates); wintty.c decodes them.
+   Terminals that don't know these modes ignore them. */
+void
+tty_mouse_reporting(boolean on)
+{
+#ifdef UNIX
+    static boolean reporting = FALSE;
+
+    if (on == reporting)
+        return;
+    xputs(on ? "\033[?1000h\033[?1006h" : "\033[?1006l\033[?1000l");
+    (void) fflush(stdout);
+    reporting = on;
+#else
+    nhUse(on);
+#endif
 }
 
 /* Cursor movements */

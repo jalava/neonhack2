@@ -882,6 +882,17 @@ curses_convert_keys(int key)
         ret = iflags.num_pad ? '5' : 'g';
         break;
 #endif /* KEY_B2 */
+#ifdef NCURSES_MOUSE_VERSION
+    case KEY_MOUSE:
+        /* NeonHack: leave a click for curses_nh_poskey() when the core can
+           use one (a command or a map position); it used to be rejected
+           as out of range like any other function key, so clicks were
+           turned into ESC */
+        reject = (program_state.input_state != commandInp
+                  && program_state.input_state != getposInp);
+        as_is = TRUE;
+        break;
+#endif
 #ifdef KEY_RESIZE
     case KEY_RESIZE:
         /* actual resize is handled elsewhere; just avoid beep/bell here */
