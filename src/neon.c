@@ -56,12 +56,22 @@ utf8_locale(void)
     return (boolean) is_utf8;
 }
 
+/* can the terminal show NeonGrid's characters and emoji?  a UTF-8 locale,
+   and not the Linux console, whose fonts have few of them */
+boolean
+neon_utf8_terminal(void)
+{
+    const char *term = nh_getenv("TERM");
+
+    return (boolean) (utf8_locale() && !(term && !strcmp(term, "linux")));
+}
+
 /* 'e' (an emoji followed by a space) if the emoji option is on and the
    terminal can show it, otherwise "" */
 const char *
 neon_emoji(const char *e)
 {
-    if (!iflags.emoji || !utf8_locale()
+    if (!iflags.emoji || !neon_utf8_terminal()
         || !WINDOWPORT(tty) || iflags.debug_fuzzer)
         return "";
     return e;

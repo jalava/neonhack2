@@ -96,9 +96,23 @@ medkits and sixteen implants. NetHack names still work when wishing.
 | Heat | Crimes make you `Wanted`; corporate security squads come for you. |
 | Conduct | "You have remained fully organic." |
 
-**Look.** The default map is classic NetHack ASCII. `OPTIONS=symset:NeonGrid`
-switches to neon box-drawing walls; the `emoji` option (on by default,
-UTF-8 terminals only) decorates the new feature messages.
+**Look.** On a UTF-8 terminal the map uses the NeonGrid symbols: box-drawn
+walls tinted by branch, `░▒` corridors, and distinct shapes for things that
+look alike in NetHack (lava `▓` and water `≈`, ice `◦` and floor `·`, sink
+`#` and fountain `⌠`, closed door `■` and spellchip `+`, altar `Ω` coloured
+by alignment). Monsters and objects keep NetHack's letters and colours.
+It only uses characters every Windows font has, so it works over ssh from
+Windows Terminal or PowerShell.
+
+| Option | Effect |
+|---|---|
+| `symset:NeonGrid+` | rounded corners, dashed doors, diagonal beams (Cascadia Mono and similar fonts) |
+| `symset:default` | NetHack's ASCII map |
+| `!use_truecolor` | 256 colours, for terminals without 24-bit colour |
+| `!emoji` | no emoji in messages (they are on by default, UTF-8 terminals only) |
+
+`tools/neon/neongrid.py preview` shows the sets side by side in your terminal;
+`neongrid.py glyphs` checks your font.
 
 ## For developers
 

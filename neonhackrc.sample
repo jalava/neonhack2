@@ -6,8 +6,12 @@ OPTIONS=name:Case
 #OPTIONS=role:Netrunner,race:human,gender:female,align:chaotic
 OPTIONS=pettype:cat,!autopickup,time,showexp
 
-# neon map: box-drawing walls in 24-bit color (needs a UTF-8 terminal)
-OPTIONS=symset:NeonGrid
+# the map: NeonGrid is the default on UTF-8 terminals.  Rounded corners
+# and dashed doors (Cascadia Mono and similar fonts), or NetHack's ASCII:
+#OPTIONS=symset:NeonGrid+
+#OPTIONS=symset:default
+# NeonGrid colours are 24-bit; for a terminal that only has 256 colours:
+#OPTIONS=!use_truecolor
 
 # emoji in some messages (only used on UTF-8 terminals); turn off with
 #OPTIONS=!emoji

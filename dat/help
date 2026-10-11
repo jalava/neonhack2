@@ -233,8 +233,13 @@ NeonHack additions:
         Heat       Murder, shoplifting and attacking security raise your
                    heat.  When you are "Wanted", corporate security squads
                    come looking for you.  Heat cools down over time.
-        Display    The 'emoji' option decorates some messages (on a UTF-8
-                   terminal); OPTIONS=symset:NeonGrid gives a neon map.
+        Display    On a UTF-8 terminal the map uses the NeonGrid symbols:
+                   walls tinted by branch, lava as solid shading, ice as
+                   small circles, closed doors as filled squares, altars
+                   as omegas coloured by alignment.  OPTIONS=symset:default
+                   gives NetHack's ASCII; symset:NeonGrid+ adds rounded
+                   corners for fonts that have them.  The 'emoji' option
+                   decorates some messages.
         Moving     The arrow keys move.  Home, PgUp, End and PgDn (Fn plus
                    Left, Up, Right, Down on most laptops) move diagonally,
                    turned 45 degrees clockwise from the arrow: Home goes

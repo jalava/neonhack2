@@ -1,6 +1,7 @@
-# NeonGrid 2: a character set for playability (plan)
+# NeonGrid: a character set for playability
 
-Status: proposal, not implemented.  Preview it in the terminal you play in:
+Status: implemented (2026-10-11).  NeonGrid is the default map on UTF-8
+terminals; `NeonGrid+` is opt-in.  Preview them in the terminal you play in:
 
 ```sh
 tools/neon/neongrid.py preview   # sample level, 3 ways
@@ -58,9 +59,9 @@ Consequences:
 
 ## 3. The set
 
-What NetHack's extended sets get wrong today, and the proposal:
+What NetHack's extended sets get wrong, and what NeonGrid does instead:
 
-| Feature | ASCII | IBMgraphics | DECgraphics | **NeonGrid 2** | Colour |
+| Feature | ASCII | IBMgraphics | DECgraphics | **NeonGrid** | Colour |
 |---|---|---|---|---|---|
 | walls | `- \|` | `─│┌┼…` | `─│┌┼…` | `─│┌┼…` | per branch |
 | Sokoban walls | `- \|` | single | single | `═║╔╬…` | blue |
@@ -93,55 +94,56 @@ What NetHack's extended sets get wrong today, and the proposal:
 `#` for sinks is NetHack 3.6's old sink symbol; it is free again because
 corridors, trees and iron bars no longer use `#`.
 
-## 4. Changes
+## 4. What was built
 
-All small, and most are data.
+1. **The sets**: `tools/neon/neongrid.py` holds the table above and
+   generates the `NeonGrid` and `NeonGrid+` blocks in `dat/symbols`
+   (`neongrid.py install`): `S_` lines for shapes and colours, `G_` lines
+   for branch walls, altar alignments and the boulder (UTF8 symsets ignore
+   `S_boulder`).  The preview reads the same table, and `install` refuses
+   to write a set in which any pair from rule 2 shares a character.  The
+   old hand-written NeonGrid (rounded magenta corners) is gone.
+2. **24-bit colour in tty**: tty now honours `use_truecolor` instead of
+   always squeezing custom colours into the 256-colour palette, and
+   NeonHack turns it on by default (`!use_truecolor` for terminals without
+   24-bit colour).
+3. **Default**: `initoptions_init()` loads NeonGrid when the locale is
+   UTF-8 and `TERM` isn't the Linux console, before the config file is
+   read, so `symset:` in the config (`symset:default` for ASCII) wins.
+   This also replaces curses' own default ("curses", DEC line drawing).
+   Emoji use the same terminal check.
+4. **Docs**: README, `dat/help`, `neonhackrc.sample`, NEONHACK.md.
 
-1. **The set itself**: `tools/neon/neongrid.py` holds the table above; a
-   `symset` command generates the `NeonGrid` block in `dat/symbols` from
-   it (`S_` lines for shapes and colours, `G_` lines for branch walls and
-   altar alignments), so the preview and the game can't drift apart.  It
-   replaces the current NeonGrid; its rounded magenta corners move to the
-   extras (§5).
-2. **Real 24-bit colour in tty**: honour `use_truecolor` (and
-   `COLORTERM=truecolor` when the client sends it) instead of always
-   squeezing to the 256-colour palette.  One condition in
-   `win/tty/termcap.c`.
-3. **IBMgraphics over ssh** (optional): when the locale is UTF-8, translate
-   code page 437 to UTF-8 as tty writes it, so IBMgraphics, RogueIBM and
-   friends work on any modern terminal.  About 30 lines in
-   `win/tty/wintty.c`.
-4. **Default**: optionally start in NeonGrid when the locale is UTF-8
-   (plain ASCII otherwise, `symset:plain` to opt out).  Today the default
-   is NetHack ASCII.
-5. **Docs**: README, `dat/help`, `neonhackrc.sample` (recommended options:
-   `symset:NeonGrid`, `use_truecolor`, `dark_room`, `lit_corridor`,
-   `hilite_pile`).
+Not done: translating IBMgraphics to UTF-8 (NeonGrid covers the IBM
+look), and honouring `COLORTERM` (24-bit is on by default instead).
 
-## 5. Extras (NeonGrid+, only if the glyph check passes)
+## 5. Extras (NeonGrid+)
 
-Outside WGL4, so only for Windows Terminal with Cascadia Mono (or another
-font that has them): rounded room corners `╭╮╰╯`, dashed open doors `╌ ╎`,
-diagonal beams `╱ ╲`, web `╳`, engulf and explosion edges `▔▁▏▕`.  These
-ship as a second symset, `NeonGrid+`, never as the default.
+Outside WGL4, so only for fonts that have them (Cascadia Mono, the
+Windows Terminal default, does): rounded room corners `╭╮╰╯`, dashed open
+doors `╌ ╎`, diagonal beams `╱ ╲`, web `╳`, engulf and explosion edges
+`▔▁▏▕`.  `OPTIONS=symset:NeonGrid+`.
 
 ## 6. Testing
 
-* Run `neongrid.py glyphs` in each terminal that matters (Windows Terminal
-  with Cascadia Mono; classic console with Consolas; Linux) before any
-  glyph is final.
-* A wizard-mode showcase level (Lua) with every feature, every branch's
-  walls and all altar alignments, captured with `tools/nhdrive` in tty and
-  curses.
-* The same captures in 16-colour mode and with a colour-blindness filter
-  (deuteranopia and protanopia): every pair in rule 2 must still read.
-* The fuzzer, as after every change.
+* `neongrid.py glyphs` on a Windows client (Windows Terminal, Cascadia Mono):
+  every NeonGrid and NeonGrid+ character renders in line.
+* `tools/neon/showcase.lua`, loaded with `#wizloaddes` in wizard mode,
+  builds a room with every feature (door states, altars of every
+  alignment, liquids, ice, clouds, traps, web, engraving, boulder,
+  ladders, lit and unlit floor); checked in tty with NeonGrid and
+  NeonGrid+, and the 24-bit colour escapes inspected.
+* Defaults: NeonGrid in tty and curses on UTF-8; ASCII with
+  `symset:default`, `LANG=C` and `TERM=linux`.
+* The fuzzer.
 
-## 7. Questions before building
+Branch wall colours are generated like the walls of the Undercity but
+weren't visited in-game.
 
-1. Which window does PowerShell open in on the Windows client: Windows Terminal (tabs
-   in the title bar) or the classic console?  Which font?
-2. What does `neongrid.py glyphs` show: any boxes, question marks or bars
-   out of line?
-3. Corridors as `░ ▒` (IBM look) or NetHack's `#`?
-4. NeonGrid as the default on UTF-8 terminals, or keep ASCII as default?
+## 7. Decisions
+
+1. Played in Windows Terminal with Cascadia Mono, over ssh.
+2. The glyph check showed no missing or misaligned characters, so
+   NeonGrid+ ships too.
+3. Corridors: `░ ▒`, the IBM look.
+4. NeonGrid is the default on UTF-8 terminals.

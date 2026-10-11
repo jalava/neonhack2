@@ -1609,7 +1609,7 @@ term_start_extracolor(uint32 customcolor, uint16 color256idx)
 {
     /* color 0 has bit 0x1000000 set */
     long mcolor = (customcolor & 0xFFFFFF);
-    if (iflags.colorcount == 256)
+    if (iflags.colorcount == 256 && !iflags.use_truecolor)
         emit256(color256idx);
     else
         emit24bit(mcolor);

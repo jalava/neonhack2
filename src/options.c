@@ -7255,6 +7255,14 @@ initoptions_init(void)
         load_symset("MACGraphics", PRIMARYSET);
     switch_symbols(TRUE);
 #endif /* MAC_GRAPHICS_ENV */
+#if defined(NEONHACK) && defined(ENHANCED_SYMBOLS)
+    /* NeonHack: the NeonGrid map wherever the terminal can show it;
+       OPTIONS=symset:default brings back NetHack's ASCII */
+    if (!gs.symset[PRIMARYSET].explicitly && neon_utf8_terminal()) {
+        load_symset("NeonGrid", PRIMARYSET);
+        switch_symbols(TRUE);
+    }
+#endif
     flags.menu_style = MENU_FULL;
 
     iflags.wc_align_message = ALIGN_TOP;
@@ -7267,6 +7275,9 @@ initoptions_init(void)
 #ifdef NEONHACK
     /* clicking on the map travels there (tty on Unix terminals, curses) */
     iflags.wc_mouse_support = 1;
+    /* NeonGrid's 24-bit colours as they are, not squeezed into the 256
+       colour palette; nearly every terminal has them by now */
+    iflags.use_truecolor = TRUE;
 #endif
 
     /*

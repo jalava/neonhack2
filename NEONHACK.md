@@ -34,9 +34,9 @@ the result differs from the plan:
 * **Heat.** There's no bribe mechanic; heat decays over time and drops
   when a robbed shopkeeper is paid.  Squads don't deploy in Sokoban, Fort
   Ludios, Vlad's Tower, Gehennom or the endgame.
-* **Display.** The default map is vanilla ASCII; the neon look is the
-  opt-in `NeonGrid` symset.  Emoji are only used in tty messages on UTF-8
-  locales.
+* **Display.** On UTF-8 terminals the map defaults to the `NeonGrid`
+  symset (doc/neongrid-plan.md), elsewhere to NetHack's ASCII.  Emoji are
+  only used in tty messages on UTF-8 terminals.
 * **Text.** Monk, Tourist and Valkyrie keep NetHack's quest stories (they
   fit); the Guidebook is not rewritten.
 
@@ -99,8 +99,15 @@ wherever they already fit ("grid bug", "quantum mechanic", "mail daemon",
 
 * Same ASCII map, same symbols, same default colours for monsters/objects.
   The map stays strictly single-width.
-* New optional **neon** wall colouring: walls and doors default to bright
-  blue/magenta instead of grey (`symset:plain` restores vanilla).
+* **NeonGrid** map (default on UTF-8 terminals, `symset:default` for
+  ASCII): the IBM look in Unicode, with every pair you must tell apart
+  differing in shape (lava `▓` vs water `≈`, ice `◦` vs floor `·`, sink
+  `#` vs fountain `⌠`, closed door `■` vs spellchip `+`, altar `Ω` vs
+  chain `_`), wall colour per branch, altar colour per alignment, 24-bit
+  colour.  Only WGL4 characters, so any Windows font works over ssh;
+  `NeonGrid+` adds rounded corners, dashed doors and diagonal beams.
+  Both are generated from `tools/neon/neongrid.py`; see
+  `doc/neongrid-plan.md`.
 * **Emoji** appear only in single-line, non-map text: the new feature
   messages (hacking 💻, implants 🦾, gunfire 💥, heat 🚨), the tombstone and
   the end-of-game summary. They can be turned off with the `!emoji` option.
