@@ -5,7 +5,7 @@
 -- The dungeon description file.
 dungeon = {
    {
-      name = "The Dungeons of Doom",
+      name = "The Undercity",
       bonetag = "D",
       base = 25,
       range = 5,
@@ -13,7 +13,7 @@ dungeon = {
       themerooms = "themerms.lua",
       branches = {
          {
-            name = "The Gnomish Mines",
+            name = "The Old Metro",
             base = 2,
             range = 3
          },
@@ -167,7 +167,7 @@ dungeon = {
       }
    },
    {
-      name = "The Gnomish Mines",
+      name = "The Old Metro",
       bonetag = "M",
       base = 8,
       range = 2,

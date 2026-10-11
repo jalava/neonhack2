@@ -1163,7 +1163,7 @@ fixup_level_locations(void)
      */
     quest_dnum = dname_to_dnum("The Quest");
     sokoban_dnum = dname_to_dnum("Sokoban");
-    mines_dnum = dname_to_dnum("The Gnomish Mines");
+    mines_dnum = dname_to_dnum("The Old Metro");
     tower_dnum = dname_to_dnum("Vlad's Tower");
     tutorial_dnum = dname_to_dnum("The Tutorial");
 

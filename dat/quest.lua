@@ -56,7 +56,7 @@ questtext = {
  %N:	return("neutral");
  %L:	return("lawful");
  %x:	return((Blind) ? "sense" : "see");
- %Z:	return("The Dungeons of Doom");
+ %Z:	return("The Undercity");
  %%:	return(percent_sign);
  a suffix:	return an(root);
  A suffix:	return An(root);
@@ -2524,14 +2524,14 @@ to quickly return to %H and find %l.]],
       },
       guardtalk_after = {
          "\"Gehennom on 5 zorkmids a day -- more like 500 a day if you ask me.\"",
-         "\"Do you know where I could find some nice postcards of The Gnomish Mines?\"",
+         "\"Do you know where I could find some nice postcards of The Old Metro?\"",
          "\"Have you tried the weird toilets?\"",
          "\"If you stick around, I'll show you the pictures from my latest trip.\"",
          "\"Did you bring me back any souvenirs?\"",
       },
       guardtalk_before = {
          "\"Gehennom on 5 zorkmids a day -- more like 500 a day if you ask me.\"",
-         "\"Do you know where I could find some nice postcards of The Gnomish Mines?\"",
+         "\"Do you know where I could find some nice postcards of The Old Metro?\"",
          "\"Have you tried the weird toilets?\"",
          "\"Don't stay at the Inn, I hear the food is terrible and it has rats.\"",
          "\"They told me that this was the off season!\"",

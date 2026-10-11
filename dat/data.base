@@ -26,6 +26,314 @@
 #
 # Some entries include blank lines to separate paragraphs but many don't.
 #
+#
+# ---------------------------------------------------------------------
+# NeonHack entries.  These come first so that they win over the NetHack
+# entries below (lookups take the first matching key).  Text is original;
+# "[ ]" citations are in-world sources.
+# ---------------------------------------------------------------------
+#
+# --- monsters ---
+cyberwolf
+	Military wolves with ceramic fangs and optic implants, released
+	into the undercity when the war contracts ran out.  They still
+	hunt in perfect formation.
+cryowolf*
+	A biotech novelty that ran wild: a wolf whose lungs were swapped
+	for cryogenic pumps.  Its bite is cold, and its breath is colder.
+cryo mine
+incendiary mine
+shock mine
+	Floating proximity mines, abandoned by a dozen forgotten turf wars.
+	They drift toward body heat and detonate on contact.  Do not hug.
+holo-panther
+	A predator wrapped in a light-bending field.  Where you see it is
+	never quite where it is.
+urchin
+	The undercity's children grow up fast and fearless, wearing
+	whatever armor fell off the last corpse they found.
+~cyborg ??m*
+cyborg*
+	Mining crews who traded flesh for steel to dig deeper and longer.
+	They are stubborn, territorial, and almost impossible to knock
+	down, and they never go anywhere without a pick-axe.
+		[ Field Notes on the Old Metro, by an anonymous salvager ]
+juicer
+	A brawler running on black-market muscle stimulants and spite.
+	Big, slow and impossible to reason with.
+*brainjacker
+	Brainjackers wire their own cortex directly into their victims'
+	skulls and drink the electrical storm inside.  What they leave
+	behind can still walk, but it can no longer read.
+~ratkin ??m*
+ratkin*
+	Gene-spliced vermin people, the failed product line of a pet
+	company.  They breed in the sewers and hate everyone above them.
+debt collector
+	"Your account is overdue."  The debt collector is quick, smiling
+	and patient, and it never, ever leaves empty-handed.
+grifter
+pickpocket
+cat burglar
+	The undercity's light-fingered professionals.  They will flatter
+	you, distract you, relieve you of something precious and vanish
+	into the crowd before you notice it's gone.
+~mutant ??m*
+mutant*
+	Rad-scarred gangers from the deep sumps, organized into gangs
+	with names like the Sewer Kings and the Chrome Skulls.  They eat
+	anything, fear little and resent everything with clean skin.
+smog cloud
+	A drifting knot of industrial exhaust that has learned to hunt.
+~scav ??m*
+scav*
+	Small, wiry scavengers who live in the dead tunnels of the Old
+	Metro.  They trade in salvage, keep the old stations lit with
+	candles, and are friendly enough if you share their ancestry.
+rent-a-cop*
+	Private security on minimum wage.  Rent-a-cops are not very
+	good at their jobs, but there are always more of them.
+war troll
+	A regenerating gene-forged soldier left over from the corporate
+	wars, armored, armed and still following its last orders.
+black wraith
+	A figure of shadow in an ancient black coat.  Nobody remembers
+	who first uploaded it, or why it hunts.
+trash robot
+	A garbage-collecting automaton that took one too many hits to
+	the logic board.  Still collects garbage.  Considers you garbage.
+printer drone
+	A flying office printer.  When destroyed it showers the area with
+	blank script stock.  Nobody knows why it attacks.
+cable crawler
+	A snake of braided data cable with a strangling routine.
+gilded robot
+	A luxury butler robot, gold-plated for the upper towers.  It fell
+	a long way down, and it is very angry about it.
+bouncer bot
+	It checks IDs.  It does not like yours.
+wooden mannequin
+	An animated store mannequin.  Nobody admits to programming it.
+meat puppet
+	A body run by a control chip after the mind was evicted.  The
+	chip is hackable.  The body is not pleasant.
+ceramic robot
+construction mech
+glass robot
+battle mech
+	Industrial and military machinery, gone feral in the deep levels
+	of the undercity.  Some of it still answers to the right code.
+synth
+scout synth
+combat synth
+stealth synth
+synth lord
+synth lady
+synth noble
+synth king
+synth queen
+synth monarch
+	Engineered people, grown in vats to be faster, prettier and more
+	obedient than their makers.  Two out of three isn't bad.  The
+	synths that escaped built a hidden society of their own and have
+	no love for the mutant gangs.
+security guard
+security chief
+	The station security of the Metro Market.  They are honest by
+	undercity standards, and they carry stun batons.
+corpsec*
+	Corporate security: armored, well-paid and well-armed.  They
+	guard what the corporations own, and they hunt down anyone the
+	algorithms flag as a threat.
+salvager
+	Salvagers dig through the ruins of older cities for anything the
+	world forgot.  Some call them grave robbers; they call themselves
+	historians.
+nomad
+	The convoy clans of the wasteland beyond the arcology walls.
+	Tough, loyal to their kin, and handy with a chainsword.
+feral
+	Born in the sewers, raised by the undercity.  Ferals know every
+	pipe and every rat by name.
+ripperdoc
+	A street surgeon who installs chrome no questions asked.  The
+	good ones keep their scalpels clean.
+marshal
+	One of the last lawmen who still follow a code, riding the
+	corridors of the undercity on horseback like it's the old west.
+techpriest*
+	Priests of the machine churches.  They read the blessings and
+	curses written into every object, and their gods still answer.
+gunslinger
+	A sharpshooter who lives and dies by the pistol.
+infiltrator
+	A professional at getting into places that are locked, guarded
+	and watched, and getting back out again.
+ronin
+	A corporate samurai who outlived their employer, now selling a
+	sword and a revolver to anyone who can pay.
+netrunner
+	A hacker who treats every lock, drone and mainframe as an open
+	invitation.  Netrunners live on stims, code and bad decisions.
+intern
+	An unpaid research intern of the Salvagers' Guild.
+clan rider
+	A rider of the Duali convoys.
+feral elder
+	A keeper of the old sewer ways.
+orderly
+	An orderly of the Epidaurus Free Clinic.
+cadet
+	A cadet of Camelot Precinct.
+commissioner arthur
+	The commissioner of Camelot Precinct, keeper of the old code.
+doc hippocrates
+	The founder of the Epidaurus Free Clinic, who never once turned
+	away a patient who couldn't pay.
+minion of entropy
+	A servant of the force that rusts every machine and erases every
+	archive, given a body of rot and rage.
+water daemon
+amorous daemon
+	Daemons are the processes that run in the deep, unseen and
+	unkillable.  Some of them took bodies.
+street punk
+	A kid with a mohawk, a knife and something to prove.  They run
+	in packs.
+		[ The Street Survival Manual, Undercity edition ]
+yakuza
+	Tattooed enforcers of the old syndicates, as comfortable with a
+	katana as with a pistol.
+black hat
+	A hostile netrunner, selling stolen code and casting it at anyone
+	who gets in the way.
+cyberpsycho
+	Someone who installed more chrome than their mind could carry,
+	and stopped being anyone at all.  Fast, armed and berserk.  The
+	implant that broke them is usually still inside.
+security drone
+	A flying camera with a taser.  When it sees you it sounds the
+	alarm, and security will come.
+spider bot
+	An eight-legged maintenance robot repurposed for perimeter
+	defense.  It can climb walls and bite through cable.
+sentry bot
+	A walking gun platform with a single directive: protect the
+	property.  You are not the property.
+robo-rat
+	A mechanical rat built to hunt real ones.  It no longer knows
+	the difference.
+glitch
+	A flicker in the augmented-reality layer that got loose.  Its
+	touch scrambles your senses, and it skips from place to place
+	like a bad frame.
+virus
+	A nanotech pathogen with too many legs.  Its bite saps the body.
+nanite cloud
+	A swarm of disassembler nanites hungry for power.  It engulfs its
+	prey and drains every charge it can find.
+cyberzombie
+	A corpse kept walking by military cyberware that never received
+	the order to shut down.
+black ice
+	Intrusion countermeasures with a body.  Black ICE guards the
+	deepest sectors of the old network and drains the life and power
+	out of anything that touches it.
+# --- objects ---
+bullet*
+shotgun shell*
+hollow-point*
+	Ammunition.  A round that hits its target is spent; a miss can
+	sometimes be picked up again.
+pistol
+smart pistol
+zip gun
+revolver
+shotgun
+	Firearms.  Wield one, quiver its ammunition and fire.  Every shot
+	is loud enough to wake the neighbours.
+submachine gun
+assault rifle
+	Automatic weapons fire bursts of rounds with every pull of the
+	trigger.  They are loud even by firearm standards.
+stun baton
+	A shock prod favored by security forces.  Its discharge hurts and
+	can stun, unless the target shrugs off electricity.
+monofilament whip
+	A single molecule-thin strand on a weighted handle.  It cuts
+	through almost anything, including the careless user's own hand.
+chainsword
+	A sword with a motorized cutting chain.  Loud, heavy, effective.
+baseball bat
+	The undercity's most popular argument settler.
+tinfoil hat
+	It blocks the mind-control rays.  Netrunners swear it clears
+	their heads; everyone else finds it gives them a headache.
+trench coat
+	Long, dark and full of pockets.  The uniform of the undercity.
+faraday cloak
+	A cloak woven with conductive mesh that shrugs off hostile
+	signals of every kind.
+optical camo cloak
+	Active camouflage.  It bends light around the wearer.
+holo-cloak
+	It projects the wearer's image a short distance away.
+lab coat
+	Spill-proof and acid-proof.  The slogans on the back are not.
+satellite uplink
+	A portable dish that can be aimed at the orbital feeds to locate
+	objects, creatures or features on the current level.
+cyberdeck
+	A portable hacking rig.  Apply it, or use #hack, to take over an
+	adjacent robot or spring an electronic lock.  Each attempt uses a
+	battery charge.
+medkit
+	Bandages, sealant and painkillers.  It heals you, and makes
+	installing an implant far less dangerous.
+frag grenade
+flashbang
+emp grenade
+	Throw it and it goes off where it lands.  Frag grenades explode;
+	flashbangs blind and stun everything nearby; EMP grenades shut
+	down machines and short out cyberware.
+*implant
+optic implant
+reflex booster
+dermal plate
+neural firewall
+toxin filter
+grounding mesh
+heat sink
+cryo lining
+threat sensor
+neural uplink
+muscle graft
+smartlink
+nanite regenerator
+sound dampener
+rebreather
+mantis blades
+	Cyberware.  Apply an implant to install it in yourself.  Each one
+	grants a permanent ability, but every piece of chrome adds to the
+	strain on your mind, and too much of it leads to cyberpsychosis.
+		[ Know Your Chrome, a public health leaflet ]
+cup of ramen
+	Just add hot water.  Or don't.
+vial*
+	Glass vials of chemicals, drugs and stranger things.
+script*
+	A single-use program on a data stick.  Reading a script runs it,
+	and running it wipes it.
+spellchip*
+	A chip of compiled psionic code.  Slot it and study it, and you
+	will learn the spell it carries.
+credit*
+	The currency of the arcology: gold-backed credit chips.
+#
+# ---------------------------------------------------------------------
+# NetHack entries
+# ---------------------------------------------------------------------
+#
 abbot
 	For it had been long apparent to Count Landulf that nothing
 	could be done with his seventh son Thomas, except to make him

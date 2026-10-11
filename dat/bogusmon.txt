@@ -560,3 +560,26 @@ water lemon
 water melon
 winged grizzly
 yellow wight
+# NeonHack
+replicant
+grey goo
+corporate lawyer
+sentient vending machine
+mall cop
+deepfake
+spam bot
+rogue AI
+data ghost
+neon dragon
+chrome golem
+middle manager
+crypto bro
+pop-up ad
+captcha
+buffer overflow
+kernel panic
+segfault
+technical debt
+unpaid intern
+self-driving car
+smart fridge

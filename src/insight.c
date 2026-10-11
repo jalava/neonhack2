@@ -76,8 +76,8 @@ static struct ll_achieve_msg achieve_msg [] = {
     { 0, "hero was always blond, no, blind" },
     { 0, "hero never wore armor" },
      /* */
-    { LL_MINORAC | LL_DUMP, "entered the Gnomish Mines" },
-    { LL_ACHIEVE, "reached Mine Town" }, /* probably minor, but dnh logs it */
+    { LL_MINORAC | LL_DUMP, "entered the Old Metro" },
+    { LL_ACHIEVE, "reached the Metro Market" }, /* probably minor, but dnh logs it */
     { LL_MINORAC, "entered a shop" },
     { LL_MINORAC, "entered a temple" },
     { LL_ACHIEVE, "consulted the Oracle" }, /* minor, but rare enough */
@@ -2311,10 +2311,10 @@ show_achievements(
             enl_msg(You_, "have gone", "went", " without any armor", "");
             break;
         case ACH_MINE:
-            you_have_X("entered the Gnomish Mines");
+            you_have_X("entered the Old Metro");
             break;
         case ACH_TOWN:
-            you_have_X("entered Minetown");
+            you_have_X("reached the Metro Market");
             break;
         case ACH_SHOP:
             you_have_X("entered a shop");
@@ -2335,7 +2335,7 @@ show_achievements(
             you_have_X("completed Sokoban");
             break;
         case ACH_MINE_PRIZE: /* hidden guaranteed luckstone */
-            you_have_X("completed the Gnomish Mines");
+            you_have_X("reached the End of the Line");
             break;
         case ACH_BGRM:
             you_have_X("entered the Big Room");

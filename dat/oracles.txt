@@ -23,16 +23,16 @@ scales from a dragon's hide.
 -----
 It is customarily known among travelers that extra-healing draughts may clear
 thy senses when thou art addled by delusory visions.  But never forget, the
-lowly potion which makes one sick may be used for the same purpose.
+lowly vial which makes one sick may be used for the same purpose.
 -----
 While the consumption of lizard flesh or water beloved of the gods may clear
 the muddled head, the application of the horn of a creature of utmost purity
 can alleviate many other afflictions as well.
 -----
 If thou wouldst travel quickly between distant locations, thou must be
-able to control thy teleports, and in a confused state misread the scroll
+able to control thy teleports, and in a confused state misread the script
 which usually teleports thyself locally.  Daring adventurers have also
-performed the same feat sans need for scrolls or potions by stepping into
+performed the same feat sans need for scripts or vials by stepping into
 a particular ambuscade.
 -----
 Almost all adventurers who come this way hope to pass the dread Medusa.  To
@@ -66,7 +66,7 @@ of the gods.
 -----
 At times, the gods may favor worthy supplicants with named blades whose
 powers echo throughout legend.  Learned wayfarers can reproduce blades of
-elven lineage, hated of the orcs, without the need for such intervention.
+synth lineage, hated of the mutants, without the need for such intervention.
 -----
 There are many stories of a mighty amulet, the origins of which are said
 to be ancient Yendor.  This amulet doth have awesome power, and the gods
@@ -84,7 +84,7 @@ pure sound of a silver bell shall announce thee.  The terrible runes,
 read from Moloch's book, shall cause the earth to tremble mightily.  The
 light of an enchanted candelabrum shall show thee the way.
 -----
-In the deepest recesses of the Dungeons of Doom, guarding access to the
+In the deepest recesses of the Undercity, guarding access to the
 nether regions, there standeth a castle, wherein lieth a wand of wishes.
 If thou wouldst gain entry, bear with thee an instrument of music, for the
 pontlevis may be charmed down with the proper melody.  What notes comprise
@@ -103,3 +103,25 @@ utmost calm, thy safety will be aided greatly, but beware lest thy clumsy
 feet scuff the inscription, cancelling its potence, or thy wayward
 sword-arm break the truce.
 -----
+-----
+The flesh is weak and the chrome is strong, yet the mind is weakest of all.
+Graft not more steel into thy body than thy spirit can carry, lest thou
+forget whose hands are thine.  The blue draught of the clinics may quiet
+the storm a while, but it is no cure.
+-----
+Know that the corporations keep a ledger of every life thou takest
+unbidden, and every coin thou takest unpaid.  Mend thy ways, or settle
+thy debts, and in time the ledger forgets; but should it grow long, they
+shall send their soldiers from the sky to balance it.
+-----
+The machines of the deep are deaf to prayer but not to code.  Bring a
+deck of good make, a sharp mind and a steady hand, and the iron guardian
+shall kneel to thee.  But beware the cold that answers a clumsy touch.
+-----
+A gun speaketh with a loud voice, and every sleeper within a stone's
+throw shall hear it.  Choose thy battles by their sound as well as by
+their foes, for the quiet blade gathers fewer witnesses.
+-----
+When the lightning finds thee, thy grafted wonders may fall dark and
+silent.  Ground thyself in mesh or in the blood of the eel, and thy
+chrome shall endure the storm.

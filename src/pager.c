@@ -2228,10 +2228,10 @@ look_engrs(boolean nearby)
 }
 
 static const char *suptext1[] = {
-    "%s is a member of a marauding horde of orcs",
+    "%s is a member of a marauding gang of mutants",
     "rumored to have brutally attacked and plundered",
-    "the ordinarily sheltered town that is located ",
-    "deep within The Gnomish Mines.",
+    "the ordinarily sheltered market that is located ",
+    "deep within The Old Metro.",
     "",
     "The members of that vicious horde proudly and ",
     "defiantly acclaim their allegiance to their",
@@ -2241,11 +2241,11 @@ static const char *suptext1[] = {
 
 static const char *suptext2[] = {
     "\"%s\" is the common dungeon name of",
-    "a nefarious orc who is known to acquire property",
+    "a nefarious mutant who is known to acquire property",
     "from thieves and sell it off for profit.",
     "",
     "The perpetrator was last seen hanging around the",
-    "stairs leading to the Gnomish Mines.",
+    "stairs leading to the Old Metro.",
     (char *) 0,
 };
 

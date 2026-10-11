@@ -101,7 +101,7 @@ tshirt_text(struct obj *tshirt, char *buf)
 {
     static const char *const shirt_msgs[] = {
         /* Scott Bigham */
-      "I explored the Dungeons of Doom and all I got was this lousy T-shirt!",
+      "I explored the Undercity and all I got was this lousy T-shirt!",
         "Is that Mjollnir in your pocket or are you just happy to see me?",
       "It's not the size of your sword, it's how #enhance'd you are with it.",
         "Madame Elvira's House O' Succubi Lifetime Customer",
@@ -143,8 +143,8 @@ tshirt_text(struct obj *tshirt, char *buf)
         "Lichen Park",
         "LOST IN THOUGHT - please send search party",
         "Meat is Mordor",
-        "Minetown Better Business Bureau",
-        "Minetown Watch",
+        "Metro Market Better Business Bureau",
+        "Metro Market Watch",
         /* Discworld riff; unfortunately long */
         ("Ms. Palm's House of Negotiable Affection--A Very Reputable"
             " House Of Disrepute"),

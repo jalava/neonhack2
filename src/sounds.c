@@ -33,9 +33,9 @@ throne_mon_sound(struct monst *mtmp)
          || is_prince(mtmp->data)) && !is_animal(mtmp->data)
         && mon_in_room(mtmp, COURT)) {
         static const char *const throne_msg[4] = {
-            "the tones of courtly conversation.",
-            "a sceptre pounded in judgment.",
-            "Someone shouts \"Off with %s head!\"",
+            "the murmur of a board meeting.",
+            "a gavel pounded in judgment.",
+            "Someone shouts \"Clear out %s desk, you're fired!\"",
             "Queen Beruthiel's cats!",
         };
         int which = rn2(3) + (Hallucination ? 1 : 0);
@@ -212,8 +212,8 @@ dosounds(void)
 
     if (svl.level.flags.nfountains && !rn2(400)) {
         static const char *const fountain_msg[4] = {
-            "bubbling water.", "water falling on coins.",
-            "the splashing of a naiad.", "a soda fountain!",
+            "bubbling water.", "water falling on credit chips.",
+            "the hum of a coolant pump.", "a soda fountain!",
         };
         You_hear1(fountain_msg[rn2(3) + hallu]);
     }
@@ -285,7 +285,7 @@ dosounds(void)
     }
     if (svl.level.flags.has_barracks && !rn2(200)) {
         static const char *const barracks_msg[4] = {
-            "blades being honed.", "loud snoring.", "dice being thrown.",
+            "guns being cleaned.", "loud snoring.", "dice being thrown.",
             "General MacArthur!",
         };
         int count = 0;
