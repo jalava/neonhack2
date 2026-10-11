@@ -97,3 +97,6 @@ util/*.lib
 util/*.exp
 submodules/CHKSUMS.tmp
 sys/amiga/regex/
+
+# NeonHack: local source-install playground
+/playground/

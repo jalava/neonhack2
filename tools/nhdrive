@@ -1,0 +1,31 @@
+#!/bin/bash
+# nhdrive - drive the game inside a detached tmux session (for testing).
+#
+#   nhdrive start [game args...]   start a fresh game (e.g. -D for debug mode)
+#   nhdrive keys 'text'            type text literally
+#   nhdrive key Enter|Escape|C-x   send named tmux keys
+#   nhdrive screen                 print the current 80x24 screen
+#   nhdrive stop                   kill the session
+#
+# Env: NHSESSION (tmux session name), NHOPTS (NETHACKOPTIONS),
+#      NHCOLS/NHROWS (terminal size), NHDELAY (seconds after input)
+top=$(cd "$(dirname "$0")/.." && pwd)
+play="$top/playground"
+S=${NHSESSION:-nhtest}
+D=${NHDELAY:-0.25}
+game=$(ls "$play"/neonhack "$play"/nethack 2>/dev/null | head -1)
+opts=${NHOPTS:-"name:Tester,role:Wizard,race:human,gender:male,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen"}
+cmd=$1; shift
+case "$cmd" in
+start)
+    tmux kill-session -t "$S" 2>/dev/null
+    home=$(mktemp -d /tmp/nhhome.XXXXXX)
+    tmux new-session -d -s "$S" -x "${NHCOLS:-80}" -y "${NHROWS:-24}" \
+        "cd '$play' && HOME='$home' TERM=xterm-256color NETHACKOPTIONS='$opts' '$game' $*; echo '[game exited]'; sleep 600"
+    sleep "${NHSTARTDELAY:-0.8}" ;;
+keys)   tmux send-keys -t "$S" -l -- "$*"; sleep "$D" ;;
+key)    tmux send-keys -t "$S" "$@"; sleep "$D" ;;
+screen) tmux capture-pane -t "$S" -p ;;
+stop)   tmux kill-session -t "$S" 2>/dev/null ;;
+*)      sed -n '2,12p' "$0"; exit 1 ;;
+esac
