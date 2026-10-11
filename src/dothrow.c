@@ -231,6 +231,9 @@ throw_obj(struct obj *obj, int shotlimit)
             multishot = rnd(multishot);
 
         multishot = rnd(multishot);
+        /* NeonHack: automatic weapons fire bursts */
+        if (ammo_and_launcher(obj, uwep))
+            multishot += firearm_burst(uwep);
         if ((long) multishot > obj->quan)
             multishot = (int) obj->quan;
         if (shotlimit > 0 && multishot > shotlimit)
@@ -241,11 +244,15 @@ throw_obj(struct obj *obj, int shotlimit)
     /* give a message if shooting more than one, or if player
        attempted to specify a count */
     if (multishot > 1 || shotlimit > 0) {
-        /* "You shoot N arrows." or "You throw N daggers." */
-        You("%s %d %s.", gm.m_shot.s ? "shoot" : "throw",
+        /* "You fire N bullets." or "You throw N daggers." */
+        You("%s %d %s.",
+            !gm.m_shot.s ? "throw" : is_firearm(uwep) ? "fire" : "shoot",
             multishot, /* (might be 1 if player gave shotlimit) */
             (multishot == 1) ? singular(obj, xname) : xname(obj));
     }
+    /* NeonHack: guns are loud */
+    if (gm.m_shot.s)
+        u_gunfire(uwep, multishot);
 
     wep_mask = obj->owornmask;
     oldslot = 0;
@@ -1983,6 +1990,9 @@ should_mulch_missile(struct obj *obj)
         || obj->otyp == BOOMERANG
         || objects[obj->otyp].oc_magic)
         return FALSE;
+    /* NeonHack: a bullet or shell that hits something is spent */
+    if (is_cartridge(obj))
+        return TRUE;
 
     /* we had been breaking 2/3 of everything unconditionally.  we still don't
        want anything to survive unconditionally, but we need ammo to stay
@@ -2021,6 +2031,12 @@ thitmonst(
     hmode = (obj == uwep) ? HMON_APPLIED
               : (obj == gk.kickedobj) ? HMON_KICKED
                 : HMON_THROWN;
+
+    /* NeonHack: a grenade goes off when it reaches its target */
+    if (is_grenade(obj) && obj != uwep) {
+        (void) hero_breaks(obj, mon->mx, mon->my, BRK_FROM_INV);
+        return 1;
+    }
 
     /* Differences from melee weapons:
      *
@@ -2485,6 +2501,7 @@ breakobj(
 {
     boolean fracture = FALSE;
     boolean explosion = FALSE;
+    int grenade = is_grenade(obj) ? obj->otyp : STRANGE_OBJECT;
 
     if (is_crackable(obj)) /* if erodeproof, erode_obj() will say so */
         return (erode_obj(obj, armor_simple_name(obj), ERODE_CRACK,
@@ -2570,6 +2587,8 @@ breakobj(
         delobj(obj);
     if (explosion)
         explode(x, y, -11, d(3, 6), 0, EXPL_FIERY);
+    if (grenade != STRANGE_OBJECT)
+        grenade_explode(grenade, x, y);
     return 1;
 }
 
@@ -2591,6 +2610,9 @@ breaktest(struct obj *obj)
 
     if (obj_resists(obj, nonbreakchance, 99))
         return FALSE;
+    /* NeonHack: grenades go off on impact */
+    if (is_grenade(obj))
+        return TRUE;
     if (objects[obj->otyp].oc_material == GLASS && !obj->oartifact
         && obj->oclass != GEM_CLASS)
         return TRUE;
@@ -2614,6 +2636,8 @@ breakmsg(struct obj *obj, boolean in_view)
     const char *to_pieces;
 
     if (is_crackable(obj)) /* breakobj() will call erode_obj() for message */
+        return;
+    if (is_grenade(obj)) /* grenade_explode() gives the messages */
         return;
 
     to_pieces = "";

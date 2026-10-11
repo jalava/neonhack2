@@ -236,6 +236,9 @@ monmulti(
             multishot += (long) rounddiv(mwep->spe, 3);
         /* Some randomness */
         multishot = rnd((int) multishot);
+        /* NeonHack: automatic weapons fire bursts */
+        if (ammo_and_launcher(otmp, mwep))
+            multishot += firearm_burst(mwep);
 
         /* class bonus */
         multishot += multishot_class_bonus(monsndx(mtmp->data), otmp, mwep);
@@ -295,6 +298,9 @@ monshoot(struct monst *mtmp, struct obj *otmp, struct obj *mwep)
     } else {
         gm.m_shot.o = STRANGE_OBJECT; /* don't give multishot feedback */
     }
+    /* NeonHack: guns are loud */
+    if (ammo_and_launcher(otmp, mwep))
+        m_gunfire(mtmp, mwep, multishot);
     gm.m_shot.n = multishot;
     for (gm.m_shot.i = 1; gm.m_shot.i <= gm.m_shot.n; gm.m_shot.i++) {
         m_throw(mtmp, mtmp->mx, mtmp->my, sgn(gt.tbx), sgn(gt.tby), dm, otmp);

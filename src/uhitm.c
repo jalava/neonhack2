@@ -608,6 +608,9 @@ known_hitum(
 
     if (!*mhit) {
         missum(mon, uattk, (rollneeded + armorpenalty > dieroll));
+        /* NeonHack: an unskilled hand loses control of a monowhip */
+        if (weapon && weapon == uwep && weapon->otyp == MONOFILAMENT_WHIP)
+            monowhip_backlash();
     } else {
         int oldhp = mon->mhp;
         long oldweaphit = u.uconduct.weaphit;
@@ -1035,6 +1038,9 @@ hmon_hitmon_weapon_melee(
     if (hmd->material == SILVER && mon_hates_silver(mon)) {
         hmd->silvermsg = hmd->silverobj = TRUE;
     }
+    /* NeonHack: stun batons discharge into their target */
+    if (obj->otyp == STUN_BATON && hmd->hand_to_hand)
+        hmd->dmg += stun_baton_hit(mon);
     if (artifact_light(obj) && obj->lamplit
         && mon_hates_light(mon))
         hmd->lightobj = TRUE;
@@ -1056,6 +1062,8 @@ hmon_hitmon_weapon_melee(
             else if (Race_if(PM_ELF) && obj->otyp == ELVEN_ARROW
                      && uwep->otyp == ELVEN_BOW)
                 hmd->dmg++;
+            /* NeonHack: guns hit harder than bows */
+            hmd->dmg += firearm_dmg_bonus(uwep, mon);
             hmd->train_weapon_skill = (hmd->dmg > 0);
         }
         if (obj->opoisoned && is_poisonable(obj))
@@ -4077,6 +4085,18 @@ mhitm_ad_phys(
                     pline_The("silver sears your flesh!");
                     exercise(A_CON, FALSE);
                 }
+                /* NeonHack: stun batons discharge into their target */
+                if (otmp->otyp == STUN_BATON) {
+                    if (Shock_resistance) {
+                        shieldeff(u.ux, u.uy);
+                    } else {
+                        You("are jolted!");
+                        mhm->damage += rnd(6);
+                        if (!rn2(3))
+                            make_stunned((HStun & TIMEOUT) + (long) rnd(3),
+                                         TRUE);
+                    }
+                }
                 /* this redundancy necessary because you have
                    to take the damage _before_ being cloned;
                    need to have at least 2 hp left to split */
@@ -4153,6 +4173,12 @@ mhitm_ad_phys(
             if ((marmg = which_armor(magr, W_ARMG)) != 0
                 && marmg->otyp == GAUNTLETS_OF_POWER)
                 mhm->damage += rn1(4, 3); /* 3..6 */
+            /* NeonHack: stun batons discharge into their target */
+            if (mwep->otyp == STUN_BATON && !resists_elec(mdef)) {
+                mhm->damage += rnd(6);
+                if (!rn2(3))
+                    mdef->mstun = 1;
+            }
             if (mhm->damage < 1) /* is this necessary?  mhitu.c has it... */
                 mhm->damage = 1;
             if (mwep->oartifact) {

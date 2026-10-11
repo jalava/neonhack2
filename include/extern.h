@@ -2077,6 +2077,20 @@ extern void awaken_soldiers(struct monst *) NONNULLARG1;
 extern int do_play_instrument(struct obj *) NONNULLARG1;
 enum instruments obj_to_instr(struct obj *) NONNULLARG1;
 
+/* ### neon.c ### */
+
+extern boolean is_firearm(struct obj *);
+extern boolean is_cartridge(struct obj *);
+extern int firearm_burst(struct obj *);
+extern void u_gunfire(struct obj *, int);
+extern void m_gunfire(struct monst *, struct obj *, int) NONNULLARG1;
+extern boolean is_grenade(struct obj *);
+extern void grenade_explode(int, coordxy, coordxy);
+extern void emp_burst(coordxy, coordxy, int, boolean);
+extern int firearm_dmg_bonus(struct obj *, struct monst *) NONNULLARG2;
+extern int stun_baton_hit(struct monst *) NONNULLARG1;
+extern void monowhip_backlash(void);
+
 /* ### nhlsel.c ### */
 
 #if !defined(CROSSCOMPILE) || defined(CROSSCOMPILE_TARGET)
