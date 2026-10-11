@@ -106,6 +106,9 @@
 #define is_bird(ptr) ((ptr)->mlet == S_BAT && !is_bat(ptr))
 #define is_giant(ptr) (((ptr)->mflags2 & M2_GIANT) != 0L)
 #define is_golem(ptr) ((ptr)->mlet == S_GOLEM)
+/* NeonHack: machines are the targets of hacking and EMP; all golems are
+   robots (even the meat puppet runs on a control chip) */
+#define is_robot(ptr) (is_golem(ptr) || (ptr) == &mons[PM_ROBO_RAT])
 #define is_domestic(ptr) (((ptr)->mflags2 & M2_DOMESTIC) != 0L)
 #define is_demon(ptr) (((ptr)->mflags2 & M2_DEMON) != 0L)
 #define is_mercenary(ptr) (((ptr)->mflags2 & M2_MERC) != 0L)

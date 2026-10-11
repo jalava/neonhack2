@@ -1017,8 +1017,9 @@ name_to_monplus(
             { "djinn", PM_DJINNI, NEUTRAL },
             { "mumakil", PM_MUMAK, NEUTRAL },
             { "erinyes", PM_ERINYS, NEUTRAL },
-            /* NeonHack: NetHack names of renamed monsters (longest
-               first, since matching is by whole-word prefix) */
+            /* BEGIN NeonHack monster aliases (rename_monsters.py) */
+            /* NetHack names of renamed monsters (longest first,
+               since matching is by whole-word prefix) */
             { "master mind flayer", PM_MASTER_MIND_FLAYER, NEUTRAL },
             { "minion of huhetotl", PM_MINION_OF_HUHETOTL, NEUTRAL },
             { "wizard of yendor", PM_WIZARD_OF_YENDOR, NEUTRAL },  /* not the alias */
@@ -1065,6 +1066,7 @@ name_to_monplus(
             { "neanderthal", PM_NEANDERTHAL, NEUTRAL },
             { "orc-captain", PM_ORC_CAPTAIN, NEUTRAL },
             { "paper golem", PM_PAPER_GOLEM, NEUTRAL },
+            { "soldier ant", PM_SOLDIER_ANT, NEUTRAL },  /* not the alias */
             { "stone golem", PM_STONE_GOLEM, NEUTRAL },
             { "straw golem", PM_STRAW_GOLEM, NEUTRAL },
             { "water demon", PM_WATER_DEMON, NEUTRAL },
@@ -1082,6 +1084,7 @@ name_to_monplus(
             { "gold golem", PM_GOLD_GOLEM, NEUTRAL },
             { "iron golem", PM_IRON_GOLEM, NEUTRAL },
             { "leprechaun", PM_LEPRECHAUN, NEUTRAL },
+            { "lieutenant", PM_LIEUTENANT, NEUTRAL },
             { "mordor orc", PM_MORDOR_ORC, NEUTRAL },
             { "orc shaman", PM_ORC_SHAMAN, NEUTRAL },
             { "orc zombie", PM_ORC_ZOMBIE, NEUTRAL },
@@ -1105,11 +1108,14 @@ name_to_monplus(
             { "grey-elf", PM_GREY_ELF, NEUTRAL },
             { "hill orc", PM_HILL_ORC, NEUTRAL },
             { "olog-hai", PM_OLOG_HAI, NEUTRAL },
+            { "sergeant", PM_SERGEANT, NEUTRAL },
             { "uruk-hai", PM_URUK_HAI, NEUTRAL },
             { "watchman", PM_WATCHMAN, NEUTRAL },
             { "bugbear", PM_BUGBEAR, NEUTRAL },
+            { "captain", PM_CAPTAIN, NEUTRAL },
             { "caveman", PM_CAVE_DWELLER, MALE },
             { "samurai", PM_SAMURAI, NEUTRAL },
+            { "soldier", PM_SOLDIER, NEUTRAL },
             { "student", PM_STUDENT, NEUTRAL },
             { "cleric", PM_CLERIC, NEUTRAL },
             { "goblin", PM_GOBLIN, NEUTRAL },
@@ -1128,6 +1134,7 @@ name_to_monplus(
             { "warg", PM_WARG, NEUTRAL },
             { "elf", PM_ELF, NEUTRAL },
             { "orc", PM_ORC, NEUTRAL },
+            /* END NeonHack monster aliases */
             /* end of list */
             { 0, NON_PM, NEUTRAL }
         };

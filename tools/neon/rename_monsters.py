@@ -85,6 +85,9 @@ def apply():
 def lua_apply(pairs):
     changed = {}
     for path in sorted(glob.glob(os.path.join(TOP, "dat", "*.lua"))):
+        # dungeon.lua names levels ("rogue"), not monsters
+        if os.path.basename(path) == "dungeon.lua":
+            continue
         s = open(path).read()
         orig = s
         for old, new, enum, slot in pairs:
@@ -112,6 +115,49 @@ def report(pairs):
                     print("%s:%d: [%s -> %s] %s" % (os.path.relpath(f, TOP), n,
                           old, new, line.strip()))
 
+def alias_block(pairs):
+    """C lines for mondata.c's alt_spl table: every NetHack name of a
+    renamed monster, plus protective entries for current names that
+    start with such an alias followed by a space (matching is by
+    whole-word prefix, first match wins)"""
+    # ignore obsolete entries kept under '#if 0'
+    cur = re.sub(r'#if 0[\s\S]*?#endif', '', open(MONH).read())
+    allnames = []
+    for s, e, enum, names in mon_entries(cur):
+        if len(names) == 1:
+            allnames.append((names[0], enum, "NEUTRAL"))
+        else:
+            allnames.extend((n, enum, slot) for slot, n in zip(SLOTS, names))
+    aliases = {}
+    for old, new, enum, slot in pairs:
+        if old.lower() != new.lower():
+            aliases[old.lower()] = (enum, slot)
+    protect = {}
+    for a in aliases:
+        for n, enum, slot in allnames:
+            if n.lower().startswith(a + " ") and n.lower() not in aliases:
+                protect[n.lower()] = (enum, slot)
+    entries = sorted(list(aliases.items()) + list(protect.items()),
+                     key=lambda kv: (-len(kv[0]), kv[0]))
+    out = [BEGIN + "\n",
+           "            /* NetHack names of renamed monsters (longest first,\n",
+           "               since matching is by whole-word prefix) */\n"]
+    for name, (enum, slot) in entries:
+        tag = "" if name in aliases else "  /* not the alias */"
+        out.append('            { "%s", PM_%s, %s },%s\n' % (name, enum, slot, tag))
+    out.append(END + "\n")
+    return "".join(out)
+
+BEGIN = "            /* BEGIN NeonHack monster aliases (rename_monsters.py) */"
+END = "            /* END NeonHack monster aliases */"
+
+def update_aliases(pairs):
+    p = os.path.join(TOP, "src", "mondata.c")
+    s = open(p).read()
+    b, e = s.index(BEGIN), s.index(END) + len(END) + 1
+    open(p, "w").write(s[:b] + alias_block(pairs) + s[e:])
+
+
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "report"
     if cmd == "apply":
@@ -122,6 +168,7 @@ if __name__ == "__main__":
         pairs = old_new_pairs(vanilla)
         apply()
         print("lua files changed:", lua_apply(pairs))
+        update_aliases(pairs)
     elif cmd in ("report", "aliases", "pairs"):
         import subprocess
         vanilla = subprocess.run(["git", "-C", TOP, "show",
@@ -134,7 +181,5 @@ if __name__ == "__main__":
             for p in pairs:
                 print("\t".join(p))
         else:
-            for old, new, enum, slot in sorted(pairs, key=lambda p: -len(p[0])):
-                if old.lower() == new.lower():
-                    continue
-                print('            { "%s", PM_%s, %s },' % (old.lower(), enum, slot))
+            print(alias_block(pairs), end="")
+

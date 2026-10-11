@@ -21,6 +21,7 @@ staticfn void init_mongen_order(void);
 staticfn boolean wrong_elem_type(struct permonst *);
 staticfn void m_initgrp(struct monst *, coordxy, coordxy, int, mmflags_nht);
 staticfn void m_initthrow(struct monst *, int, int);
+staticfn void m_initgun(struct monst *, int);
 staticfn void m_initweap(struct monst *);
 staticfn void m_initinv(struct monst *);
 staticfn boolean makemon_rnd_goodpos(struct monst *, mmflags_nht, coord *);
@@ -157,6 +158,19 @@ m_initthrow(struct monst *mtmp, int otyp, int oquan)
     (void) mpickobj(mtmp, otmp);
 }
 
+/* NeonHack: give a monster a firearm and a supply of matching ammo */
+staticfn void
+m_initgun(struct monst *mtmp, int launcher)
+{
+    (void) mongets(mtmp, launcher);
+    if (objects[launcher].oc_skill == P_CROSSBOW)
+        m_initthrow(mtmp, CROSSBOW_BOLT, 10); /* shotgun shells */
+    else if (launcher == ORCISH_BOW)
+        m_initthrow(mtmp, ORCISH_ARROW, 8); /* zip gun; scrap bullets */
+    else
+        m_initthrow(mtmp, ARROW, (launcher == BOW) ? 12 : 24);
+}
+
 staticfn void
 m_initweap(struct monst *mtmp)
 {
@@ -186,10 +200,16 @@ m_initweap(struct monst *mtmp)
     case S_HUMAN:
         if (is_mercenary(ptr)) {
             w1 = w2 = 0;
+            /* NeonHack: corporate security and station guards carry
+               firearms, which the monster launcher code knows how to use */
             switch (mm) {
             case PM_WATCHMAN:
+                w1 = rn2(3) ? STUN_BATON : SHORT_SWORD;
+                if (!rn2(3))
+                    m_initgun(mtmp, BOW);
+                break;
             case PM_SOLDIER:
-                if (!rn2(3)) {
+                if (!rn2(5)) {
                     /* lance and dwarvish mattock used to be in midst of
                        the polearms but use different skills from polearms
                        and aren't appropriates choices for human soldiers */
@@ -197,17 +217,29 @@ m_initweap(struct monst *mtmp)
                         w1 = rn1(BEC_DE_CORBIN - PARTISAN + 1, PARTISAN);
                     } while (objects[w1].oc_skill != P_POLEARMS);
                     w2 = rn2(2) ? DAGGER : KNIFE;
-                } else
-                    w1 = rn2(2) ? SPEAR : SHORT_SWORD;
+                } else {
+                    m_initgun(mtmp, !rn2(3) ? SUBMACHINE_GUN
+                                    : !rn2(3) ? CROSSBOW : BOW);
+                    w1 = rn2(2) ? KNIFE : STUN_BATON;
+                }
                 break;
             case PM_SERGEANT:
-                w1 = rn2(2) ? FLAIL : MACE;
+                m_initgun(mtmp, rn2(2) ? SUBMACHINE_GUN : CROSSBOW);
+                w1 = rn2(2) ? STUN_BATON : MACE;
                 break;
             case PM_LIEUTENANT:
+                m_initgun(mtmp, ASSAULT_RIFLE);
                 w1 = rn2(2) ? BROADSWORD : LONG_SWORD;
+                if (!rn2(3))
+                    (void) mongets(mtmp, FRAG_GRENADE);
                 break;
             case PM_CAPTAIN:
+                m_initgun(mtmp, ASSAULT_RIFLE);
+                w1 = rn2(2) ? LONG_SWORD : SILVER_SABER;
+                (void) mongets(mtmp, rn2(2) ? FRAG_GRENADE : FLASHBANG);
+                break;
             case PM_WATCH_CAPTAIN:
+                m_initgun(mtmp, BOW);
                 w1 = rn2(2) ? LONG_SWORD : SILVER_SABER;
                 break;
             default:
@@ -223,6 +255,43 @@ m_initweap(struct monst *mtmp)
                 w2 = KNIFE;
             if (w2)
                 (void) mongets(mtmp, w2);
+        } else if (mm == PM_STREET_PUNK) {
+            switch (rn2(5)) {
+            case 0:
+                (void) mongets(mtmp, KNIFE);
+                break;
+            case 1:
+                (void) mongets(mtmp, CLUB); /* baseball bat */
+                break;
+            case 2:
+                (void) mongets(mtmp, STILETTO);
+                break;
+            case 3:
+                (void) mongets(mtmp, RUBBER_HOSE);
+                break;
+            default:
+                m_initgun(mtmp, ORCISH_BOW); /* zip gun */
+                break;
+            }
+            if (!rn2(3))
+                (void) mongets(mtmp, LEATHER_JACKET);
+        } else if (mm == PM_YAKUZA) {
+            (void) mongets(mtmp, rn2(3) ? KATANA : SHORT_SWORD);
+            if (rn2(2))
+                m_initgun(mtmp, BOW);
+        } else if (mm == PM_BLACK_HAT) {
+            (void) mongets(mtmp, rn2(2) ? DAGGER : KNIFE);
+            if (!rn2(3))
+                (void) mongets(mtmp, CYBERDECK);
+        } else if (mm == PM_CYBERPSYCHO) {
+            if (rn2(2)) {
+                m_initgun(mtmp, SUBMACHINE_GUN);
+                (void) mongets(mtmp, KNIFE);
+            } else {
+                (void) mongets(mtmp, TWO_HANDED_SWORD); /* chainsword */
+            }
+            if (!rn2(3))
+                (void) mongets(mtmp, FRAG_GRENADE);
         } else if (is_elf(ptr)) {
             if (rn2(2))
                 (void) mongets(mtmp,
@@ -405,7 +474,7 @@ m_initweap(struct monst *mtmp)
         if (!rn2(4))
             m_initthrow(mtmp, CREAM_PIE, 2);
         if (!rn2(3))
-            (void) mongets(mtmp, (rn2(2)) ? CLUB : RUBBER_HOSE);
+            (void) mongets(mtmp, rn2(3) ? STUN_BATON : RUBBER_HOSE);
         break;
     case S_ORC:
         if (rn2(2))
@@ -487,6 +556,10 @@ m_initweap(struct monst *mtmp)
         (void) mongets(mtmp, LONG_SWORD);
         break;
     case S_ZOMBIE:
+        if (mm == PM_CYBERZOMBIE) {
+            (void) mongets(mtmp, rn2(2) ? AXE : KNIFE); /* fire axe */
+            break;
+        }
         if (!rn2(4))
             (void) mongets(mtmp, LEATHER_ARMOR);
         if (!rn2(4))
@@ -521,6 +594,13 @@ m_initweap(struct monst *mtmp)
          */
         if (!is_demon(ptr))
             break;
+        FALLTHROUGH;
+        /*FALLTHRU*/
+    case S_GOLEM:
+        if (mm == PM_SENTRY_BOT) {
+            m_initgun(mtmp, ASSAULT_RIFLE);
+            break;
+        }
         FALLTHROUGH;
         /*FALLTHRU*/
     default:
@@ -698,7 +778,16 @@ m_initinv(struct monst *mtmp)
                     (void) mongets(mtmp, C_RATION);
                 if (ptr != &mons[PM_SOLDIER] && !rn2(3))
                     (void) mongets(mtmp, BUGLE);
+                if (!rn2(8))
+                    (void) mongets(mtmp, MEDKIT);
             }
+        } else if (ptr == &mons[PM_CYBERPSYCHO]) {
+            /* NeonHack: the source of the trouble can be salvaged */
+            (void) mongets(mtmp, rn1(LAST_IMPLANT - FIRST_IMPLANT + 1,
+                                     FIRST_IMPLANT));
+        } else if (ptr == &mons[PM_STREET_PUNK]) {
+            if (!rn2(4))
+                (void) mongets(mtmp, CUP_OF_RAMEN);
         } else if (ptr == &mons[PM_SHOPKEEPER]) {
             (void) mongets(mtmp, SKELETON_KEY);
             switch (rn2(4)) {
@@ -2255,6 +2344,13 @@ golemhp(int type)
         return 80;
     case PM_IRON_GOLEM:
         return 120;
+    /* NeonHack robots */
+    case PM_SECURITY_DRONE:
+        return 25;
+    case PM_SPIDER_BOT:
+        return 45;
+    case PM_SENTRY_BOT:
+        return 90;
     default:
         return 0;
     }

@@ -117,3 +117,11 @@ RENAMES = {
     "WATER_DEMON": "water daemon",
     "AMOROUS_DEMON": ("incubus", "succubus", "amorous daemon"),
 }
+
+# corporate security replaces the army
+RENAMES.update({
+    "SOLDIER": "corpsec trooper",
+    "SERGEANT": "corpsec sergeant",
+    "LIEUTENANT": "corpsec lieutenant",
+    "CAPTAIN": "corpsec captain",
+})
