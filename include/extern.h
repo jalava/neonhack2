@@ -2079,6 +2079,7 @@ enum instruments obj_to_instr(struct obj *) NONNULLARG1;
 
 /* ### neon.c ### */
 
+extern const char *neon_emoji(const char *);
 extern boolean is_firearm(struct obj *);
 extern boolean is_cartridge(struct obj *);
 extern int firearm_burst(struct obj *);

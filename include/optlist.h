@@ -300,6 +300,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(eight_bit_tty, Advanced, 0, opt_in, set_in_game,
                 Off, Yes, No, No, NoAlias, &iflags.wc_eight_bit_input,
            Term_False, "send 8-bit characters directly to terminal")
+    NHOPTB(emoji, Advanced, 0, opt_out, set_in_game,
+           On, Yes, No, No, NoAlias, &iflags.emoji, Term_False,
+           "decorate some NeonHack messages with emoji")
     NHOPTB(extmenu, Advanced, 0, opt_in, set_in_game,
            Off, Yes, No, No, NoAlias, &iflags.extmenu, Term_False,
            "use menu for getting extended commands")

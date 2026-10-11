@@ -19,6 +19,7 @@
 
 #include "hack.h"
 
+staticfn boolean utf8_locale(void);
 staticfn int gunfire_range(struct obj *);
 staticfn const char *gunfire_sound(struct obj *, int);
 staticfn void flashbang(coordxy, coordxy);
@@ -32,6 +33,39 @@ staticfn int hack_robot(struct obj *, struct monst *);
 staticfn int hack_lock(struct obj *, coordxy, coordxy);
 staticfn boolean squad_allowed_here(void);
 staticfn void send_squad(void);
+
+/* ------------------------------------------------------------------ */
+/*  Emoji                                                             */
+/* ------------------------------------------------------------------ */
+
+/* does the terminal's locale look like it can show UTF-8? */
+staticfn boolean
+utf8_locale(void)
+{
+    static int is_utf8 = -1;
+
+    if (is_utf8 < 0) {
+        const char *loc = nh_getenv("LC_ALL");
+
+        if (!loc || !*loc)
+            loc = nh_getenv("LC_CTYPE");
+        if (!loc || !*loc)
+            loc = nh_getenv("LANG");
+        is_utf8 = (loc && (strstri(loc, "UTF-8") || strstri(loc, "utf8")));
+    }
+    return (boolean) is_utf8;
+}
+
+/* 'e' (an emoji followed by a space) if the emoji option is on and the
+   terminal can show it, otherwise "" */
+const char *
+neon_emoji(const char *e)
+{
+    if (!iflags.emoji || !utf8_locale()
+        || !WINDOWPORT(tty) || iflags.debug_fuzzer)
+        return "";
+    return e;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Firearms                                                          */
@@ -110,7 +144,7 @@ u_gunfire(struct obj *launcher, int shots)
     if (!is_firearm(launcher))
         return;
     if (!Deaf)
-        pline("%s", gunfire_sound(launcher, shots));
+        pline("%s%s", neon_emoji("\U0001F4A5 "), gunfire_sound(launcher, shots));
     wake_nearto(u.ux, u.uy, gunfire_range(launcher));
 }
 
@@ -122,7 +156,8 @@ m_gunfire(struct monst *mtmp, struct obj *launcher, int shots)
         return;
     if (!Deaf) {
         if (canseemon(mtmp))
-            pline("%s", gunfire_sound(launcher, shots));
+            pline("%s%s", neon_emoji("\U0001F4A5 "),
+                  gunfire_sound(launcher, shots));
         else
             You_hear("gunfire%s.",
                      (mdistu(mtmp) > 15 * 15) ? " in the distance" : "");
@@ -219,7 +254,8 @@ flashbang(coordxy x, coordxy y)
     boolean u_near = (dist2(u.ux, u.uy, x, y) <= 3 * 3 && couldsee(x, y));
 
     if (cansee(x, y) || u_near)
-        pline("There is a blinding flash and a deafening bang!");
+        pline("%sThere is a blinding flash and a deafening bang!",
+              neon_emoji("\u2728 "));
     else if (!Deaf)
         You_hear("a loud bang!");
 
@@ -261,7 +297,7 @@ emp_burst(coordxy x, coordxy y, int radius, boolean by_hero)
     int r2 = radius * radius;
 
     if (cansee(x, y))
-        pline("Blue sparks crackle through the air!");
+        pline("%sBlue sparks crackle through the air!", neon_emoji("\u26A1 "));
     else if (!Deaf)
         You_hear("a sharp electrical crack.");
 
@@ -518,7 +554,7 @@ use_implant(struct obj *obj)
 
     if (!u.ucybershort) {
         implant_props(otyp, TRUE);
-        pline("%s", ii->feel);
+        pline("%s%s", neon_emoji("\U0001F9BE "), ii->feel);
     } else {
         pline("It will come online once your cyberware recovers.");
     }
@@ -644,7 +680,8 @@ cyberpsycho_episode(void)
         make_confused((HConfusion & TIMEOUT) + (long) rn1(6, 4), FALSE);
         break;
     case 2:
-        You("scream in sudden, chrome-plated rage!");
+        You("scream in sudden, chrome-plated rage!%s",
+            *neon_emoji("x") ? " \U0001F92F" : "");
         wake_nearby(FALSE);
         break;
     case 3:
@@ -765,7 +802,8 @@ hack_robot(struct obj *deck, struct monst *mtmp)
         pline("%s is already running your code.", Monnam(mtmp));
         return ECMD_OK;
     }
-    You("jack into %s...", seen ? mon_nam(mtmp) : "something");
+    You("%sjack into %s...", neon_emoji("\U0001F4BB "),
+        seen ? mon_nam(mtmp) : "something");
     if (rn2(100) < hack_chance(deck, difficulty)) {
         exercise(A_INT, TRUE);
         if (mtmp->m_lev <= u.ulevel / 2 + 2 && !(mtmp->data->geno & G_UNIQ)
@@ -784,7 +822,7 @@ hack_robot(struct obj *deck, struct monst *mtmp)
         }
         newsym(mtmp->mx, mtmp->my);
     } else {
-        pline("Access denied.");
+        pline("%sAccess denied.", neon_emoji("\U0001F6AB "));
         if (mtmp->mpeaceful)
             setmangry(mtmp, TRUE);
         else
@@ -911,7 +949,8 @@ heat_add(int amount)
         u.uheat = HEAT_MAX;
     if (old < HEAT_WANTED && u.uheat >= HEAT_WANTED) {
         You_feel("the cold attention of a corporate algorithm.");
-        pline("You are now wanted by corporate security.");
+        pline("%sYou are now wanted by corporate security.",
+              neon_emoji("\U0001F6A8 "));
         u.uheatsquad = svm.moves; /* a little grace period */
     } else if (old >= HEAT_WANTED && u.uheat < HEAT_WANTED) {
         You_feel("that corporate security has lost interest in you.");
@@ -939,7 +978,8 @@ send_squad(void)
                  : (heat >= 50) ? PM_SERGEANT : NON_PM;
 
     if (!Deaf)
-        You_hear("the whine of a corpsec dropship overhead!");
+        You_hear("the whine of a corpsec dropship overhead!%s",
+                 *neon_emoji("x") ? " \U0001F6A8" : "");
     else
         You_feel("the floor vibrate as something heavy lands nearby.");
     stop_occupation();

@@ -379,6 +379,7 @@ struct instance_flags {
     uchar bouldersym;         /* symbol for boulder display */
     char prevmsg_window;      /* type of old message window to use */
     boolean extmenu;          /* extended commands use menu interface */
+    boolean emoji;            /* NeonHack: emoji in some messages */
 #ifdef MICRO
     boolean BIOS; /* use IBM or ST BIOS calls when appropriate */
 #endif

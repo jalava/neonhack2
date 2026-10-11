@@ -918,6 +918,48 @@ start: Enhanced1
 	G_trwall_mines: U+251C/190-126-0    # ├ BOX DRAWINGS LIGHT VERTICAL AND RIGHT
 finish
 
+start: NeonGrid
+	Description: NeonHack neon grid: box drawing in 24-bit neon colors
+	Restrictions: primary
+	Handling: UTF8
+	S_vwall: U+2502/0-200-255           # │ neon cyan walls
+	S_hwall: U+2500/0-200-255           # ─
+	S_tlcorn: U+256D/255-0-200          # ╭ neon magenta corners
+	S_trcorn: U+256E/255-0-200          # ╮
+	S_blcorn: U+2570/255-0-200          # ╰
+	S_brcorn: U+256F/255-0-200          # ╯
+	S_crwall: U+253C/0-200-255          # ┼
+	S_tuwall: U+2534/0-200-255          # ┴
+	S_tdwall: U+252C/0-200-255          # ┬
+	S_tlwall: U+2524/0-200-255          # ┤
+	S_trwall: U+251C/0-200-255          # ├
+	S_ndoor: U+00B7/255-160-0           # · amber doorways
+	S_vodoor: U+007C/255-160-0          # |
+	S_hodoor: U+002D/255-160-0          # -
+	S_vcdoor: U+002B/255-160-0          # +
+	S_hcdoor: U+002B/255-160-0          # +
+	S_bars: U+2261/0-255-180            # ≡
+	S_tree: U+03A8/0-255-120            # Ψ
+	S_room: U+00B7/90-90-140            # · dim violet floor
+	S_darkroom: U+00B7/45-45-80         # ·
+	S_corr: U+2591/70-70-110            # ░
+	S_litcorr: U+2592/110-110-170       # ▒
+	S_engroom: U+03BE/200-200-255       # ξ
+	S_engrcorr: U+2591/200-200-255      # ░
+	S_upstair: U+003C/0-255-120         # < neon green stairs
+	S_dnstair: U+003E/0-255-120         # >
+	S_upladder: U+2264/0-255-120        # ≤
+	S_dnladder: U+2265/0-255-120        # ≥
+	S_altar: U+03A9/255-230-0           # Ω
+	S_grave: U+2020/180-180-180         # †
+	S_throne: U+005C/255-215-0          # \
+	G_fountain: U+2320/0-150-255        # ⌠
+	S_pool: U+224B/0-110-255            # ≋
+	S_water: U+2248/0-80-200            # ≈
+	S_lava: U+224B/255-60-0             # ≋
+	S_ice: U+00B7/170-230-255           # ·
+finish
+
 start: Enhanced2
 #       contributed in GitHub pull request 1503 by abcbarryn.
 #       This has double line wall symbols.

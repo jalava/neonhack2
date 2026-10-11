@@ -12,6 +12,8 @@
 
 static void redotoplin(const char *);
 static void topl_putsym(char);
+static int utf8_seqlen(unsigned char);
+static int utf8_colwidth(const char *, int);
 static void removetopl(int);
 static void msghistory_snapshot(boolean);
 static void free_msghistory_snapshot(boolean);
@@ -258,11 +260,14 @@ update_topl(const char *bp)
 
     /* If there is room on the line, print message on same line */
     /* But messages like "You die..." deserve their own line */
-    n0 = strlen(bp);
+    /* [NeonHack: widths are display columns, so UTF-8 (emoji) fits; and
+       the hero flatlines rather than dies] */
+    n0 = tty_strwidth(bp);
     if ((ttyDisplay->toplin == TOPLINE_NEED_MORE || skip)
         && cw->cury == 0
-        && n0 + (int) strlen(gt.toplines) + 3 < CO - 8 /* room for --More-- */
-        && (notdied = strncmp(bp, "You die", 7)) != 0) {
+        && n0 + tty_strwidth(gt.toplines) + 3 < CO - 8 /* room for --More-- */
+        && (notdied = (strncmp(bp, "You die", 7)
+                       && strncmp(bp, "You flatline", 12))) != 0) {
         Strcat(gt.toplines, "  ");
         Strcat(gt.toplines, bp);
         cw->curx += 2;
@@ -282,8 +287,17 @@ update_topl(const char *bp)
     gt.toplines[TBUFSZ - 1] = 0;
 
     for (tl = gt.toplines; n0 >= CO; ) {
+        int cols = 0;
+
         otl = tl;
-        for (tl += CO - 1; tl != otl; --tl)
+        /* advance to the byte where the display reaches column CO-1 */
+        while (*tl && cols < CO - 1) {
+            int len = utf8_seqlen((unsigned char) *tl);
+
+            cols += utf8_colwidth(tl, len);
+            tl += len;
+        }
+        for (; tl != otl; --tl)
             if (*tl == ' ')
                 break;
         if (tl == otl) {
@@ -293,7 +307,7 @@ update_topl(const char *bp)
                 break; /* No choice but to spit it out whole. */
         }
         *tl++ = '\n';
-        n0 = strlen(tl);
+        n0 = tty_strwidth(tl);
     }
     if (!notdied) /* double negative => "You die"; avoid suppressing mesg */
         cw->flags &= ~WIN_STOP, skip = FALSE;
@@ -343,11 +357,86 @@ topl_putsym(char c)
 #endif
 }
 
+/* NeonHack: UTF-8 aware output for the message line.  Multi-byte
+   characters are written as a unit and advance the cursor by their
+   display width, so emoji don't throw off wrapping or --More-- */
+
+/* byte length of the UTF-8 sequence starting with lead byte 'c' */
+static int
+utf8_seqlen(unsigned char c)
+{
+    return (c < 0xC0) ? 1 : (c < 0xE0) ? 2 : (c < 0xF0) ? 3 : 4;
+}
+
+/* display width of the UTF-8 sequence 's' of 'len' bytes */
+static int
+utf8_colwidth(const char *s, int len)
+{
+    const unsigned char *b = (const unsigned char *) s;
+    unsigned long cp;
+
+    if (len == 1)
+        return 1;
+    if (len == 2)
+        cp = ((b[0] & 0x1FUL) << 6) | (b[1] & 0x3FUL);
+    else if (len == 3)
+        cp = ((b[0] & 0x0FUL) << 12) | ((b[1] & 0x3FUL) << 6)
+             | (b[2] & 0x3FUL);
+    else
+        cp = ((b[0] & 0x07UL) << 18) | ((b[1] & 0x3FUL) << 12)
+             | ((b[2] & 0x3FUL) << 6) | (b[3] & 0x3FUL);
+    if (cp == 0xFE0FUL || cp == 0x200DUL) /* variation selector, ZWJ */
+        return 0;
+    /* wide: CJK, hangul, fullwidth forms, and the emoji blocks */
+    if ((cp >= 0x1100UL && cp <= 0x115FUL) || (cp >= 0x2E80UL && cp <= 0xA4CFUL)
+        || (cp >= 0xAC00UL && cp <= 0xD7A3UL)
+        || (cp >= 0xF900UL && cp <= 0xFAFFUL)
+        || (cp >= 0xFF00UL && cp <= 0xFF60UL)
+        || (cp >= 0x1F300UL && cp <= 0x1FAFFUL)
+        /* the few dingbats that default to emoji presentation */
+        || cp == 0x231AUL || cp == 0x231BUL || cp == 0x23F0UL
+        || cp == 0x26A1UL || cp == 0x2705UL || cp == 0x2728UL
+        || cp == 0x274CUL || cp == 0x2753UL || cp == 0x2757UL)
+        return 2;
+    return 1;
+}
+
+/* display width of a string */
+int
+tty_strwidth(const char *str)
+{
+    int len, width = 0;
+
+    while (*str) {
+        len = utf8_seqlen((unsigned char) *str);
+        width += utf8_colwidth(str, len);
+        while (len-- > 0 && *str)
+            str++;
+    }
+    return width;
+}
+
 void
 putsyms(const char *str)
 {
-    while (*str)
-        topl_putsym(*str++);
+    struct WinDesc *cw = wins[WIN_MESSAGE];
+    int len, width;
+
+    while (*str) {
+        len = utf8_seqlen((unsigned char) *str);
+        if (len == 1) {
+            topl_putsym(*str++);
+            continue;
+        }
+        width = utf8_colwidth(str, len);
+        if (ttyDisplay->curx + width > CO - 1)
+            topl_putsym('\n');
+        while (len-- > 0 && *str)
+            (void) putchar(*str++);
+        ttyDisplay->curx += width;
+        if (cw)
+            cw->curx = ttyDisplay->curx;
+    }
 }
 
 static void
