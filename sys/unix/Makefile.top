@@ -455,7 +455,11 @@ install: rootcheck $(PRECHECK) $(GAME) recover $(VARDAT) spec_levs sys/unix/sysc
 # not all mkdirs have -p; those that don't will create a -p directory
 	-if test -n '$(SHELLDIR)'; then \
 		mkdir -p $(SHELLDIR); fi
-	rm -rf $(INSTDIR) $(VARDIR)
+# NeonHack 2: don't wipe the playground; games in progress (level files),
+# saves and scores survive a reinstall.  The game's files are unlinked
+# before new copies go in, so a running game keeps reading its own.
+	-rm -f $(INSTDIR)/$(GAME) $(INSTDIR)/recover $(INSTDIR)/nhdat \
+	    $(INSTDIR)/symbols $(INSTDIR)/license $(INSTDIR)/sysconf
 	-mkdir -p $(INSTDIR) $(VARDIR) $(VARDIR)/save
 	if test -d ./-p; then rmdir ./-p; fi
 	-$(CHOWN) $(GAMEUID) $(INSTDIR) $(VARDIR) $(VARDIR)/save

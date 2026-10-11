@@ -142,6 +142,7 @@ staticfn void st_flag_set(const char *, long);
 staticfn void st_log_add(int, long, const char *);
 staticfn char *st_subst(const char *, char *, int);
 staticfn boolean st_need(struct st_kvl *);
+staticfn boolean st_need_shown(struct st_kvl *, char *);
 staticfn struct obj *st_carried(const char *);
 staticfn void st_give_item(const char *);
 staticfn void st_take_item(const char *);
@@ -1114,6 +1115,42 @@ st_need(struct st_kvl *need)
     return TRUE;
 }
 
+/* a choice whose only unmet needs are ones the player can see (credits,
+   an item) is shown greyed out with the reason in 'why'; any other unmet
+   need (flags, reputation, quests) keeps it hidden */
+staticfn boolean
+st_need_shown(struct st_kvl *need, char *why)
+{
+    int i, x;
+    long have;
+    char tmp[BUFSZ];
+
+    *why = '\0';
+    for (i = 0; i < need->n; i++) {
+        struct st_kv *kv = &need->kv[i];
+        struct st_kvl one;
+
+        one.n = 1, one.kv = kv;
+        if (st_need(&one))
+            continue;
+        if (!strcmp(kv->key, "credits")) {
+            have = money_cnt(gi.invent);
+            Sprintf(tmp, "needs %ld %s; you have %ld", kv->num,
+                    currency(kv->num), have);
+        } else if (!strcmp(kv->key, "item")
+                   && (x = st_item_idx(kv->str)) >= 0) {
+            Sprintf(tmp, "needs %s", an(st.items[x].name));
+        } else {
+            return FALSE;
+        }
+        if (*why)
+            Strcat(why, ", ");
+        if (strlen(why) + strlen(tmp) < BUFSZ - 1)
+            Strcat(why, tmp);
+    }
+    return (boolean) (*why != '\0');
+}
+
 /* show a block of story text in a window */
 staticfn void
 st_show_text(const char *title, const char *text)
@@ -1577,24 +1614,43 @@ st_dialogue(struct st_npc *np, const char *start)
 
     for (steps = 0; n >= 0 && steps < 50; steps++) {
         struct st_node *node = &st.nodes[n];
-        int nshown = 0, chosen = -1;
+        int nshown = 0, chosen = -1, only = -1;
+        char why[BUFSZ];
 
+        /* how many answers can be picked? one is preselected, so that
+           Enter (or Space) takes it */
+        for (i = 0; i < node->nchoices; i++)
+            if (st_need(&node->choices[i].need))
+                nshown++, only = i;
         win = create_nhwindow(NHW_MENU);
         start_menu(win, MENU_BEHAVE_STANDARD);
         if (node->text)
             st_wrap_menu(win, st_subst(node->text, buf, (int) sizeof buf));
+        if (node->nchoices)
+            add_menu_str(win, "");
         for (i = 0; i < node->nchoices; i++) {
             struct st_choice *cp = &node->choices[i];
 
-            if (!st_need(&cp->need))
+            if (!st_need(&cp->need)) {
+                /* answers you can't afford yet are shown, but not offered */
+                if (st_need_shown(&cp->need, why)) {
+                    Snprintf(buf, sizeof buf, "    %s  (%s)",
+                             st_subst(cp->text, tbuf, (int) sizeof tbuf),
+                             why);
+                    add_menu_str(win, buf);
+                }
                 continue;
-            if (!nshown++)
-                add_menu_str(win, "");
+            }
             any = cg.zeroany;
             any.a_int = i + 1;
             add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR,
                      st_subst(cp->text, tbuf, (int) sizeof tbuf),
-                     MENU_ITEMFLAGS_NONE);
+                     (nshown == 1) ? MENU_ITEMFLAGS_SELECTED
+                                   : MENU_ITEMFLAGS_NONE);
+        }
+        if (nshown > 1) {
+            add_menu_str(win, "");
+            add_menu_str(win, "(pick an answer; Escape walks away)");
         }
         end_menu(win, np->name);
         pick = 0;
@@ -1606,8 +1662,14 @@ st_dialogue(struct st_npc *np, const char *start)
         }
         if (!nshown)
             return 1; /* just text: read and done */
-        if (chosen < 0)
-            return 0; /* walked away */
+        if (k == 0 && nshown == 1)
+            chosen = only; /* Enter with the one answer deselected */
+        if (k == 0 && chosen < 0)
+            continue; /* Enter without an answer: ask again */
+        if (chosen < 0) {
+            You("walk away from %s.", np->name);
+            return 0;
+        }
         {
             struct st_choice *cp = &node->choices[chosen];
 

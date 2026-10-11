@@ -66,7 +66,7 @@ clear_msgs
 
 # prologue
 talk okoye
-expect "The bill is 300 credits." "Okoye wakes you"
+expect "The bill is 200 credits." "Okoye wakes you"
 keys a; expect "SPLINTER" "Okoye on the chip"
 keys a; keys c; expect "Tell her Okoye sent you." "Okoye sends you to Mags"
 keys a; clear_msgs
@@ -89,16 +89,34 @@ keys b; clear_msgs
 expect "Lantern Mkt" "arrived in Lantern Market"
 talk sato
 expect "That isn't cyberware." "Sato scans you"
-keys a; clear_msgs
-expect "150" "Sato pays"
+key Enter                         # the one answer is preselected
+expect_msg "You get 150 credits" "Enter takes Sato's only answer"
+clear_msgs
 key Tab; expect "Find the netrunner Hex" "journal: Hex"; key Escape; clear_msgs
 
-# the gig: Benny pays up (the kind way)
+# the gig: Benny pays up (the kind way: 100 of Sato's 150)
 talk benny
 expect "business is dead" "Benny pleads"
 keys b; clear_msgs
 key Tab; expect "Bring Benny's envelope to Mags" "gig stage 2"; key Escape
 clear_msgs
+levelport "Neo Yendor:1"
+talk mags
+expect "Here's your cut" "Mags takes the envelope"
+key Enter
+expect_msg "You get 60 credits" "Mags pays the cut"
+clear_msgs
+# Okoye's bill: 110 isn't enough; the answer shows why
+talk okoye
+expect "needs 200 credits; you have 110" "unaffordable answer shown"
+key Escape
+expect_msg "You walk away from Doc Okoye" "Escape walks away"
+clear_msgs
+key C-w; keys "90 credits"; key Enter; clear_msgs
+talk okoye
+keys a
+expect_msg "Pleasure doing business" "the bill is paid"
+key Enter; clear_msgs
 
 # Block 7: the roof, then the fourth floor
 ext wizcity; clear_msgs

@@ -15,7 +15,7 @@ story = {
 
    items = {
       coldcase = { name = "frosted cold case" },
-      envelope = { name = "envelope of creased credits" },
+      envelope = { name = "sealed envelope marked MAGS" },
       hexcore = { name = "scorched deck core" },
    },
 
@@ -85,7 +85,7 @@ You don't remember the last week.  You remember antiseptic, a woman's voice coun
              log = [[I woke up on a ripperdoc's table on Neon Mile with fresh stitches behind my ear.  I don't remember the last week.]] },
            { goal = "Find Mags Vance in the Static Lounge.",
              where = "nc-neonmile", talk = "mags", dialogue = "mags_meet",
-             log = [[Doc Okoye wants 300 credits for patching me up.  She says Mags Vance, at the Static Lounge two doors east, has work for people who don't ask questions.]] },
+             log = [[Doc Okoye wants 200 credits for patching me up.  She says Mags Vance, at the Static Lounge two doors east, has work for people who don't ask questions.]] },
         },
         done = { start = { "act1", "bill", "rent" } } },
 
@@ -122,9 +122,9 @@ You don't remember the last week.  You remember antiseptic, a woman's voice coun
       -- side job: Okoye's bill
       { id = "bill", title = "Okoye's Bill", kind = "side",
         stages = {
-           { goal = "Pay Doc Okoye her 300 credits.", where = "nc-neonmile",
+           { goal = "Pay Doc Okoye her 200 credits.", where = "nc-neonmile",
              talk = "okoye", dialogue = "okoye_bill",
-             log = [[I owe Doc Okoye 300 credits for the stitches.  She'll be in her operating room on Neon Mile.]] },
+             log = [[I owe Doc Okoye 200 credits for the stitches.  She'll be in her operating room on Neon Mile.]] },
         } },
 
       -- gig: Mags wants Benny's protection money
@@ -146,11 +146,11 @@ You don't remember the last week.  You remember antiseptic, a woman's voice coun
 
 You're in my clinic on Neon Mile.  Somebody dumped you on my doorstep three nights ago with a hole behind your ear and a chip in it that isn't one of mine.  I closed you up.  You're welcome.
 
-The bill is 300 credits.]],
+The bill is 200 credits.]],
          choices = {
             { "What chip?", go = "okoye_chip" },
             { "Who brought me in?", go = "okoye_who" },
-            { "I don't have 300 credits.", go = "okoye_work" },
+            { "I don't have 200 credits.", go = "okoye_work" },
          } },
       okoye_ask = {
          text = [[Doc Okoye waits, arms folded.]],
@@ -239,7 +239,7 @@ Put the four back together and you hold Neo Yendor's Grid: every lock, every cam
       okoye_bill = {
          text = [[Come to settle up?]],
          choices = {
-            { "Here's your 300.", need = { credits = 300 }, credits = -300,
+            { "Here's your 200.", need = { credits = 200 }, credits = -200,
               go = "okoye_paid" },
             { "Not yet.", wait = true },
          } },
@@ -263,9 +263,9 @@ Look, business is dead.  The Circuit already took their cut this week, and I've 
             { "Not my problem.", wait = true },
          } },
       benny_threat = {
-         text = [[All right, all right!  Here.  And when the Circuit asks who's been leaning on their people, I'm giving them your face.]] },
+         text = [[All right, all right!  Here, take it to her.  It's sealed, so don't get ideas.  And when the Circuit asks who's been leaning on their people, I'm giving them your face.]] },
       benny_grateful = {
-         text = [[You'd do that?  For Benny?  ...I won't forget it.  Neither will Matron Lin; she likes people who look after her people.]] },
+         text = [[You'd do that?  For Benny?  ...Here, it's sealed, Mags likes it that way.  I won't forget this.  Neither will Matron Lin; she likes people who look after her people.]] },
       mags_rent = {
          text = [[Benny paid?  Huh.  I had a bet with myself that you'd come back bleeding.  Here's your cut.]],
          choices = { { "Pleasure.", credits = 60 } } },
