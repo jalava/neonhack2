@@ -1232,7 +1232,7 @@ movemon_singlemon(struct monst *mtmp)
        off the map too; gd_move() decides whether the temporary
        corridor can be removed and guard discarded (via clearing
        mon->isgd flag so that dmonsfree() will get rid of mon) */
-    if (mtmp->isgd && !mtmp->mx && !(mtmp->mstate & MON_MIGRATING)) {
+    if (PARKEDMONSTER(mtmp) && !(mtmp->mstate & MON_MIGRATING)) {
         /* parked at <0,0>; eventually isgd should get set to false */
         if (svm.moves > mtmp->mlstmv) {
             (void) gd_move(mtmp);
@@ -4444,6 +4444,8 @@ seemimic(struct monst *mtmp)
     /*
      *  Discovered mimics don't block light.
      */
+    if (!mtmp->mx) /* NeonHack: not yet placed (arriving pet) */
+        return;
     if (is_blocker_appear
         && !does_block(mtmp->mx, mtmp->my, &levl[mtmp->mx][mtmp->my]))
         unblock_point(mtmp->mx, mtmp->my);
@@ -4465,7 +4467,8 @@ normal_shape(struct monst *mon)
         /* newcham() may uncancel a polymorphing monster; override that */
         if (mcan)
             mon->mcan = 1;
-        newsym(mon->mx, mon->my);
+        if (mon->mx) /* NeonHack: not yet placed (arriving pet) */
+            newsym(mon->mx, mon->my);
     }
     if (is_were(mon->data) && mon->data->mlet != S_HUMAN) {
         new_were(mon);

@@ -922,7 +922,7 @@ dochug(struct monst *mtmp)
             /*FALLTHRU*/
         case MMOVE_NOTHING: /* no movement, but it can still attack you */
         case MMOVE_DONE: /* absolutely no movement */
-            /* vault guard might have vanished */
+            /* vault guard might have vanished; PARKEDMONSTER(mtmp) */
             if (mtmp->isgd && (DEADMONSTER(mtmp) || mtmp->mx == 0))
                 return 1; /* behave as if it died */
             /* During hallucination, monster appearance should
@@ -1653,7 +1653,9 @@ postmov(
             u_on_newpos(mtmp->mx, mtmp->my);
             swallowed(0);
         } else {
-            newsym(mtmp->mx, mtmp->my);
+            /* only call newsym() when not a vault guard moving to <0,0> */
+            if (mtmp->mx)
+                newsym(mtmp->mx, mtmp->my);
         }
     } /* mmoved==MMOVE_MOVED */
 
