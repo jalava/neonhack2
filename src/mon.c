@@ -284,7 +284,10 @@ mon_sanity_check(void)
 
         /* some temp mstate bits can be expected for a mon on fmon, as part of
            removing it, but DEADMONSTER check above should skip those. */
-        } else if (mon_offmap(mtmp)) {
+        } else if (mon_offmap(mtmp)
+                   /* NeonHack: a vault guard parked at <0,0> (post-5.0.0
+                      MON_PARKED backport) is expected to be "off map" */
+                   && !(mtmp->isgd && (mtmp->mstate & MON_PARKED) != 0)) {
             impossible("floor mon (%s) with mstate set to 0x%08lx",
                        fmt_ptr((genericptr_t) mtmp), mtmp->mstate);
         }
