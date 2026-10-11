@@ -5980,6 +5980,10 @@ destroy_items(
     boolean u_carry = (mon == &gy.youmonst);
     /* this is a struct obj** because we might destroy the first item in it */
     struct obj **objchn = u_carry ? &gi.invent : &mon->minvent;
+
+    /* NeonHack: electrical damage can short out the hero's cyberware */
+    if (u_carry && dmgtyp == AD_ELEC)
+        cyber_shock();
     int dmg_out = 0; /* damage caused by items getting destroyed */
     xint8 where = NOBJ_STATES;
 

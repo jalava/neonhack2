@@ -1033,6 +1033,15 @@ mksobj_init(struct obj **obj, boolean artif)
             otmp->spe = rn1(5, 3); /* 0..4 + 3 => 3..7 */
             blessorcurse(otmp, 2);
             break;
+        /* NeonHack gear */
+        case CYBERDECK:
+            otmp->spe = rn1(10, 6); /* 6..15 battery charges */
+            blessorcurse(otmp, 5);
+            break;
+        case MEDKIT:
+            otmp->spe = rn1(4, 2); /* 2..5 uses */
+            blessorcurse(otmp, 5);
+            break;
         case HORN_OF_PLENTY:
         case BAG_OF_TRICKS:
             otmp->spe = rn1(18, 3); /* 0..17 + 3 => 3..20 */

@@ -415,6 +415,12 @@ enlightenment(
        included there due to space considerations;
        shown for both basic and magic enlightenment */
     status_enlightenment(mode, final);
+    /* NeonHack: installed cyberware; the hero always knows about it */
+    if (u.ucyber) {
+        enlght_out("");
+        enlght_out(final ? "Final Cyberware:" : "Cyberware:");
+        cyber_enlightenment(enlght_out);
+    }
     /* remaining attributes; shown for potion,&c or wizard mode and
        explore mode ^X or end of game disclosure */
     if (mode & MAGICENLIGHTENMENT) {
@@ -2161,6 +2167,15 @@ show_conduct(int final)
     } else {
         Sprintf(buf, "genocided %d type%s of monster%s", ngenocided,
                 plur(ngenocided), plur(ngenocided));
+        you_have_X(buf);
+    }
+
+    /* NeonHack */
+    if (!u.uconduct.cyberware) {
+        enl_msg(You_, "have remained", "remained", " fully organic", "");
+    } else {
+        Sprintf(buf, "installed %ld implant%s", u.uconduct.cyberware,
+                plur(u.uconduct.cyberware));
         you_have_X(buf);
     }
 

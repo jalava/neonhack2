@@ -2499,6 +2499,8 @@ find_ac(void)
     /* armor class from other sources */
     if (HProtection & INTRINSIC)
         uac -= u.ublessed;
+    if (cyber_active(DERMAL_PLATE)) /* NeonHack */
+        uac -= 2;
     uac -= u.uspellprot;
 
     /* put a cap on armor class [5.0: was +127,-128, now reduced to +/- 99 */

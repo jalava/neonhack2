@@ -2090,6 +2090,21 @@ extern void emp_burst(coordxy, coordxy, int, boolean);
 extern int firearm_dmg_bonus(struct obj *, struct monst *) NONNULLARG2;
 extern int stun_baton_hit(struct monst *) NONNULLARG1;
 extern void monowhip_backlash(void);
+extern boolean is_implant(struct obj *);
+extern boolean has_implant(int);
+extern boolean cyber_active(int);
+extern int cyber_load(void);
+extern int cyber_capacity(void);
+extern boolean cyberpsychotic(void);
+extern int use_implant(struct obj *) NONNULLARG1;
+extern int use_medkit(struct obj *) NONNULLARG1;
+extern void neuroblocker_effect(struct obj *) NONNULLARG1;
+extern void cyber_short(long);
+extern void cyber_shock(void);
+extern void cyber_turn(void);
+extern void cyber_enlightenment(void (*)(const char *));
+extern int use_cyberdeck(struct obj *) NONNULLARG1;
+extern int dohack(void);
 
 /* ### nhlsel.c ### */
 

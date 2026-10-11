@@ -848,6 +848,13 @@ hmon_hitmon_barehands(struct _hitmon_data *hmd, struct monst *mon)
         /* note: 1..2 or 1..4 can be substantially increased by
            strength bonus or skill bonus, usually both... */
         hmd->dmg = rnd(!martial_bonus() ? 2 : 4);
+        /* NeonHack: mantis blades turn a punch into a slash; they don't
+           fit through gloves */
+        if (cyber_active(MANTIS_BLADES) && !uarmg && !Upolyd) {
+            hmd->dmg += rnd(8);
+            if (!rn2(4) && flags.verbose)
+                Your("mantis blades flash out!");
+        }
         hmd->use_weapon_skill = TRUE;
         hmd->train_weapon_skill = (hmd->dmg > 1);
     }

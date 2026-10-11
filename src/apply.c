@@ -4240,7 +4240,22 @@ doapply(void)
     if (obj->oclass == COIN_CLASS)
         return flip_coin(obj);
 
+    /* NeonHack gear */
+    if (is_implant(obj))
+        return use_implant(obj);
+    if (is_grenade(obj)) {
+        pline("Pull the pin and throw it, using the '%c' command.",
+              cmd_from_func(dothrow));
+        return ECMD_OK;
+    }
+
     switch (obj->otyp) {
+    case MEDKIT:
+        res = use_medkit(obj);
+        break;
+    case CYBERDECK:
+        res = use_cyberdeck(obj);
+        break;
     case BLINDFOLD:
     case LENSES:
         if (obj == ublindf) {

@@ -758,7 +758,8 @@ static const struct condmap condition_aliases[] = {
                         | BL_MASK_STRNGL | BL_MASK_STUN | BL_MASK_SUBMERGED
                         | BL_MASK_TERMILL | BL_MASK_TETHERED
                         | BL_MASK_TRAPPED | BL_MASK_UNCONSC
-                        | BL_MASK_WOUNDEDL | BL_MASK_HOLDING },
+                        | BL_MASK_WOUNDEDL | BL_MASK_HOLDING
+                        | BL_MASK_CYPSY | BL_MASK_WANTED },
     { "major_troubles", BL_MASK_FOODPOIS | BL_MASK_GRAB | BL_MASK_INLAVA
                         | BL_MASK_SLIME | BL_MASK_STONE | BL_MASK_STRNGL
                         | BL_MASK_TERMILL },
@@ -810,6 +811,8 @@ const struct conditions_t conditions[] = {
     { 20, BL_MASK_UNCONSC,   bl_unconsc,   { "Out",      "Out",   "KO"  } },
     { 20, BL_MASK_WOUNDEDL,  bl_woundedl,  { "WLegs",    "Leg",   "Lg"  } },
     { 20, BL_MASK_HOLDING,   bl_holding,   { "UHold",    "UHld",  "UHd" } },
+    {  8, BL_MASK_CYPSY,     bl_cypsy,     { "CyPsy",    "CyPs",  "Cy"  } },
+    {  7, BL_MASK_WANTED,    bl_wanted,    { "Wanted",   "Wntd",  "Wn"  } },
 };
 
 /* [perhaps these should all be opt_out with default of 'in';
@@ -847,6 +850,8 @@ struct condtests_t condtests[CONDITION_COUNT] = {
     { bl_unconsc,   "unconscious", opt_in,  FALSE, FALSE, FALSE },
     { bl_woundedl,  "woundedlegs", opt_in,  FALSE, FALSE, FALSE },
     { bl_holding,   "holding",     opt_in,  FALSE, FALSE, FALSE },
+    { bl_cypsy,     "cyberpsycho", opt_out, TRUE,  FALSE, FALSE },
+    { bl_wanted,    "wanted",      opt_out, TRUE,  FALSE, FALSE },
 };
 /* condition indexing */
 int cond_idx[CONDITION_COUNT] = { 0 };
@@ -1189,6 +1194,8 @@ bot_via_windowport(void)
         }
     }
     condtests[bl_blind].test     = (Blind) ? TRUE : FALSE;
+    condtests[bl_cypsy].test     = cyberpsychotic(); /* NeonHack */
+    condtests[bl_wanted].test    = (u.uheat >= HEAT_WANTED) ? TRUE : FALSE;
     condtests[bl_conf].test      = (Confusion) ? TRUE : FALSE;
     condtests[bl_deaf].test      = (Deaf) ? TRUE : FALSE;
     condtests[bl_fly].test       = (Flying) ? TRUE : FALSE;

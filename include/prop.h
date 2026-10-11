@@ -137,6 +137,8 @@ struct prop {
 #define FROMEXPER   0x01000000L /* Gain/lose with experience, for role */
 #define FROMRACE    0x02000000L /* Gain/lose with experience, for race */
 #define FROMOUTSIDE 0x04000000L /* By corpses, prayer, thrones, etc. */
+#define FROMCYBER   0x08000000L /* NeonHack: installed cyberware; not part of
+                                 * INTRINSIC, so it can't be stolen */
 #define INTRINSIC   (FROMOUTSIDE | FROMRACE | FROMEXPER)
 /* Control flags */
 #define FROMFORM    0x10000000L /* Polyd; conferred by monster form */

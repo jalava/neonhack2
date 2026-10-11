@@ -1417,6 +1417,9 @@ peffects(struct obj *otmp)
     case POT_POLYMORPH:
         peffect_polymorph(otmp);
         break;
+    case POT_NEUROBLOCKER: /* NeonHack */
+        neuroblocker_effect(otmp);
+        break;
     default:
         impossible("What a funny vial! (%u)", otmp->otyp);
         return 0;

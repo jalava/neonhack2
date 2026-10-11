@@ -231,9 +231,12 @@ throw_obj(struct obj *obj, int shotlimit)
             multishot = rnd(multishot);
 
         multishot = rnd(multishot);
-        /* NeonHack: automatic weapons fire bursts */
-        if (ammo_and_launcher(obj, uwep))
+        /* NeonHack: automatic weapons fire bursts; a smartlink helps */
+        if (ammo_and_launcher(obj, uwep)) {
             multishot += firearm_burst(uwep);
+            if (is_firearm(uwep) && cyber_active(SMARTLINK))
+                multishot++;
+        }
         if ((long) multishot > obj->quan)
             multishot = (int) obj->quan;
         if (shotlimit > 0 && multishot > shotlimit)
@@ -2068,6 +2071,11 @@ thitmonst(
     if (disttmp < -4)
         disttmp = -4;
     tmp += disttmp;
+
+    /* NeonHack: a smartlink puts the crosshairs on target */
+    if (uwep && is_firearm(uwep) && ammo_and_launcher(obj, uwep)
+        && cyber_active(SMARTLINK))
+        tmp += 2;
 
     /* gloves are a hindrance to proper use of bows */
     if (uarmg && uwep && objects[uwep->otyp].oc_skill == P_BOW) {

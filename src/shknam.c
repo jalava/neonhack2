@@ -175,6 +175,15 @@ static const char *const shkgeneral[] = {
     "Bordeyri",     "Holmavik",     0
 };
 
+/* NeonHack: street clinics are named after their neighbourhoods */
+static const char *const shkclinic[] = {
+    "Chiba",     "Kabukicho", "Akihabara", "Shinjuku",  "Kowloon",
+    "Mong Kok",  "Hongdae",   "Itaewon",   "Zona Norte", "Tepito",
+    "Makoko",    "Dharavi",   "Kreuzberg", "Neukolln",  "Kallio",
+    "Hervanta",  "Punavuori", "Sodermalm", "Christiania", "Nowa Huta",
+    "=Doc Lune", "=Mother Wire", "=Sister Scalpel", "=Auntie Chrome", 0
+};
+
 static const char *const shkhealthfoods[] = {
     /* Tibet */
     "Ga'er",    "Zhangmu",   "Rikaze",   "Jiangji",     "Changdu",
@@ -209,7 +218,7 @@ static const char *const shkhealthfoods[] = {
 const struct shclass shtypes[] = {
     { "general store", NULL,
       RANDOM_CLASS,
-      42,
+      38,
       D_SHOP,
       { { 100, RANDOM_CLASS },
         { 0, 0 },
@@ -229,7 +238,7 @@ const struct shclass shtypes[] = {
         { 0, 0 },
         { 0, 0 } },
       shkarmors },
-    { "second-hand bookstore", "scroll shop",
+    { "warez stall", "scroll shop",
       SCROLL_CLASS,
       10,
       D_SHOP,
@@ -240,7 +249,7 @@ const struct shclass shtypes[] = {
         { 0, 0 },
         { 0, 0 } },
       shkbooks },
-    { "liquor emporium", "potion shop",
+    { "pharmacy", "potion shop",
       POTION_CLASS,
       10,
       D_SHOP,
@@ -251,7 +260,7 @@ const struct shclass shtypes[] = {
         { 0, 0 },
         { 0, 0 } },
       shkliquors },
-    { "antique weapons outlet", "weapon shop",
+    { "gun shop", "weapon shop",
       WEAPON_CLASS,
       5,
       D_SHOP,
@@ -262,7 +271,7 @@ const struct shclass shtypes[] = {
         { 0, 0 },
         { 0, 0 } },
       shkweapons },
-    { "delicatessen", "food shop",
+    { "noodle bar", "food shop",
       FOOD_CLASS,
       5,
       D_SHOP,
@@ -284,7 +293,7 @@ const struct shclass shtypes[] = {
         { 0, 0 },
         { 0, 0 } },
       shkrings },
-    { "quality apparel and accessories", "wand shop",
+    { "gadget store", "wand shop",
       WAND_CLASS,
       3,
       D_SHOP,
@@ -304,7 +313,7 @@ const struct shclass shtypes[] = {
         { 0, 0 },
         { 0, 0 } },
       shktools },
-    { "rare books", "bookstore",
+    { "software emporium", "bookstore",
       SPBOOK_CLASS,
       3,
       D_SHOP,
@@ -315,7 +324,7 @@ const struct shclass shtypes[] = {
         { 0, 0 },
         { 0, 0 } },
       shkbooks },
-    { "health food store", "vegetarian food shop",
+    { "organic grocery", "vegetarian food shop",
       FOOD_CLASS,
       2,
       D_SHOP,
@@ -326,6 +335,19 @@ const struct shclass shtypes[] = {
         { 2, -SCR_FOOD_DETECTION },
         { 1, -LUMP_OF_ROYAL_JELLY } },
       shkhealthfoods },
+    /* NeonHack: implants and medical supplies; -FIRST_IMPLANT stands for
+       a random implant (see mkshobj_at()) */
+    { "cyberware clinic", "clinic",
+      TOOL_CLASS,
+      4,
+      D_SHOP,
+      { { 70, -FIRST_IMPLANT },
+        { 14, -MEDKIT },
+        { 8, -POT_NEUROBLOCKER },
+        { 5, -CYBERDECK },
+        { 3, -EMP_GRENADE },
+        { 0, 0 } },
+      shkclinic },
     /* Shops below this point are "unique".  That is they must all have a
      * probability of zero.  They are only created via the special level
      * loader.
@@ -458,8 +480,8 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, boolean mkspecl)
     int atype;
 
     /* 3.6 tribute */
-    if (mkspecl && (!strcmp(shp->name, "rare books")
-                    || !strcmp(shp->name, "second-hand bookstore"))) {
+    if (mkspecl && (!strcmp(shp->name, "software emporium")
+                    || !strcmp(shp->name, "warez stall"))) {
         struct obj *novel = mksobj_at(SPE_NOVEL, sx, sy, FALSE, FALSE);
 
         if (novel)
@@ -473,6 +495,8 @@ mkshobj_at(const struct shclass *shp, int sx, int sy, boolean mkspecl)
         /* nothing */
     } else {
         atype = get_shop_item((int) (shp - shtypes));
+        if (atype == -FIRST_IMPLANT) /* NeonHack: any implant */
+            atype = -rn1(LAST_IMPLANT - FIRST_IMPLANT + 1, FIRST_IMPLANT);
         if (atype == VEGETARIAN_CLASS)
             mkveggy_at(sx, sy);
         else if (atype < 0)

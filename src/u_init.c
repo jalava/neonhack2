@@ -85,6 +85,7 @@ static const struct trobj Healer[] = {
     { SPE_EXTRA_HEALING, 0, SPBOOK_CLASS, 1, 1, 1 },
     { SPE_STONE_TO_FLESH, 0, SPBOOK_CLASS, 1, 1, 1 },
     { APPLE, 0, FOOD_CLASS, 5, 5, 0 },
+    { MEDKIT, 4, TOOL_CLASS, 1, 1, 1 }, /* NeonHack */
     { 0, 0, 0, 0, 0, 0 }
 };
 static const struct trobj Knight[] = {
@@ -128,6 +129,7 @@ static const struct trobj Ranger[] = {
     { ARROW, 0, WEAPON_CLASS, 30, 39, UNDEF_BLESS },
     { CLOAK_OF_DISPLACEMENT, 2, ARMOR_CLASS, 1, 1, UNDEF_BLESS },
     { CRAM_RATION, 0, FOOD_CLASS, 4, 4, 0 },
+    { FRAG_GRENADE, 0, TOOL_CLASS, 1, 1, 0 }, /* NeonHack */
     { 0, 0, 0, 0, 0, 0 }
 };
 static const struct trobj Rogue[] = {
@@ -137,6 +139,7 @@ static const struct trobj Rogue[] = {
     { POT_SICKNESS, 0, POTION_CLASS, 1, 1, 0 },
     { LOCK_PICK, 0, TOOL_CLASS, 1, 1, 0 },
     { SACK, 0, TOOL_CLASS, 1, 1, 0 },
+    { CYBERDECK, 6, TOOL_CLASS, 1, 1, 0 }, /* NeonHack */
     { 0, 0, 0, 0, 0, 0 }
 };
 static const struct trobj Samurai[] = {
@@ -174,6 +177,7 @@ static const struct trobj Wizard[] = {
     { SPE_FORCE_BOLT, 0, SPBOOK_CLASS, 1, 1, 1 },
     { UNDEF_TYP, UNDEF_SPE, SPBOOK_CLASS, 1, 1, UNDEF_BLESS },
     { MAGIC_MARKER, 19, TOOL_CLASS, 1, 1, 0 }, /* actually spe = 18 + d4 */
+    { CYBERDECK, 12, TOOL_CLASS, 1, 1, 0 }, /* NeonHack */
     { 0, 0, 0, 0, 0, 0 }
 };
 
@@ -682,6 +686,24 @@ u_init_role(void)
         if (!rn2(25))
             ini_inv(Lamp);
         knows_object(POT_FULL_HEALING, FALSE);
+        /* NeonHack: a ripperdoc carries a spare implant and knows chrome */
+        {
+            struct trobj Implant[2];
+
+            Implant[0].trotyp = rn1(LAST_IMPLANT - FIRST_IMPLANT + 1,
+                                    FIRST_IMPLANT);
+            Implant[0].trspe = 0, Implant[0].trclass = TOOL_CLASS;
+            Implant[0].trquan_min = Implant[0].trquan_max = 1;
+            Implant[0].trbless = 1;
+            memset((genericptr_t) &Implant[1], 0, sizeof Implant[1]);
+            ini_inv(Implant);
+        }
+        {
+            int imp;
+
+            for (imp = FIRST_IMPLANT; imp <= LAST_IMPLANT; imp++)
+                knows_object(imp, FALSE);
+        }
         break;
     case PM_KNIGHT:
         ini_inv(Knight);

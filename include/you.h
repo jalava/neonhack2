@@ -144,6 +144,10 @@ struct u_realtime {
  * These are voluntary challenges.  Each field denotes the number of
  * times a challenge has been violated.
  */
+/* NeonHack: heat at or above this shows the Wanted status condition and
+   makes corporate security hunt you */
+#define HEAT_WANTED 20
+
 struct u_conduct {     /* number of times... */
     long unvegetarian; /* eaten any animal */
     long unvegan;      /* ... or any animal byproduct */
@@ -160,7 +164,7 @@ struct u_conduct {     /* number of times... */
     long sokocheat;    /* violated special 'rules' in Sokoban */
     long pets;         /* obtained a pet */
     /* genocides already listed at end of game */
-    long reserved1;
+    long cyberware;    /* NeonHack: installed an implant */
     long reserved2;
     long reserved3;
     long reserved4;
@@ -505,6 +509,12 @@ struct you {
     short umovement;         /* instead of youmonst.movement */
     schar uachieved[N_ACH];  /* list of achievements in the order attained */
     struct monst *umonst;    /* for future conversion of &gy.youmonst to u.umonst */
+    /* NeonHack */
+    unsigned long ucyber;       /* installed implants, a bit per type */
+    unsigned long ucyberglitch; /* ...of which these were installed cursed */
+    long ucybershort;           /* turns until shorted-out implants recover */
+    long uneuroblock;           /* turns of neuroblocker protection left */
+    long uheat;                 /* how hard corporate security wants you */
 }; /* end of `struct you' */
 
 
