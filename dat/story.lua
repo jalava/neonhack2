@@ -85,7 +85,7 @@ You don't remember the last week.  You remember antiseptic, a woman's voice coun
              log = [[I woke up on a ripperdoc's table on Neon Mile with fresh stitches behind my ear.  I don't remember the last week.]] },
            { goal = "Find Mags Vance in the Static Lounge.",
              where = "nc-neonmile", talk = "mags", dialogue = "mags_meet",
-             log = [[Doc Okoye wants 200 credits for patching me up.  She says Mags Vance, at the Static Lounge two doors east, has work for people who don't ask questions.]] },
+             log = [[Doc Okoye wants 200 credits for patching me up.  She says Mags Vance, at the Static Lounge next door, has work for people who don't ask questions.]] },
         },
         done = { start = { "act1", "bill", "rent" } } },
 
@@ -168,7 +168,7 @@ I don't know what that means and I don't want to.  Don't let anybody scan you.]]
          text = [[A nomad kid in road leathers.  Paid cash for the stitches, not for the rest of it, and was gone before the anaesthetic wore off.  No name.  They never leave a name.]],
          choices = { { "Go on.", go = "okoye_ask" } } },
       okoye_work = {
-         text = [[Then you'll earn it.  Mags Vance runs the back of the Static Lounge, two doors east.  She always needs runners who don't ask questions.
+         text = [[Then you'll earn it.  Mags Vance runs the back of the Static Lounge, right next door, across the alley.  She always needs runners who don't ask questions.
 
 Tell her Okoye sent you.  And come back when you've got my money.]],
          choices = { { "I'll go and see her." } } },
