@@ -48,7 +48,7 @@ clear_msgs
 # bounty: the target is somewhere on a site floor
 newgig bounty
 levelport "$where"
-wizstory list; expect "${gig}_t" "bounty target listed"; clear_msgs
+listed "${gig}_t" "bounty target listed"
 wizstory "kill ${gig}_t"
 expect_msg "Gig complete" "bounty collected"
 clear_msgs

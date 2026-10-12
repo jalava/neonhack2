@@ -60,6 +60,7 @@ struct st_faction {
 #define st_stance(r) ((r) >= REP_FRIENDLY ? 1 : (r) <= REP_HOSTILE ? -1 : 0)
 struct st_npc {
     char *id, *name, *monster, *home, *faction, *chat;
+    char *nearnpc; /* appears next to this NPC, if it's there */
     boolean female, stay, hostile;
     boolean fixer; /* offers gigs */
     xint8 spot;    /* where it appears when spawned: SPOT_xxx */
@@ -560,6 +561,7 @@ st_read_npcs(lua_State *L)
             np->home = get_table_str_opt(L, "home", (char *) 0);
             np->faction = get_table_str_opt(L, "faction", (char *) 0);
             np->chat = get_table_str_opt(L, "chat", (char *) 0);
+            np->nearnpc = get_table_str_opt(L, "near", (char *) 0);
             np->female = get_table_boolean_opt(L, "female", FALSE);
             np->stay = get_table_boolean_opt(L, "stay", FALSE);
             np->hostile = get_table_boolean_opt(L, "hostile", FALSE);
@@ -1127,7 +1129,7 @@ story_free(void)
         struct st_npc *np = &st.npcs[i];
 
         st_free(np->id), st_free(np->name), st_free(np->monster), st_free(np->home);
-        st_free(np->faction), st_free(np->chat);
+        st_free(np->faction), st_free(np->chat), st_free(np->nearnpc);
         for (j = 0; j < np->nidle; j++)
             st_free(np->idle[j]);
         st_free(np->idle);
@@ -1586,6 +1588,13 @@ st_spawn(struct st_npc *np, boolean now)
                    && enexto(&cc, u.ux, u.uy, &mons[pm])) {
             sx = cc.x, sy = cc.y;
         }
+        if (np->nearnpc) {
+            int k = st_npc_idx(np->nearnpc);
+            struct monst *other = (k >= 0) ? st_npc_mon(&st.npcs[k]) : 0;
+
+            if (other && enexto(&cc, other->mx, other->my, &mons[pm]))
+                sx = cc.x, sy = cc.y;
+        }
         mtmp = makemon(&mons[pm], sx, sy,
                        MM_NOMSG | (fem ? MM_FEMALE : MM_MALE)
                        | ((np->hostile || np->angry) ? 0 : NO_MINVENT));
@@ -1697,6 +1706,8 @@ st_faction_sync(void)
     struct monst *mtmp;
     int f, stance;
 
+    if (!In_city(&u.uz)) /* the Undercity knows nothing of the factions */
+        return;
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp) || (f = st_member_of(mtmp)) < 0)
             continue;
@@ -1720,7 +1731,7 @@ story_faction_peace(struct permonst *ptr)
 {
     int f, k, mndx = monsndx(ptr), stance;
 
-    if (!st.loaded)
+    if (!st.loaded || !In_city(&u.uz))
         return -1;
     for (f = 0; f < st.nfactions; f++)
         for (k = 0; k < st.factions[f].nmembers; k++)
@@ -1737,7 +1748,7 @@ story_angered(struct monst *mtmp)
 {
     int f;
 
-    if (st.loaded && (f = st_member_of(mtmp)) >= 0)
+    if (st.loaded && In_city(&u.uz) && (f = st_member_of(mtmp)) >= 0)
         st_rep_add(f, -3L, FALSE);
 }
 
@@ -1746,7 +1757,7 @@ story_killed(struct monst *mtmp)
 {
     int f;
 
-    if (st.loaded && (f = st_member_of(mtmp)) >= 0)
+    if (st.loaded && In_city(&u.uz) && (f = st_member_of(mtmp)) >= 0)
         st_rep_add(f, mtmp->mpeaceful ? -4L : -1L, FALSE);
 }
 
@@ -3521,7 +3532,7 @@ wiz_story(void)
     }
     getlin("Story command? (list, start/next/finish/fail/track <quest>, "
            "flag/rep <name> <n>, spawn/goto/kill <npc>, item/fetch <id>, tp <x> <y>, "
-           "gig <kind>, ending <id>, mons)",
+           "gig <kind>, ending <id>, tostair <dungeon>, mons)",
            buf);
     if (*buf == '\033' || !*buf)
         return ECMD_OK;
@@ -3594,9 +3605,16 @@ wiz_story(void)
         for (t = 0; t < st.ntpls; t++)
             if (!strcmp(st.tpls[t].id, arg))
                 break;
-        for (f = 0; f < st.nnpcs; f++)
-            if (st.npcs[f].fixer)
+        /* a fixer the template allows */
+        for (f = 0; t < st.ntpls && f < st.nnpcs; f++) {
+            if (!st.npcs[f].fixer)
+                continue;
+            for (k = 0; k < st.tpls[t].nfixers; k++)
+                if (!strcmp(st.tpls[t].fixers[k], st.npcs[f].id))
+                    break;
+            if (!st.tpls[t].nfixers || k < st.tpls[t].nfixers)
                 break;
+        }
         if (t == st.ntpls || f == st.nnpcs || (k = st_gig_free_slot()) < 0
             || !st_gig_place(&st.tpls[t], &o.place)) {
             pline("Can't make a \"%s\" gig.", arg);
@@ -3631,6 +3649,24 @@ wiz_story(void)
             return ECMD_OK;
         }
         teleds(otmp->ox, otmp->oy, TELEDS_TELEPORT);
+        return ECMD_OK;
+    }
+    if (!strcmp(cmd, "tostair")) { /* "tostair <dungeon>": stand on its stairs */
+        const char *dname = buf + strlen("tostair");
+        stairway *stway;
+        xint16 dn;
+
+        while (*dname == ' ')
+            dname++;
+        dn = dname_lookup(dname);
+        for (stway = gs.stairs; stway; stway = stway->next)
+            if (dn >= 0 && stway->tolev.dnum == dn)
+                break;
+        if (!stway) {
+            pline("No stairs to \"%s\" here.", dname);
+            return ECMD_OK;
+        }
+        teleds(stway->sx, stway->sy, TELEDS_TELEPORT);
         return ECMD_OK;
     }
     if (!strcmp(cmd, "mons")) { /* every monster on the level */
@@ -3828,6 +3864,11 @@ wiz_storycheck(void)
         }
         if (np->home && !city_resolve_dest(np->home, &lev)) {
             Snprintf(buf, sizeof buf, "npc %s: unknown home \"%s\"", np->id, np->home);
+            putstr(win, 0, buf), bad++;
+        }
+        if (np->nearnpc && st_npc_idx(np->nearnpc) < 0) {
+            Snprintf(buf, sizeof buf, "npc %s: unknown NPC \"%s\" (near)",
+                     np->id, np->nearnpc);
             putstr(win, 0, buf), bad++;
         }
         if (np->chat && st_node_idx(np->chat) < 0) {

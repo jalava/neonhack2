@@ -1,7 +1,8 @@
 # NeonHack 2: next phases (P7–P10)
 
-Status (2026-10-12): P7 (organic districts, 8be51b252) and P8 (economy and
-city life, 18ab4f741) are done. Next: user playtest, then P9.
+Status (2026-10-12): P7 (organic districts, 8be51b252), P8 (economy and
+city life, 18ab4f741) and P9 (acts 2-4) are done.  Next: user playtest,
+then P10 (balance, hardening).
 
 ## Context
 

@@ -1,0 +1,192 @@
+#!/bin/bash
+# story-test - play acts 2 to 4 through, both ways round, in debug-mode
+# games, with a save and restore in the middle of each.  Uses
+# tools/nhdrive (tmux) and the helpers in testlib.sh.
+#
+#   A: the Jade deal, the Long Road deal, Halcyon's splinter stolen; the
+#      Shaft stays shut until act 3 is done; Halcyon takes Hex; stay on
+#      after the Open Grid ending.
+#   B: Halcyon's deal, the Long Road sold out, the Jade Den taken by
+#      force; the Circuit takes Hex; walk away after Corporate Order.
+#
+#   tools/neon2/story-test            run it; exit status 0 if all passed
+top=$(cd "$(dirname "$0")/../.." && pwd)
+export NHSESSION=${NHSESSION:-storytest}
+export NHDELAY=${NHDELAY:-0.5}
+export NHOPTS='name:Tester,role:Valkyrie,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore,msghistory:60,msg_window:full'
+fails=0
+. "$top/tools/neon2/testlib.sh"
+
+# the start of act 2, with every district open
+act2() {
+    "$drive" start -D
+    sleep 1.5; clear_msgs; sleep 0.5; clear_msgs
+    wizstory "finish prologue"; clear_msgs
+    wizstory "finish act1"; clear_msgs
+    wizstory "finish rent"; clear_msgs
+    ext wizcity; clear_msgs
+    key Tab; expect "Get the Jade Circuit's splinter" "act 2: three lines open"
+    key Escape; clear_msgs
+}
+# pick up the story item ID lying on this level
+grab() { wizstory "fetch $1"; clear_msgs; keys ','; sleep 0.4; }
+# the journal shows TEXT
+journal() { key Tab; expect "$1" "${2:-$1}"; key Escape; clear_msgs; }
+# recent messages (^P) show TEXT
+said() {
+    local i
+    key C-p
+    for i in 1 2 3 4; do
+        screen | grep -qF -- "$1" && break
+        screen | grep -q -e '--More--' -e '(end)' -e '([0-9]* of' || break
+        key Enter
+    done
+    if screen | grep -qF -- "$1"; then echo "ok   ${2:-$1}"
+    else echo "FAIL ${2:-$1}"; screen | sed 's/^/     | /'; fails=$((fails + 1)); fi
+    key Escape; clear_msgs
+}
+
+echo "== A: deal, deal, theft"
+act2
+# the Jade Circuit: Benny gets you in, Lin wants her crate
+levelport "Neo Yendor:2"
+talk benny; expect "Get me in to see Matron Lin" "Benny offers an audience"
+keys a; expect "make the call" "Benny makes the call"
+keys a; clear_msgs
+said "counts you as a friend" "the Circuit is friendly"
+levelport "Jade Den:3"
+talk lin; expect "what I wear around my neck" "Lin wants her crate"
+keys a; clear_msgs
+journal "customs cage" "crate stage"
+levelport "Mara Sun:3"
+grab crate; clear_msgs
+journal "Bring the crate to Matron Lin" "crate in hand"
+save_and_restore
+journal "Bring the crate to Matron Lin" "crate stage survives a restore"
+levelport "Jade Den:3"
+talk lin; expect "Unopened, as agreed" "Lin takes the crate"
+key Enter; clear_msgs
+said "Story mission complete: The Matron" "jade splinter"
+# the Long Road: the Dustmother's nav core
+levelport "Neo Yendor:5"
+talk juno; expect "Bring it home" "Juno's offer"
+keys a; clear_msgs
+levelport "Storm Drains:3"
+grab navcore; clear_msgs
+levelport "Neo Yendor:5"
+talk juno; expect "Forty years of roads" "Juno takes the nav core"
+key Enter; clear_msgs
+said "Story mission complete: The Long Road" "road splinter"
+# the Shaft is shut
+levelport "Neo Yendor:7"
+wizstory "tostair The Undercity"; clear_msgs
+keys '>'; expect "Blast doors close the Shaft" "the Shaft is locked"
+clear_msgs
+# Halcyon: stolen from the tower
+levelport "Halcyon Tower:1"
+grab splinter_halcyon
+expect_msg "the vault footage" "Vos calls about the theft"
+clear_msgs
+said "wanted by corporate security" "theft makes you Wanted"
+said "Halcyon Dynamics wants you dead" "Halcyon turns hostile"
+said "Story mission complete: Three Splinters" "act 2 done"
+listed "kask" "Halcyon took Hex"
+# act 3: the Seal Vault
+levelport "Seal Vault:2"
+wizstory "kill kask"; clear_msgs
+talk hex; expect "Give me the three" "Hex at the Loom"
+keys a; expect_msg "Splinter key" "the Splinter key"
+expect_msg "a key in your hand" "the Loom assembles it"
+key Enter
+expect_msg "Little splinter" "the voice from below"
+clear_msgs
+said "New story mission: Zenith" "act 4 begins"
+levelport "Neo Yendor:7"
+wizstory "tostair The Undercity"; clear_msgs
+keys '>'; sleep 0.5; clear_msgs
+if screen | tail -2 | grep -q "Ashfall"; then
+    echo "FAIL the Shaft opens"; screen | sed 's/^/     | /'; fails=$((fails + 1))
+else
+    echo "ok   the Shaft opens"
+fi
+# act 4: allies by reputation, ARBITER, the ending
+levelport "Zenith Spire:8"
+said "Three of the Circuit's soldiers" "Circuit allies"
+said "Two outriders shoulder" "Long Road allies"
+levelport "Zenith Spire:1"
+wizstory "kill arbiter"; clear_msgs
+talk hex; expect "Broadcast them" "the three endings"
+keys c; expect "Hex starts to laugh" "the Open Grid"
+key Enter; sleep 0.3
+expect "Walk away from Neo Yendor?" "the walk-away question"
+keys n; clear_msgs
+said "New story mission: The Original" "staying on"
+"$drive" stop
+
+echo "== B: deal, betrayal, force"
+act2
+# Halcyon's deal: the crate goes to Vos
+levelport "Neo Yendor:6"
+talk vos; expect "About Halcyon's splinter" "Vos talks"
+keys a; expect "I'll lend you our" "Vos's offer"
+keys a; clear_msgs
+levelport "Mara Sun:3"
+grab crate; clear_msgs
+levelport "Neo Yendor:6"
+talk vos; expect "expect you" "Vos takes the crate"
+key Enter; clear_msgs
+said "the Jade Circuit wants you dead" "the Circuit turns hostile"
+levelport "Halcyon Tower:1"
+grab splinter_halcyon; clear_msgs
+said "Story mission complete: Halcyon's Splinter" "Halcyon splinter, no theft"
+# the Long Road, sold out
+levelport "Neo Yendor:5"
+talk juno; keys b; clear_msgs
+levelport "Neo Yendor:6"
+talk vos; expect "keeps their splinter in the Boneyard" "Vos hears of the Boneyard"
+keys a; expect "Halcyon will go in tonight" "Vos sends a raid"
+keys a; clear_msgs
+said "the Long Road wants you dead" "the Road turns hostile"
+levelport "The Boneyard:2"
+talk brandt; expect "Clean sweep" "Brandt in the vault"
+key Enter; clear_msgs
+said "Story mission complete: The Long Road" "road splinter, sold"
+save_and_restore
+journal "Matron Lin" "jade line survives a restore"
+# the Jade Circuit: by force
+levelport "Neo Yendor:2"
+talk benny; keys a; expect "go down fighting" "Benny won't call"
+keys a; clear_msgs
+levelport "Jade Den:3"
+wizstory "kill lin"
+expect_msg "Inside the locket is a splinter" "the splinter from Lin"
+clear_msgs
+said "Story mission complete: Three Splinters" "act 2 done"
+listed "shen" "the Circuit took Hex"
+levelport "Seal Vault:2"
+wizstory "kill shen"; clear_msgs
+talk hex; keys a; expect_msg "a key in your hand" "B: the Loom"
+key Enter
+expect_msg "Little splinter" "act 3 done"
+clear_msgs
+levelport "Zenith Spire:8"
+said "A corpsec lieutenant salutes" "Halcyon ally"
+levelport "Zenith Spire:1"
+wizstory "kill arbiter"; clear_msgs
+talk hex; keys a; expect "Halcyon's logo" "Corporate Order"
+key Enter; sleep 0.3
+expect "Walk away from Neo Yendor?" "the walk-away question"
+keys y; sleep 1
+for i in 1 2 3 4 5 6 7 8 9 10; do
+    screen | grep -q -e '--More--' -e 'DYWYPI' -e '\[ynq\]' -e '(end)' || break
+    screen | grep -q '\[ynq\]' && keys q || key Enter
+    sleep 0.3
+done
+if tail -1 "$top/playground/xlogfile" | grep -q "walked away from Neo Yendor (Corporate Order)"; then
+    echo "ok   walked away, and the record says so"
+else
+    echo "FAIL walked away"; tail -1 "$top/playground/xlogfile"; fails=$((fails + 1))
+fi
+"$drive" stop
+echo "story-test: $fails failure(s)"
+exit $((fails > 0))

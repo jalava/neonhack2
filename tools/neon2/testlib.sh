@@ -35,6 +35,19 @@ clear_msgs() {
         fi
     done
 }
+# listed TEXT [what]: #wizstory list (any page of it) shows TEXT
+listed() {
+    local i found=
+    wizstory list
+    for i in 1 2 3 4 5; do
+        screen | grep -qF -- "$1" && { found=1; break; }
+        screen | grep -q -e '--More--' -e '(end)' -e '([0-9]* of' || break
+        key Enter
+    done
+    if [ -n "$found" ]; then echo "ok   ${2:-$1}"
+    else echo "FAIL ${2:-$1}"; screen | sed 's/^/     | /'; fails=$((fails + 1)); fi
+    clear_msgs
+}
 ext() { keys "#$1"; key Enter; }
 wizstory() { ext wizstory; keys "$1"; key Enter; }
 # talk NPC: stand next to it and #chat

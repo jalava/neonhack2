@@ -83,7 +83,7 @@ expect "you're the splinter" "Hex meets you"
 keys b; clear_msgs
 levelport "Block 7:2"
 expect "Block 7 4F" "fourth floor"
-wizstory list; expect "lazarus    alive" "Saint Lazarus is here"; clear_msgs
+listed "lazarus    alive" "Saint Lazarus is here"
 wizstory "kill lazarus"; sleep 0.3
 expect_msg "scorched deck core" "Lazarus drops the core"
 clear_msgs

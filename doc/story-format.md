@@ -14,15 +14,41 @@ dialogue node or place that doesn't exist.
 
 ```lua
 story = {
-   factions = { jade = "the Jade Circuit", ... },  -- id = name
+   factions = { jade = { name = "the Jade Circuit", members = { "yakuza" } } },
    items = { shard = { name = "Hex's data shard" }, ... },
    npcs = { id = { ... }, ... },
    quests = { { ... }, ... },                        -- in journal order
    dialogue = { id = { ... }, ... },
    gigs = { { ... }, ... },                          -- repeatable jobs
    districts = { ["nc-stacks"] = { ... }, ... },     -- city life
+   locks = { ["The Undercity"] = { ... }, ... },     -- shut ways
+   endings = { open = { ... }, ... },                -- how it ends
 }
 ```
+
+### Factions
+
+```lua
+jade = { name = "the Jade Circuit", members = { "yakuza" } },
+halcyon = "Halcyon Dynamics",       -- a name alone: no members
+```
+
+Reputation with each faction runs from -100 to 100. In the city (not the
+Undercity), a faction's members act on it:
+- at 15 or more, they are generated peaceful;
+- at -15 or less, they are hostile;
+- in between, NetHack decides as usual.
+
+When a faction's mood tips, its members on the level follow, and so do
+those on a level when you arrive. Killing a member costs 1 (4 if it was
+peaceful); attacking a peaceful one costs 3. Story NPCs, shopkeepers and
+pets don't count as members.
+
+### Items
+
+Story items are data shards with a name from `items`. A district or site
+layout can leave one on the floor (`d.item('c', "crate")` in
+`tools/neon2/districts/*.py`). Monsters don't steal them.
 
 ### Places
 
@@ -47,8 +73,14 @@ okoye = {
    chat = "okoye_chat",      -- dialogue for small talk (optional)
    fixer = true,             -- offers gigs when there's nothing else to say
    idle = { "Doc Okoye wipes down her tools." },  -- one-liners otherwise
+   spot = "metro",           -- spawns by the metro, or "near" (next to you)
+   near = "hex",             -- spawns next to that NPC, if it's there
+   died = { <effects> },     -- when it is killed (by anyone)
 }
 ```
+
+A fixer with `chat` shows that first; a choice with `gigs = true` opens its
+gig board. A fixer without `chat` goes straight to the board.
 
 There are two ways an NPC gets into the world:
 - A level file places it with `des.monster({ npc = "okoye", x = 8, y = 4 })`.
@@ -57,6 +89,8 @@ There are two ways an NPC gets into the world:
   otherwise when you arrive.
 
 The story recognizes the NPC by its monster id, so it may move around.
+A level file only makes an NPC that hasn't been made yet and lives there;
+one that is alive somewhere else, dead or gone is left out.
 
 ### Quests
 
@@ -133,6 +167,27 @@ Only places the story has opened are used.
 - **`people`:** civilians (citizen, salaryman, street vendor) are topped up out of sight.
 - **`sights` and `sounds`:** now and then one of these is shown. Sights are skipped while you're blind and sounds while you're deaf.
 
+### Locks
+
+```lua
+["The Undercity"] = { flag = "shaft_open", text = [[The Shaft is sealed.]] },
+["Zenith Spire:3"] = { flag = "...", text = [[...]] },  -- one floor only
+```
+
+Stairs that lead into that dungeon (or floor) refuse to take you, with the
+text, until the flag is set. Gigs aren't sent to a locked site.
+
+### Endings
+
+```lua
+open = { title = "Open Grid", text = [[...]], stay = { start = "undercity" } },
+```
+
+The `ending` effect shows the text, writes it to the journal and the game
+log, sets the flags `ending` and `ending_<id>`, and asks whether to walk
+away. Walking away ends the game as an escape; the record says "walked
+away from Neo Yendor (Open Grid)". Staying runs the `stay` effects.
+
 ### Dialogue
 
 ```lua
@@ -175,6 +230,14 @@ this order:
 | `fail = "quest"`, `finish = "quest"`, `start = "quest"` | quest state |
 | `track = "quest"` | make it the tracked quest |
 | `xp = n` | experience |
+| `cases = { { need = {...}, <effects> }, ... }` | the first case whose `need` holds (a case without `need` always does) |
+| `when = { ... }` | every case whose `need` holds |
+| `anger = "npc"` | the NPC turns hostile, now or when it's next made |
+| `move = { hex = "Seal Vault:2" }` | the NPC lives there now: it leaves (an old copy on another level is removed when you get there) and turns up there |
+| `allies = { yakuza = 3 }` | tame monsters, next to you |
+| `heat = n` | Heat (corporate security's interest) |
+| `gigs = true` | (in a fixer's dialogue) the fixer's gig board |
+| `ending = "open"` | an ending (see above) |
 
 ### Conditions (`need`)
 
@@ -185,6 +248,8 @@ this order:
 | `credits` | you have at least that much |
 | `rep = { jade = 10 }` / `norep` | reputation is at least / below |
 | `active` / `done` / `notdone` | the quest's state |
+| `worst` / `best = "jade"` | that faction thinks the least / most of you (ties: the first by id) |
+| `alive` / `dead = "npc"` | the NPC hasn't died / has died |
 
 ## Debug-mode commands
 
@@ -194,6 +259,7 @@ this order:
   - `flag <name> <n>` or `rep <faction> <n>`;
   - `spawn <npc>`, `goto <npc>` (teleport next to it), `kill <npc>` or `item <id>`;
   - `tp <x> <y>` (teleport to level coordinates) or `mons` (list monsters);
-  - `gig <kind>` (start a gig from the first fixer; says where) or `fetch <item>` (stand on a story item lying on this level).
+  - `gig <kind>` (start a gig from a fixer it allows; says where) or `fetch <item>` (stand on a story item lying on this level);
+  - `tostair <dungeon>` (stand on the stairs into it) or `ending <id>`.
 - `#wizstorycheck` checks every reference in story.lua.
 - `#wizcity` opens every district.
