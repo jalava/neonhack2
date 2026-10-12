@@ -6,8 +6,8 @@ Neo Yendor is the sprawl that grew over NeonHack 1's sealed arcology; the
 whole of NeonHack 1 is still down there, under the Shaft in Ashfall.
 
 Status: a playable slice. The prologue and act 1 run across Neon Mile,
-Lantern Market, the Stacks and the Block 7 tower, with a side job and a
-gig. The other districts are placeholders, and act 2 onwards isn't
+Lantern Market, the Stacks and the Block 7 tower, with side jobs and
+endless gigs from fixers. The other districts are placeholders, and act 2 onwards isn't
 written yet. The design is in `doc/neonhack2-plan.md`.
 
 ## Building and playing
