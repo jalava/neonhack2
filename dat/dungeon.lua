@@ -375,5 +375,76 @@ dungeon = {
       parent = "nc-lantern",
       danger = 3,
       lvlfill = "nc-jadefill",
+      levels = {
+         { name = "nc-jadehall", base = -1 },
+      }
+   },
+   {
+      name = "Mara Sun",
+      base = 3,
+      flags = { "unconnected", "city" },
+      parent = "nc-docks",
+      danger = 7,
+      lvlfill = "nc-marafill",
+      levels = {
+         { name = "nc-marahold", base = -1 },
+      }
+   },
+   {
+      name = "Storm Drains",
+      base = 3,
+      flags = { "unconnected", "city" },
+      parent = "nc-docks",
+      danger = 7,
+      lvlfill = "nc-drainfill",
+      levels = {
+         { name = "nc-drainhub", base = -1 },
+      }
+   },
+   {
+      name = "The Boneyard",
+      base = 2,
+      flags = { "unconnected", "city" },
+      parent = "nc-fringe",
+      danger = 7,
+      lvlfill = "nc-bonefill",
+      levels = {
+         { name = "nc-bonevault", base = -1 },
+      }
+   },
+   {
+      name = "Halcyon Tower",
+      base = 6,
+      entry = -1,
+      flags = { "unconnected", "city" },
+      parent = "nc-chrome",
+      danger = 11,
+      lvlfill = "nc-halcfill",
+      levels = {
+         { name = "nc-halctop", base = 1 },
+      }
+   },
+   {
+      name = "Seal Vault",
+      base = 2,
+      flags = { "unconnected", "city" },
+      parent = "nc-ashfall",
+      danger = 9,
+      lvlfill = "nc-sealfill",
+      levels = {
+         { name = "nc-sealloom", base = -1 },
+      }
+   },
+   {
+      name = "Zenith Spire",
+      base = 8,
+      entry = -1,
+      flags = { "unconnected", "city" },
+      parent = "nc-zenith",
+      danger = 14,
+      lvlfill = "nc-spirefill",
+      levels = {
+         { name = "nc-spiretop", base = 1 },
+      }
    },
 }

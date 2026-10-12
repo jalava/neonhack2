@@ -1,7 +1,7 @@
 # Lantern Market: the night market, Jade Circuit turf.
 #
 # North: Dr. Sato's clinic and back room, Benny Two-Tone's stall, the
-# Jade Circuit's den (locked; its stairs go down to the den), the Church
+# Jade Circuit's den (its stairs go down to the den), the Church
 # of the Signal and the dumpling cart.  The middle is a warren of stalls
 # around a fountain square; the south is back lanes, homes and more
 # shops.  The metro station is at the east end.
@@ -20,7 +20,7 @@ MAP = r"""
  |.......|.z....|..|........|....y................|..|....._......|..........|
  |.......|......|..----/-----..............y......|..|............|..........|
  ----+------+----......e....|.....................|..|............-----/------
-F....c......d...............-----------%-----------..------+-------....o......F
+F....c......d...............-----------/-----------..------+-------....o......F
 F....q............------...............f.............E.....g..................F
 F..--+---.........|.8..|....u.....------..........---+---.....................F
 F..|.6..|.------..|....+t.--+---..|.h..|..------..|..j..|..------...........a.F

@@ -2,7 +2,8 @@
 """Build NeonHack 2 level files (dat/nc-*.lua) from hand-drawn maps.
 
 Each layout in tools/neon2/districts/<name>.py defines PROTO, TITLE, an
-optional BLURB and FLAGS, a MAP drawn in des.map characters (up to 79x21)
+optional BLURB, FLAGS and LIT (True: no neon pools, all of it lit), a MAP
+drawn in des.map characters (up to 79x21)
 and a legend(d) function that says what the marker characters mean:
 
     terrain    ' ' stone  . floor  - | walls  # corridor  { fountain
@@ -20,6 +21,7 @@ and a legend(d) function that says what the marker characters mean:
                                a home); not a game room
     d.npc('o', "okoye")        story NPC     d.mon('g', "street punk", False)
     d.obj('k', "medkit")       object        d.altar('_', "neutral")
+    d.item('c', "crate")       a story item (an id from dat/story.lua)
     d.sign('a', "TEXT")        a neon sign (burned engraving); lights a pool
     d.metro('=')               metro station; lights a pool
     d.stair('<', up=True, dest="Block 7")
@@ -81,6 +83,7 @@ class District:
         self.variants = []    # (marker, pct, becomes, base)
         self.errors = []
         self.layout_name = proto
+        self.alllit = False
 
     # --- legend -----------------------------------------------------------
     def _mark(self, ch, kind, *args):
@@ -104,6 +107,9 @@ class District:
 
     def obj(self, ch, name):
         self._mark(ch, "obj", name)
+
+    def item(self, ch, story_id):
+        self._mark(ch, "item", story_id)
 
     def altar(self, ch, align):
         self._mark(ch, "altar", align)
@@ -350,7 +356,7 @@ class District:
             for x in range(self.w):
                 c = self.art[y][x]
                 if c == "." and (x, y) not in self.roomcells:
-                    c = "*" if (x, y) in self.lit_cells else ":"
+                    c = "*" if (x, y) in self.lit_cells or self.alllit else ":"
                 row.append(c)
             out.append("".join(row))
         return "\n".join(out)
@@ -386,9 +392,14 @@ class District:
             for (x, y) in self.cells(vch):
                 out.append(f"   des.terrain({x}, {y}, {lua_str(becomes)})")
             out.append("end")
-        # lighting: dark streets with neon pools
-        out.append(f'des.region(selection.area(0,0,{self.w - 1},{self.h - 1}), "unlit")')
+        # lighting: dark streets with neon pools, or (LIT = True) all lit
+        if self.alllit:
+            out.append(f'des.region(selection.area(0,0,{self.w - 1},{self.h - 1}), "lit")')
+        else:
+            out.append(f'des.region(selection.area(0,0,{self.w - 1},{self.h - 1}), "unlit")')
         for (x1, y, x2) in self._runs(self.lit_cells):
+            if self.alllit:
+                break
             out.append(f'des.region(selection.area({x1},{y},{x2},{y}), "lit")')
         for r in self.rooms:
             if r["kind"] == "litroom":
@@ -443,6 +454,10 @@ class District:
                 elif kind == "obj":
                     out.append(f'des.object({{ id = {lua_str(args[0])}, '
                                f'x = {x}, y = {y} }})')
+                elif kind == "item":
+                    out.append(f'des.object({{ id = "data shard", '
+                               f'name = {lua_str(args[0])}, buc = "uncursed", '
+                               f'x = {x}, y = {y} }})')
                 elif kind == "sign":
                     out.append(f'des.engraving({{ x = {x}, y = {y}, type = "burn", '
                                f'text = {lua_str(args[0])} }})')
@@ -464,6 +479,7 @@ def load(name):
     d = District(mod.PROTO, mod.TITLE, mod.MAP, getattr(mod, "BLURB", ""),
                  getattr(mod, "FLAGS", ()))
     d.layout_name = name
+    d.alllit = getattr(mod, "LIT", False)
     mod.legend(d)
     d.analyze()
     return d
