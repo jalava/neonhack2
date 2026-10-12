@@ -1424,7 +1424,7 @@ staticfn void
 restore_neon2state(NHFILE *nhfp)
 {
     int slen = 0;
-    char line[BUFSZ * 4];
+    char line[BUFSZ * 8]; /* story.c writes lines up to BUFSZ*4+64 */
 
 #ifndef SFCTOOL
     neon2_state_reset();

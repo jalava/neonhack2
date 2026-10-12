@@ -36,6 +36,8 @@ struct st_kvl {
 
 struct st_item {
     char *id, *name;
+    d_level drop;    /* gigs: left lying somewhere on this level */
+    boolean dropped; /* ... and it has been put there */
 };
 struct st_faction {
     char *id, *name;
@@ -44,6 +46,8 @@ struct st_faction {
 struct st_npc {
     char *id, *name, *monster, *home, *faction, *chat;
     boolean female, stay, hostile;
+    boolean fixer; /* offers gigs */
+    xint8 spot;    /* where it appears when spawned: SPOT_xxx */
     int level; /* experience level, if not the monster type's own */
     int nidle;
     char **idle;
@@ -53,6 +57,8 @@ struct st_npc {
     xint8 status;    /* NPC_xxx */
     boolean pending; /* spawn when the hero reaches its home */
 };
+#define SPOT_RANDOM 0
+#define SPOT_METRO 1 /* next to the district's metro station */
 #define NPC_UNMADE 0
 #define NPC_ALIVE 1
 #define NPC_DEAD 2
@@ -73,6 +79,7 @@ struct st_quest {
     /* state */
     xint8 status; /* Q_xxx */
     int stage;    /* current stage, 0-based */
+    long ended;   /* turn it was finished or failed */
 };
 #define Q_INACTIVE 0
 #define Q_ACTIVE 1
@@ -90,6 +97,39 @@ struct st_node {
     struct st_choice *choices;
 };
 
+/* gigs: repeatable jobs from fixers, made from templates in story.lua
+   into a few slots kept at the end of the quest, NPC and item arrays */
+#define GIG_SLOTS 8      /* gigs that can exist at once, finished included */
+#define GIG_ACTIVE_MAX 3 /* gigs you can have running */
+struct st_gigtpl {
+    char *id, *place; /* place: "district" or "site" */
+    boolean hostile, drop, metro;
+    int reward;       /* plus 10 per point of danger */
+    int nfixers, nmonsters, nnames, ninames;
+    char **fixers, **monsters, **names, **inames;
+    struct st_quest q; /* title, stages, done; with $ and % holes */
+};
+struct st_gig {
+    boolean used;
+    long seq;  /* gig<seq> is the quest's id */
+    int tpl;   /* template */
+    int fixer; /* NPC index */
+    d_level place;
+    long reward;
+    int pm;    /* target's monster type */
+    char tname[64], iname[64];
+};
+
+/* what a district (or a site, by dungeon name) is like */
+struct st_district {
+    char *key;      /* "nc-stacks" or "Block 7" */
+    d_level lev;    /* a district; dlevel 0 for a whole site dungeon */
+    int nmon, npeople, nsight, nsound;
+    int *mon, *monw;       /* random monsters and their weights */
+    int *people, *peoplen; /* civilians and how many to keep around */
+    char **sight, **sound; /* ambience */
+};
+
 struct st_log {
     int quest;
     long turn;
@@ -105,6 +145,13 @@ struct st_flag {
 static struct story_data {
     boolean loaded;
     int nquests, nnpcs, nnodes, nitems, nfactions;
+    int nstatq, nstatn, nstati; /* story.lua's own; gig slots follow */
+    int ntpls, ndist;
+    struct st_gigtpl *tpls;
+    struct st_district *dist;
+    long lastamb; /* turn of the last ambient message */
+    struct st_gig gigs[GIG_SLOTS];
+    long gigseq;
     struct st_quest *quests;
     struct st_npc *npcs;
     struct st_node *nodes;
@@ -127,6 +174,23 @@ staticfn void st_read_kvl_field(lua_State *, const char *, struct st_kvl *);
 staticfn void st_free_kvl(struct st_kvl *);
 staticfn void st_read_npcs(lua_State *);
 staticfn void st_read_quests(lua_State *);
+staticfn void st_read_quest(lua_State *, struct st_quest *, int);
+staticfn char **st_read_strlist(lua_State *, const char *, int *);
+staticfn void st_read_gigs(lua_State *);
+staticfn void st_add_gig_slots(void);
+staticfn void st_free_quest(struct st_quest *);
+staticfn char *st_gigsub(const char *, struct st_gig *);
+staticfn void st_gigsub_kvl(struct st_kvl *, struct st_kvl *, struct st_gig *);
+staticfn void st_place_spec(d_level *, char *);
+staticfn int st_gig_build(int, long, int, int, d_level *, long, int,
+                          const char *, const char *, boolean);
+staticfn boolean st_gig_place(struct st_gigtpl *, d_level *);
+staticfn int st_gig_free_slot(void);
+staticfn void st_gig_board(struct st_npc *);
+staticfn void st_drop_items(void);
+staticfn void st_read_districts(lua_State *);
+staticfn int st_read_weights(lua_State *, const char *, int **, int **);
+staticfn struct st_district *st_here(void);
 staticfn void st_read_nodes(lua_State *);
 staticfn void st_read_named(lua_State *, const char *);
 staticfn void st_resolve(void);
@@ -376,6 +440,7 @@ st_read_npcs(lua_State *L)
             np->stay = get_table_boolean_opt(L, "stay", FALSE);
             np->hostile = get_table_boolean_opt(L, "hostile", FALSE);
             np->level = get_table_int_opt(L, "level", 0);
+            np->fixer = get_table_boolean_opt(L, "fixer", FALSE);
             lua_getfield(L, -1, "idle");
             if (lua_type(L, -1) == LUA_TTABLE) {
                 lua_len(L, -1);
@@ -398,11 +463,71 @@ st_read_npcs(lua_State *L)
     lua_pop(L, 1);
 }
 
+/* read the quest table at the top of the stack into qp */
+staticfn void
+st_read_quest(lua_State *L, struct st_quest *qp, int i)
+{
+    int j;
+
+    qp->id = get_table_str_opt(L, "id", (char *) 0);
+    if (!qp->id) {
+        char buf[20];
+
+        Sprintf(buf, "quest%d", i + 1);
+        qp->id = dupstr(buf);
+    }
+    qp->title = get_table_str_opt(L, "title", (char *) 0);
+    if (!qp->title)
+        qp->title = dupstr(qp->id);
+    qp->kind = get_table_str_opt(L, "kind", (char *) 0);
+    if (!qp->kind)
+        qp->kind = dupstr("side");
+    qp->autostart = get_table_boolean_opt(L, "start", FALSE);
+    st_read_kvl_field(L, "done", &qp->done);
+    lua_getfield(L, -1, "stages");
+    if (lua_type(L, -1) == LUA_TTABLE) {
+        lua_len(L, -1);
+        qp->nstages = (int) lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        qp->stages = (struct st_stage *) alloc((qp->nstages + 1)
+                                               * sizeof *qp->stages);
+        (void) memset(qp->stages, 0, (qp->nstages + 1) * sizeof *qp->stages);
+        for (j = 0; j < qp->nstages; j++) {
+            struct st_stage *sp = &qp->stages[j];
+
+            lua_pushinteger(L, j + 1);
+            lua_gettable(L, -2);
+            if (lua_type(L, -1) == LUA_TTABLE) {
+                sp->goal = get_table_str_opt(L, "goal", (char *) 0);
+                sp->where = get_table_str_opt(L, "where", (char *) 0);
+                sp->talk = get_table_str_opt(L, "talk", (char *) 0);
+                sp->give = get_table_str_opt(L, "give", (char *) 0);
+                sp->carry = get_table_str_opt(L, "carry", (char *) 0);
+                sp->kill = get_table_str_opt(L, "kill", (char *) 0);
+                sp->arrive = get_table_str_opt(L, "arrive", (char *) 0);
+                sp->flag = get_table_str_opt(L, "flag", (char *) 0);
+                sp->dialogue = get_table_str_opt(L, "dialogue", (char *) 0);
+                sp->remind = get_table_str_opt(L, "remind", (char *) 0);
+                sp->log = get_table_str_opt(L, "log", (char *) 0);
+                st_read_kvl_field(L, "start", &sp->start);
+                st_read_kvl_field(L, "done", &sp->done);
+            } else {
+                impossible("story.lua: %s stage %d is not a table", qp->id,
+                           j + 1);
+            }
+            lua_pop(L, 1);
+        }
+    } else {
+        impossible("story.lua: quest %s has no stages", qp->id);
+    }
+    lua_pop(L, 1); /* stages */
+}
+
 /* quests = { { id =, title =, stages = { {...}, ... } }, ... } */
 staticfn void
 st_read_quests(lua_State *L)
 {
-    int n, i, j;
+    int n, i;
 
     lua_getfield(L, -1, "quests");
     if (lua_type(L, -1) != LUA_TTABLE) {
@@ -415,73 +540,202 @@ st_read_quests(lua_State *L)
     st.quests = (struct st_quest *) alloc((n + 1) * sizeof *st.quests);
     (void) memset(st.quests, 0, (n + 1) * sizeof *st.quests);
     for (i = 0; i < n; i++) {
-        struct st_quest *qp = &st.quests[i];
-
         lua_pushinteger(L, i + 1);
         lua_gettable(L, -2);
         if (lua_type(L, -1) != LUA_TTABLE) {
             impossible("story.lua: quests[%d] is not a table", i + 1);
-            lua_pop(L, 1);
-            continue;
-        }
-        qp->id = get_table_str_opt(L, "id", (char *) 0);
-        if (!qp->id) {
-            char buf[20];
-
-            Sprintf(buf, "quest%d", i + 1);
-            qp->id = dupstr(buf);
-        }
-        qp->title = get_table_str_opt(L, "title", (char *) 0);
-        if (!qp->title)
-            qp->title = dupstr(qp->id);
-        qp->kind = get_table_str_opt(L, "kind", (char *) 0);
-        if (!qp->kind)
-            qp->kind = dupstr("side");
-        qp->autostart = get_table_boolean_opt(L, "start", FALSE);
-        st_read_kvl_field(L, "done", &qp->done);
-        lua_getfield(L, -1, "stages");
-        if (lua_type(L, -1) == LUA_TTABLE) {
-            lua_len(L, -1);
-            qp->nstages = (int) lua_tointeger(L, -1);
-            lua_pop(L, 1);
-            qp->stages = (struct st_stage *) alloc((qp->nstages + 1)
-                                                   * sizeof *qp->stages);
-            (void) memset(qp->stages, 0,
-                          (qp->nstages + 1) * sizeof *qp->stages);
-            for (j = 0; j < qp->nstages; j++) {
-                struct st_stage *sp = &qp->stages[j];
-
-                lua_pushinteger(L, j + 1);
-                lua_gettable(L, -2);
-                if (lua_type(L, -1) == LUA_TTABLE) {
-                    sp->goal = get_table_str_opt(L, "goal", (char *) 0);
-                    sp->where = get_table_str_opt(L, "where", (char *) 0);
-                    sp->talk = get_table_str_opt(L, "talk", (char *) 0);
-                    sp->give = get_table_str_opt(L, "give", (char *) 0);
-                    sp->carry = get_table_str_opt(L, "carry", (char *) 0);
-                    sp->kill = get_table_str_opt(L, "kill", (char *) 0);
-                    sp->arrive = get_table_str_opt(L, "arrive", (char *) 0);
-                    sp->flag = get_table_str_opt(L, "flag", (char *) 0);
-                    sp->dialogue = get_table_str_opt(L, "dialogue",
-                                                     (char *) 0);
-                    sp->remind = get_table_str_opt(L, "remind", (char *) 0);
-                    sp->log = get_table_str_opt(L, "log", (char *) 0);
-                    st_read_kvl_field(L, "start", &sp->start);
-                    st_read_kvl_field(L, "done", &sp->done);
-                } else {
-                    impossible("story.lua: %s stage %d is not a table",
-                               qp->id, j + 1);
-                }
-                lua_pop(L, 1);
-            }
+            st.quests[i].id = dupstr("");
+            st.quests[i].title = dupstr("");
+            st.quests[i].kind = dupstr("side");
         } else {
-            impossible("story.lua: quest %s has no stages", qp->id);
+            st_read_quest(L, &st.quests[i], i);
         }
-        lua_pop(L, 1); /* stages */
         lua_pop(L, 1); /* quest */
     }
     st.nquests = n;
     lua_pop(L, 1);
+}
+
+/* t[name] as an array of strings; a single string is a list of one */
+staticfn char **
+st_read_strlist(lua_State *L, const char *name, int *n)
+{
+    char **list = 0;
+    int i, len;
+
+    *n = 0;
+    lua_getfield(L, -1, name);
+    if (lua_type(L, -1) == LUA_TSTRING) {
+        list = (char **) alloc(2 * sizeof (char *));
+        list[0] = dupstr(lua_tostring(L, -1));
+        *n = 1;
+    } else if (lua_type(L, -1) == LUA_TTABLE) {
+        lua_len(L, -1);
+        len = (int) lua_tointeger(L, -1);
+        lua_pop(L, 1);
+        list = (char **) alloc((len + 1) * sizeof (char *));
+        for (i = 0; i < len; i++) {
+            lua_pushinteger(L, i + 1);
+            lua_gettable(L, -2);
+            if (lua_type(L, -1) == LUA_TSTRING)
+                list[(*n)++] = dupstr(lua_tostring(L, -1));
+            lua_pop(L, 1);
+        }
+    }
+    lua_pop(L, 1);
+    return list;
+}
+
+/* gigs = { { id =, place =, fixers = {...}, target = {...}, names = {...},
+   items = {...}, reward =, hostile =, drop =, spot =, title =,
+   stages = {...}, done = {...} }, ... } */
+staticfn void
+st_read_gigs(lua_State *L)
+{
+    int n, i;
+    char *spot;
+
+    lua_getfield(L, -1, "gigs");
+    if (lua_type(L, -1) != LUA_TTABLE) {
+        lua_pop(L, 1);
+        return;
+    }
+    lua_len(L, -1);
+    n = (int) lua_tointeger(L, -1);
+    lua_pop(L, 1);
+    st.tpls = (struct st_gigtpl *) alloc((n + 1) * sizeof *st.tpls);
+    (void) memset(st.tpls, 0, (n + 1) * sizeof *st.tpls);
+    for (i = 0; i < n; i++) {
+        struct st_gigtpl *tp = &st.tpls[st.ntpls];
+
+        lua_pushinteger(L, i + 1);
+        lua_gettable(L, -2);
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            st_read_quest(L, &tp->q, i);
+            tp->id = dupstr(tp->q.id);
+            tp->place = get_table_str_opt(L, "place", (char *) 0);
+            if (!tp->place)
+                tp->place = dupstr("district");
+            spot = get_table_str_opt(L, "spot", (char *) 0);
+            tp->metro = (spot && !strcmp(spot, "metro"));
+            st_free(spot);
+            tp->hostile = get_table_boolean_opt(L, "hostile", FALSE);
+            tp->drop = get_table_boolean_opt(L, "drop", FALSE);
+            tp->reward = get_table_int_opt(L, "reward", 20);
+            tp->fixers = st_read_strlist(L, "fixers", &tp->nfixers);
+            tp->monsters = st_read_strlist(L, "target", &tp->nmonsters);
+            tp->names = st_read_strlist(L, "names", &tp->nnames);
+            tp->inames = st_read_strlist(L, "items", &tp->ninames);
+            st.ntpls++;
+        }
+        lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+}
+
+/* t[name] = { ["street punk"] = 3, urchin = 1 }: monster types and
+   numbers; returns how many */
+staticfn int
+st_read_weights(lua_State *L, const char *name, int **pms, int **wts)
+{
+    int n = 0, gend = 0, pm;
+
+    *pms = *wts = (int *) 0;
+    lua_getfield(L, -1, name);
+    if (lua_type(L, -1) == LUA_TTABLE) {
+        int cap = st_count_keys(L);
+
+        *pms = (int *) alloc((cap + 1) * sizeof (int));
+        *wts = (int *) alloc((cap + 1) * sizeof (int));
+        lua_pushnil(L);
+        while (lua_next(L, -2) != 0) {
+            if (lua_type(L, -2) == LUA_TSTRING && n < cap) {
+                pm = name_to_mon(lua_tostring(L, -2), &gend);
+                if (pm >= LOW_PM) {
+                    (*pms)[n] = pm;
+                    (*wts)[n] = (int) lua_tointeger(L, -1);
+                    if ((*wts)[n] > 0)
+                        n++;
+                } else {
+                    impossible("story.lua: unknown monster \"%s\"",
+                               lua_tostring(L, -2));
+                }
+            }
+            lua_pop(L, 1);
+        }
+    }
+    lua_pop(L, 1);
+    return n;
+}
+
+/* districts = { ["nc-stacks"] = { monsters = {...}, people = {...},
+   sights = {...}, sounds = {...} }, ["Block 7"] = {...} } */
+staticfn void
+st_read_districts(lua_State *L)
+{
+    int n;
+
+    lua_getfield(L, -1, "districts");
+    if (lua_type(L, -1) != LUA_TTABLE) {
+        lua_pop(L, 1);
+        return;
+    }
+    n = st_count_keys(L);
+    st.dist = (struct st_district *) alloc((n + 1) * sizeof *st.dist);
+    (void) memset(st.dist, 0, (n + 1) * sizeof *st.dist);
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0) {
+        if (lua_type(L, -2) == LUA_TSTRING && lua_type(L, -1) == LUA_TTABLE
+            && st.ndist < n) {
+            struct st_district *dp = &st.dist[st.ndist++];
+
+            dp->key = dupstr(lua_tostring(L, -2));
+            dp->nmon = st_read_weights(L, "monsters", &dp->mon, &dp->monw);
+            dp->npeople = st_read_weights(L, "people", &dp->people,
+                                          &dp->peoplen);
+            dp->sight = st_read_strlist(L, "sights", &dp->nsight);
+            dp->sound = st_read_strlist(L, "sounds", &dp->nsound);
+        }
+        lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+}
+
+/* room for gigs at the end of the quest, NPC and item arrays; done once,
+   right after loading, so no pointers into the arrays exist yet */
+staticfn void
+st_add_gig_slots(void)
+{
+    struct st_quest *q2;
+    struct st_npc *n2;
+    struct st_item *i2;
+    int k;
+
+    st.nstatq = st.nquests, st.nstatn = st.nnpcs, st.nstati = st.nitems;
+    q2 = (struct st_quest *) alloc((st.nquests + GIG_SLOTS + 1) * sizeof *q2);
+    (void) memset(q2, 0, (st.nquests + GIG_SLOTS + 1) * sizeof *q2);
+    if (st.nquests)
+        (void) memcpy(q2, st.quests, st.nquests * sizeof *q2);
+    n2 = (struct st_npc *) alloc((st.nnpcs + GIG_SLOTS + 1) * sizeof *n2);
+    (void) memset(n2, 0, (st.nnpcs + GIG_SLOTS + 1) * sizeof *n2);
+    if (st.nnpcs)
+        (void) memcpy(n2, st.npcs, st.nnpcs * sizeof *n2);
+    i2 = (struct st_item *) alloc((st.nitems + GIG_SLOTS + 1) * sizeof *i2);
+    (void) memset(i2, 0, (st.nitems + GIG_SLOTS + 1) * sizeof *i2);
+    if (st.nitems)
+        (void) memcpy(i2, st.items, st.nitems * sizeof *i2);
+    st_free(st.quests), st_free(st.npcs), st_free(st.items);
+    st.quests = q2, st.npcs = n2, st.items = i2;
+    for (k = 0; k < GIG_SLOTS; k++) {
+        q2[st.nquests + k].id = dupstr("");
+        q2[st.nquests + k].title = dupstr("");
+        q2[st.nquests + k].kind = dupstr("gig");
+        n2[st.nnpcs + k].id = dupstr("");
+        n2[st.nnpcs + k].name = dupstr("");
+        i2[st.nitems + k].id = dupstr("");
+        i2[st.nitems + k].name = dupstr("");
+    }
+    st.nquests += GIG_SLOTS, st.nnpcs += GIG_SLOTS, st.nitems += GIG_SLOTS;
 }
 
 /* dialogue = { id = { text = [[...]], choices = { { "text", go =,
@@ -551,6 +805,21 @@ staticfn void
 st_resolve(void)
 {
     int i, j;
+    s_level *slev;
+    xint16 dn;
+
+    for (i = 0; i < st.ndist; i++) {
+        struct st_district *dp = &st.dist[i];
+
+        if ((slev = find_level(dp->key)) != 0) {
+            dp->lev = slev->dlevel;
+        } else if ((dn = dname_lookup(dp->key)) >= 0) {
+            dp->lev.dnum = dn, dp->lev.dlevel = 0;
+        } else {
+            impossible("story.lua: unknown district or site \"%s\"", dp->key);
+            dp->lev.dnum = -1;
+        }
+    }
 
     for (i = 0; i < st.nnpcs; i++)
         if (st.npcs[i].home
@@ -595,6 +864,9 @@ story_load(void)
         st_read_npcs(L);
         st_read_quests(L);
         st_read_nodes(L);
+        st_read_gigs(L);
+        st_read_districts(L);
+        st_add_gig_slots();
         st.loaded = TRUE;
     } else {
         impossible("%s has no 'story' table.", STORY_FILE);
@@ -611,23 +883,38 @@ story_free(void)
     struct st_log *lp, *lnext;
     struct st_flag *fp, *fnext;
 
-    for (i = 0; i < st.nquests; i++) {
-        struct st_quest *qp = &st.quests[i];
-
-        for (j = 0; j < qp->nstages; j++) {
-            struct st_stage *sp = &qp->stages[j];
-
-            st_free(sp->goal), st_free(sp->where), st_free(sp->talk), st_free(sp->give);
-            st_free(sp->carry), st_free(sp->kill), st_free(sp->arrive);
-            st_free(sp->flag), st_free(sp->dialogue), st_free(sp->remind);
-            st_free(sp->log);
-            st_free_kvl(&sp->start), st_free_kvl(&sp->done);
-        }
-        st_free(qp->stages);
-        st_free(qp->id), st_free(qp->title), st_free(qp->kind);
-        st_free_kvl(&qp->done);
-    }
+    for (i = 0; i < st.nquests; i++)
+        st_free_quest(&st.quests[i]);
     st_free(st.quests);
+    for (i = 0; i < st.ntpls; i++) {
+        struct st_gigtpl *tp = &st.tpls[i];
+
+        st_free_quest(&tp->q);
+        st_free(tp->id), st_free(tp->place);
+        for (j = 0; j < tp->nfixers; j++)
+            st_free(tp->fixers[j]);
+        for (j = 0; j < tp->nmonsters; j++)
+            st_free(tp->monsters[j]);
+        for (j = 0; j < tp->nnames; j++)
+            st_free(tp->names[j]);
+        for (j = 0; j < tp->ninames; j++)
+            st_free(tp->inames[j]);
+        st_free(tp->fixers), st_free(tp->monsters), st_free(tp->names);
+        st_free(tp->inames);
+    }
+    st_free(st.tpls);
+    for (i = 0; i < st.ndist; i++) {
+        struct st_district *dp = &st.dist[i];
+
+        st_free(dp->key), st_free(dp->mon), st_free(dp->monw);
+        st_free(dp->people), st_free(dp->peoplen);
+        for (j = 0; j < dp->nsight; j++)
+            st_free(dp->sight[j]);
+        for (j = 0; j < dp->nsound; j++)
+            st_free(dp->sound[j]);
+        st_free(dp->sight), st_free(dp->sound);
+    }
+    st_free(st.dist);
     for (i = 0; i < st.nnpcs; i++) {
         struct st_npc *np = &st.npcs[i];
 
@@ -670,6 +957,26 @@ story_free(void)
     st.tracked = -1;
 }
 
+staticfn void
+st_free_quest(struct st_quest *qp)
+{
+    int j;
+
+    for (j = 0; j < qp->nstages; j++) {
+        struct st_stage *sp = &qp->stages[j];
+
+        st_free(sp->goal), st_free(sp->where), st_free(sp->talk);
+        st_free(sp->give), st_free(sp->carry), st_free(sp->kill);
+        st_free(sp->arrive), st_free(sp->flag), st_free(sp->dialogue);
+        st_free(sp->remind), st_free(sp->log);
+        st_free_kvl(&sp->start), st_free_kvl(&sp->done);
+    }
+    st_free(qp->stages);
+    st_free(qp->id), st_free(qp->title), st_free(qp->kind);
+    st_free_kvl(&qp->done);
+    (void) memset((genericptr_t) qp, 0, sizeof *qp);
+}
+
 /*
  * Lookups and small helpers
  */
@@ -679,7 +986,7 @@ st_quest_idx(const char *id)
 {
     int i;
 
-    for (i = 0; id && i < st.nquests; i++)
+    for (i = 0; id && *id && i < st.nquests; i++)
         if (!strcmp(st.quests[i].id, id))
             return i;
     return -1;
@@ -690,7 +997,7 @@ st_npc_idx(const char *id)
 {
     int i;
 
-    for (i = 0; id && i < st.nnpcs; i++)
+    for (i = 0; id && *id && i < st.nnpcs; i++)
         if (!strcmp(st.npcs[i].id, id))
             return i;
     return -1;
@@ -712,7 +1019,7 @@ st_item_idx(const char *id)
 {
     int i;
 
-    for (i = 0; id && i < st.nitems; i++)
+    for (i = 0; id && *id && i < st.nitems; i++)
         if (!strcmp(st.items[i].id, id))
             return i;
     return -1;
@@ -1022,9 +1329,23 @@ st_spawn(struct st_npc *np, boolean now)
         return;
     }
     pm = story_npc_montype(np->id, &fem);
-    mtmp = makemon(&mons[pm], 0, 0,
-                   MM_NOMSG | (fem ? MM_FEMALE : MM_MALE)
-                   | (np->hostile ? 0 : NO_MINVENT));
+    {
+        coordxy sx = 0, sy = 0;
+        coord cc;
+        stairway *stway;
+
+        if (np->spot == SPOT_METRO) {
+            for (stway = gs.stairs; stway; stway = stway->next)
+                if (stway->kind == STWAY_METRO
+                    && enexto(&cc, stway->sx, stway->sy, &mons[pm])) {
+                    sx = cc.x, sy = cc.y;
+                    break;
+                }
+        }
+        mtmp = makemon(&mons[pm], sx, sy,
+                       MM_NOMSG | (fem ? MM_FEMALE : MM_MALE)
+                       | (np->hostile ? 0 : NO_MINVENT));
+    }
     if (!mtmp) {
         np->pending = TRUE;
         return;
@@ -1373,6 +1694,513 @@ story_effects(void *vkvl)
 }
 
 /*
+ * Gigs
+ */
+
+/* a place as story.lua would write it: "nc-stacks", "Block 7:2" */
+staticfn void
+st_place_spec(d_level *lev, char *buf)
+{
+    s_level *sp = Is_special(lev);
+
+    if (In_district(lev) && sp)
+        Strcpy(buf, sp->proto);
+    else
+        Sprintf(buf, "%s:%d", svd.dungeons[lev->dnum].dname, lev->dlevel);
+}
+
+/* fill a gig's holes: %T target, %P place, %I item, %F fixer, $target,
+   $item, $place, $fixer, $fixerhome, $reward; returns a new string */
+staticfn char *
+st_gigsub(const char *in, struct st_gig *g)
+{
+    char out[BUFSZ * 4], tok[BUFSZ], *o = out;
+    const char *add, *p = in;
+    struct st_npc *fx = &st.npcs[g->fixer];
+    int l;
+
+    if (!in)
+        return (char *) 0;
+    while (*p && o < out + sizeof out - 1) {
+        add = 0;
+        tok[0] = '\0';
+        if (*p == '%' && p[1] && strchr("TPIF", p[1])) {
+            switch (p[1]) {
+            case 'T':
+                add = g->tname;
+                break;
+            case 'P':
+                add = st_place(&g->place, tok);
+                break;
+            case 'I':
+                add = g->iname;
+                break;
+            case 'F':
+                add = fx->name;
+                break;
+            }
+            p += 2;
+        } else if (*p == '$') {
+            static const char *const names[] = { "target", "item", "place",
+                                                 "fixerhome", "fixer",
+                                                 "reward", 0 };
+            int i;
+
+            for (i = 0; names[i]; i++)
+                if (!strncmp(p + 1, names[i], strlen(names[i])))
+                    break;
+            if (!names[i]) {
+                *o++ = *p++;
+                continue;
+            }
+            p += 1 + strlen(names[i]);
+            switch (i) {
+            case 0:
+                Sprintf(tok, "gig%ld_t", g->seq);
+                break;
+            case 1:
+                Sprintf(tok, "gig%ld_i", g->seq);
+                break;
+            case 2:
+                st_place_spec(&g->place, tok);
+                break;
+            case 3:
+                Strcpy(tok, fx->home ? fx->home : "");
+                break;
+            case 4:
+                Strcpy(tok, fx->id);
+                break;
+            case 5:
+                Sprintf(tok, "%ld", g->reward);
+                break;
+            }
+            add = tok;
+        } else {
+            *o++ = *p++;
+            continue;
+        }
+        l = (int) strlen(add);
+        if (o + l < out + sizeof out - 1)
+            Strcpy(o, add), o += l;
+    }
+    *o = '\0';
+    return dupstr(out);
+}
+
+/* copy effects with the holes filled; "credits = '$reward'" becomes a
+   number */
+staticfn void
+st_gigsub_kvl(struct st_kvl *to, struct st_kvl *from, struct st_gig *g)
+{
+    int i;
+
+    to->n = from->n;
+    to->kv = (struct st_kv *) alloc((from->n + 1) * sizeof *to->kv);
+    for (i = 0; i < from->n; i++) {
+        struct st_kv *f = &from->kv[i], *t = &to->kv[i];
+
+        t->key = dupstr(f->key);
+        t->num = f->num;
+        t->str = st_gigsub(f->str, g);
+        if (t->str && (!strcmp(t->key, "credits") || !strcmp(t->key, "xp"))
+            && digit(*t->str)) {
+            t->num = atol(t->str);
+            free((genericptr_t) t->str), t->str = 0;
+        }
+    }
+}
+
+/* put a gig into a slot: its quest, target NPC and item; returns the
+   quest's index (it isn't started) */
+staticfn int
+st_gig_build(int slot, long seq, int tpl, int fixer, d_level *place,
+             long reward, int pm, const char *tname, const char *iname,
+             boolean dropped)
+{
+    struct st_gigtpl *tp = &st.tpls[tpl];
+    struct st_gig *g = &st.gigs[slot];
+    int q = st.nstatq + slot, nn = st.nstatn + slot, ii = st.nstati + slot,
+        j;
+    struct st_quest *qp = &st.quests[q];
+    struct st_npc *np = &st.npcs[nn];
+    struct st_item *ip = &st.items[ii];
+    char buf[BUFSZ];
+
+    g->used = TRUE;
+    g->seq = seq;
+    g->tpl = tpl;
+    g->fixer = fixer;
+    g->place = *place;
+    g->reward = reward;
+    g->pm = pm;
+    copynchars(g->tname, tname, (int) sizeof g->tname - 1);
+    copynchars(g->iname, iname, (int) sizeof g->iname - 1);
+
+    /* the quest */
+    st_free_quest(qp);
+    Sprintf(buf, "gig%ld", seq);
+    qp->id = dupstr(buf);
+    qp->title = st_gigsub(tp->q.title, g);
+    qp->kind = dupstr("gig");
+    qp->nstages = tp->q.nstages;
+    qp->stages = (struct st_stage *) alloc((qp->nstages + 1)
+                                           * sizeof *qp->stages);
+    (void) memset(qp->stages, 0, (qp->nstages + 1) * sizeof *qp->stages);
+    for (j = 0; j < qp->nstages; j++) {
+        struct st_stage *from = &tp->q.stages[j], *to = &qp->stages[j];
+
+        to->goal = st_gigsub(from->goal, g);
+        to->where = st_gigsub(from->where, g);
+        to->talk = st_gigsub(from->talk, g);
+        to->give = st_gigsub(from->give, g);
+        to->carry = st_gigsub(from->carry, g);
+        to->kill = st_gigsub(from->kill, g);
+        to->arrive = st_gigsub(from->arrive, g);
+        to->flag = st_gigsub(from->flag, g);
+        to->dialogue = st_gigsub(from->dialogue, g);
+        to->remind = st_gigsub(from->remind, g);
+        to->log = st_gigsub(from->log, g);
+        st_gigsub_kvl(&to->start, &from->start, g);
+        st_gigsub_kvl(&to->done, &from->done, g);
+        if (!to->where || !city_resolve_dest(to->where, &to->wherelev))
+            to->wherelev.dlevel = 0;
+        if (!to->arrive || !city_resolve_dest(to->arrive, &to->arrivelev))
+            to->arrivelev.dlevel = 0;
+        if (!to->wherelev.dlevel && to->arrivelev.dlevel)
+            to->wherelev = to->arrivelev;
+    }
+    st_gigsub_kvl(&qp->done, &tp->q.done, g);
+    qp->status = Q_INACTIVE;
+    qp->stage = 0;
+    qp->ended = 0L;
+
+    /* the target */
+    st_free(np->id), st_free(np->name), st_free(np->monster);
+    st_free(np->home), st_free(np->faction), st_free(np->chat);
+    (void) memset((genericptr_t) np, 0, sizeof *np);
+    Sprintf(buf, "gig%ld_t", seq);
+    np->id = dupstr(buf);
+    np->name = dupstr(tname);
+    np->monster = dupstr(mons[pm].pmnames[NEUTRAL]);
+    st_place_spec(place, buf);
+    np->home = dupstr(buf);
+    np->homelev = *place;
+    np->hostile = tp->hostile;
+    np->stay = !tp->hostile;
+    np->spot = tp->metro ? SPOT_METRO : SPOT_RANDOM;
+    if (tp->hostile)
+        np->level = 1 + city_difficulty(place) / 2;
+
+    /* the item */
+    st_free(ip->id), st_free(ip->name);
+    (void) memset((genericptr_t) ip, 0, sizeof *ip);
+    Sprintf(buf, "gig%ld_i", seq);
+    ip->id = dupstr(buf);
+    ip->name = dupstr(iname);
+    if (tp->drop)
+        ip->drop = *place;
+    ip->dropped = dropped;
+    return q;
+}
+
+/* somewhere for a gig: an open district, or a floor of a site in one */
+staticfn boolean
+st_gig_place(struct st_gigtpl *tp, d_level *lev)
+{
+    d_level cand[64], here;
+    int n = 0, d, l;
+
+    if (!strcmp(tp->place, "site")) {
+        for (d = 0; d < svn.n_dgns && n < 60; d++) {
+            dungeon *dp = &svd.dungeons[d];
+
+            if (!dp->flags.city || d == city_dnum || dp->parent.dlevel <= 0
+                || !city_district_isopen(dp->parent.dlevel))
+                continue;
+            for (l = 1; l <= dp->num_dunlevs && n < 60; l++) {
+                here.dnum = d, here.dlevel = l;
+                if (!Is_special(&here)) /* not the hand-made key floors */
+                    cand[n++] = here;
+            }
+        }
+    } else {
+        for (d = 1; d <= city_district_total() && n < 60; d++) {
+            if (!city_district_isopen(d))
+                continue;
+            here.dnum = city_dnum, here.dlevel = d;
+            /* somewhere else than here, if there's anywhere else */
+            if (on_level(&here, &u.uz) && city_district_total() > 1)
+                continue;
+            cand[n++] = here;
+        }
+    }
+    if (!n)
+        return FALSE;
+    *lev = cand[rn2(n)];
+    return TRUE;
+}
+
+/* a slot a new gig can use, or -1 */
+staticfn int
+st_gig_free_slot(void)
+{
+    int k;
+
+    for (k = 0; k < GIG_SLOTS; k++) {
+        struct st_quest *qp = &st.quests[st.nstatq + k];
+
+        if (!st.gigs[k].used
+            || ((qp->status == Q_DONE || qp->status == Q_FAILED
+                 || qp->status == Q_INACTIVE)
+                && qp->ended < svm.moves))
+            return k;
+    }
+    return -1;
+}
+
+/* a fixer's offers */
+staticfn void
+st_gig_board(struct st_npc *fx)
+{
+    struct offer {
+        int tpl, pm;
+        d_level place;
+        long reward;
+        char tname[64], iname[64];
+    } off[3];
+    int nofr = 0, k, t, nactive = 0, fixer = (int) (fx - st.npcs), pick,
+        tries;
+    winid win;
+    anything any;
+    menu_item *sel = 0;
+    char buf[BUFSZ], pbuf[BUFSZ];
+
+    for (k = 0; k < GIG_SLOTS; k++)
+        if (st.gigs[k].used && st.quests[st.nstatq + k].status == Q_ACTIVE)
+            nactive++;
+    if (nactive >= GIG_ACTIVE_MAX || st_gig_free_slot() < 0) {
+        verbalize("Finish the jobs you've got, then come back.");
+        return;
+    }
+    for (tries = 0; nofr < 3 && tries < 12 && st.ntpls; tries++) {
+        struct st_gigtpl *tp;
+        struct offer *o = &off[nofr];
+        int gend = 0;
+        boolean mine = FALSE;
+
+        t = rn2(st.ntpls);
+        tp = &st.tpls[t];
+        for (k = 0; k < tp->nfixers; k++)
+            if (!strcmp(tp->fixers[k], fx->id))
+                mine = TRUE;
+        if (tp->nfixers && !mine)
+            continue;
+        for (k = 0; k < nofr; k++)
+            if (off[k].tpl == t)
+                break;
+        if (k < nofr && tries < 8) /* rather three kinds of job */
+            continue;
+        if (!st_gig_place(tp, &o->place))
+            continue;
+        o->tpl = t;
+        o->pm = tp->nmonsters
+                    ? name_to_mon(tp->monsters[rn2(tp->nmonsters)], &gend)
+                    : PM_HUMAN;
+        if (o->pm < LOW_PM)
+            o->pm = PM_HUMAN;
+        copynchars(o->tname, tp->nnames ? tp->names[rn2(tp->nnames)]
+                                        : "a contact",
+                   (int) sizeof o->tname - 1);
+        copynchars(o->iname, tp->ninames ? tp->inames[rn2(tp->ninames)]
+                                         : "package",
+                   (int) sizeof o->iname - 1);
+        o->reward = tp->reward + 10L * city_difficulty(&o->place);
+        nofr++;
+    }
+    if (!nofr) {
+        verbalize("Nothing for you today.");
+        return;
+    }
+    win = create_nhwindow(NHW_MENU);
+    start_menu(win, MENU_BEHAVE_STANDARD);
+    for (k = 0; k < nofr; k++) {
+        struct st_gig tmp;
+        char *title;
+
+        (void) memset(&tmp, 0, sizeof tmp);
+        tmp.seq = st.gigseq + 1, tmp.tpl = off[k].tpl, tmp.fixer = fixer;
+        tmp.place = off[k].place, tmp.reward = off[k].reward;
+        Strcpy(tmp.tname, off[k].tname), Strcpy(tmp.iname, off[k].iname);
+        title = st_gigsub(st.tpls[off[k].tpl].q.title, &tmp);
+        Snprintf(buf, sizeof buf, "%s (%s, %ld %s)", title,
+                 st_place(&off[k].place, pbuf), off[k].reward,
+                 currency(off[k].reward));
+        free((genericptr_t) title);
+        any = cg.zeroany;
+        any.a_int = k + 1;
+        add_menu(win, &nul_glyphinfo, &any, 0, 0, ATR_NONE, NO_COLOR, buf,
+                 MENU_ITEMFLAGS_NONE);
+    }
+    add_menu_str(win, "");
+    add_menu_str(win, "(pick a job; Escape for none)");
+    Snprintf(buf, sizeof buf, "%s has work:", fx->name);
+    end_menu(win, buf);
+    pick = (select_menu(win, PICK_ONE, &sel) > 0 && sel)
+               ? sel[0].item.a_int - 1 : -1;
+    if (sel)
+        free((genericptr_t) sel);
+    destroy_nhwindow(win);
+    if (pick < 0)
+        return;
+    if ((k = st_gig_free_slot()) < 0)
+        return;
+    t = st_gig_build(k, ++st.gigseq, off[pick].tpl, fixer, &off[pick].place,
+                     off[pick].reward, off[pick].pm, off[pick].tname,
+                     off[pick].iname, FALSE);
+    st_start_quest(t, TRUE);
+}
+
+/* gig items waiting to be found on this level */
+staticfn void
+st_drop_items(void)
+{
+    int i, tries;
+    coordxy x, y;
+    struct obj *otmp;
+
+    for (i = st.nstati; i < st.nitems; i++) {
+        struct st_item *ip = &st.items[i];
+
+        if (!*ip->id || ip->dropped || !st_on(&ip->drop))
+            continue;
+        for (tries = 0; tries < 1000; tries++) {
+            x = rn1(COLNO - 3, 2), y = rn2(ROWNO);
+            if ((levl[x][y].typ == ROOM || levl[x][y].typ == CORR)
+                && !*in_rooms(x, y, SHOPBASE) && !On_stairs(x, y)
+                && !t_at(x, y) && !closed_door(x, y))
+                break;
+        }
+        if (tries == 1000)
+            continue;
+        otmp = mksobj(STORY_ITEM, FALSE, FALSE);
+        otmp = oname(otmp, ip->id, ONAME_NO_FLAGS);
+        otmp->known = otmp->dknown = otmp->bknown = 1;
+        place_object(otmp, x, y);
+        ip->dropped = TRUE;
+    }
+}
+
+/*
+ * City life: who walks the streets, what you see and hear
+ */
+
+/* this level's entry in the districts table, if any */
+staticfn struct st_district *
+st_here(void)
+{
+    int i;
+    struct st_district *site = 0;
+
+    if (!st.loaded || !In_city(&u.uz))
+        return (struct st_district *) 0;
+    for (i = 0; i < st.ndist; i++) {
+        struct st_district *dp = &st.dist[i];
+
+        if (dp->lev.dnum != u.uz.dnum)
+            continue;
+        if (dp->lev.dlevel == u.uz.dlevel)
+            return dp;
+        if (dp->lev.dlevel == 0)
+            site = dp;
+    }
+    return site;
+}
+
+/* a random monster from the district's table, or 0 for the usual kind */
+struct permonst *
+story_city_monster(void)
+{
+    struct st_district *dp = st_here();
+    int i, total = 0, r, maxd;
+
+    if (!dp || !dp->nmon)
+        return (struct permonst *) 0;
+    maxd = monmax_difficulty(level_difficulty());
+    for (i = 0; i < dp->nmon; i++)
+        if (!(svm.mvitals[dp->mon[i]].mvflags & G_GONE)
+            && !(mons[dp->mon[i]].geno & G_UNIQ)
+            && mons[dp->mon[i]].difficulty <= maxd)
+            total += dp->monw[i];
+    if (!total)
+        return (struct permonst *) 0;
+    r = rn2(total);
+    for (i = 0; i < dp->nmon; i++)
+        if (!(svm.mvitals[dp->mon[i]].mvflags & G_GONE)
+            && !(mons[dp->mon[i]].geno & G_UNIQ)
+            && mons[dp->mon[i]].difficulty <= maxd) {
+            if ((r -= dp->monw[i]) < 0)
+                return &mons[dp->mon[i]];
+        }
+    return (struct permonst *) 0;
+}
+
+/* keep the streets peopled: top up the district's civilians, a few at a
+   time and out of sight ('arrived': right away, up to half the number) */
+void
+story_city_people(boolean arrived)
+{
+    struct st_district *dp = st_here();
+    struct monst *mtmp;
+    int i, have;
+
+    if (!dp || !dp->npeople || !In_district(&u.uz))
+        return;
+    for (i = 0; i < dp->npeople; i++) {
+        int pm = dp->people[i], want = dp->peoplen[i];
+
+        if (svm.mvitals[pm].mvflags & G_GONE)
+            continue;
+        have = 0;
+        for (mtmp = fmon; mtmp; mtmp = mtmp->nmon)
+            if (!DEADMONSTER(mtmp) && monsndx(mtmp->data) == pm)
+                have++;
+        if (arrived) {
+            for (; have < (want + 1) / 2; have++)
+                if (!makemon(&mons[pm], 0, 0, MM_NOMSG))
+                    break;
+        } else if (have < want && !rn2(30)) {
+            (void) makemon(&mons[pm], 0, 0, MM_NOMSG);
+        }
+    }
+}
+
+/* now and then, something happens in the street */
+void
+story_city_ambience(void)
+{
+    struct st_district *dp = st_here();
+    char buf[BUFSZ * 2];
+
+    if (!dp || !In_district(&u.uz) || svm.moves - st.lastamb < 80
+        || rn2(120))
+        return;
+    if (dp->nsound && (!dp->nsight || !rn2(2))) {
+        if (Deaf || !flags.acoustics)
+            return;
+        pline("%s", st_subst(dp->sound[rn2(dp->nsound)], buf,
+                             (int) sizeof buf));
+    } else if (dp->nsight) {
+        if (Blind)
+            return;
+        pline("%s", st_subst(dp->sight[rn2(dp->nsight)], buf,
+                             (int) sizeof buf));
+    } else {
+        return;
+    }
+    st.lastamb = svm.moves;
+}
+
+/*
  * Quests and stages
  */
 
@@ -1444,6 +2272,7 @@ st_end_quest(int q, xint8 how, const char *why)
     if (qp->status == Q_DONE || qp->status == Q_FAILED)
         return;
     qp->status = how;
+    qp->ended = svm.moves;
     if (why)
         st_log_add(q, svm.moves, why);
     if (how == Q_DONE) {
@@ -1543,6 +2372,8 @@ story_arrived(void)
                 }
         }
     }
+    st_drop_items();
+    story_city_people(TRUE);
     st_recheck();
     /* remind the player what they're doing */
     if (In_district(&u.uz) && st.tracked >= 0
@@ -1594,6 +2425,11 @@ story_chat(struct monst *mtmp)
                 st_take_item(sp->give);
             st_finish_stage(q);
         }
+        return TRUE;
+    }
+    /* fixers have work */
+    if (np->fixer) {
+        st_gig_board(np);
         return TRUE;
     }
     /* nothing urgent: small talk */
@@ -1815,7 +2651,18 @@ dojournal(void)
         q = pick[0].item.a_int - 1;
         free((genericptr_t) pick);
         st_quest_details(q);
-        if (st.quests[q].status == Q_ACTIVE && q != st.tracked) {
+        if (st.quests[q].status == Q_ACTIVE
+            && !strcmp(st.quests[q].kind, "gig")) {
+            char c;
+
+            Snprintf(buf, sizeof buf, "\"%s\": track it, drop it, or neither?",
+                     st.quests[q].title);
+            c = yn_function(buf, "tdn", 'n', TRUE);
+            if (c == 't')
+                st.tracked = q;
+            else if (c == 'd')
+                st_end_quest(q, Q_FAILED, "Dropped.");
+        } else if (st.quests[q].status == Q_ACTIVE && q != st.tracked) {
             Sprintf(buf, "Track \"%s\"?", st.quests[q].title);
             if (y_n(buf) == 'y')
                 st.tracked = q;
@@ -1880,12 +2727,27 @@ story_state_lines(char **lines, int n, int max)
 
     if (!st.loaded)
         return n;
+    /* gigs before the quest and NPC lines that refer to them */
+    Sprintf(buf, "gigseq %ld", st.gigseq);
+    lines[n++] = dupstr(buf);
+    for (i = 0; i < GIG_SLOTS && n < max; i++) {
+        struct st_gig *g = &st.gigs[i];
+
+        if (!g->used)
+            continue;
+        Snprintf(buf, sizeof buf, "gig %d %ld %s %s %d %d %ld %d %d|%s|%s", i,
+                 g->seq, st.tpls[g->tpl].id, st.npcs[g->fixer].id,
+                 g->place.dnum, g->place.dlevel, g->reward, g->pm,
+                 st.items[st.nstati + i].dropped, g->tname, g->iname);
+        lines[n++] = dupstr(buf);
+    }
     for (i = 0; i < st.nquests && n < max; i++) {
         struct st_quest *qp = &st.quests[i];
 
         if (qp->status == Q_INACTIVE)
             continue;
-        Sprintf(buf, "quest %s %d %d", qp->id, qp->status, qp->stage);
+        Sprintf(buf, "quest %s %d %d %ld", qp->id, qp->status, qp->stage,
+                qp->ended);
         lines[n++] = dupstr(buf);
     }
     for (i = 0; i < st.nfactions && n < max; i++) {
@@ -1927,11 +2789,47 @@ story_state_line(const char *line)
     long l;
 
     if (!strncmp(line, "quest ", 6)) {
-        if (sscanf(line, "quest %255s %d %d", id, &a, &b) == 3
+        l = 0L;
+        if (sscanf(line, "quest %255s %d %d %ld", id, &a, &b, &l) >= 3
             && (i = st_quest_idx(id)) >= 0) {
             st.quests[i].status = (xint8) a;
             st.quests[i].stage = b;
+            st.quests[i].ended = l;
         }
+        return TRUE;
+    }
+    if (!strncmp(line, "gigseq ", 7)) {
+        (void) sscanf(line, "gigseq %ld", &st.gigseq);
+        return TRUE;
+    }
+    if (!strncmp(line, "gig ", 4)) {
+        char tpl[BUFSZ], fixer[BUFSZ];
+        const char *names;
+        int slot, dn, dl, pm, dropped, t, f, k = 0;
+        long seq, reward;
+        d_level place;
+        char tname[64], iname[64];
+
+        if (sscanf(line, "gig %d %ld %255s %255s %d %d %ld %d %d|%n", &slot,
+                   &seq, tpl, fixer, &dn, &dl, &reward, &pm, &dropped, &k)
+                < 9 || !k || slot < 0 || slot >= GIG_SLOTS)
+            return TRUE;
+        for (t = 0; t < st.ntpls; t++)
+            if (!strcmp(st.tpls[t].id, tpl))
+                break;
+        f = st_npc_idx(fixer);
+        if (t == st.ntpls || f < 0 || pm < LOW_PM || pm >= NUMMONS)
+            return TRUE; /* story.lua lost that kind of gig */
+        names = line + k;
+        copynchars(tname, names, (int) sizeof tname - 1);
+        if (strchr(tname, '|'))
+            *strchr(tname, '|') = '\0';
+        names = strchr(names, '|');
+        copynchars(iname, names ? names + 1 : "package",
+                   (int) sizeof iname - 1);
+        place.dnum = (xint16) dn, place.dlevel = (xint16) dl;
+        (void) st_gig_build(slot, seq, t, f, &place, reward, pm, tname, iname,
+                            (boolean) dropped);
         return TRUE;
     }
     if (!strncmp(line, "rep ", 4)) {
@@ -1994,7 +2892,8 @@ wiz_story(void)
         return ECMD_OK;
     }
     getlin("Story command? (list, start/next/finish/fail/track <quest>, "
-           "flag/rep <name> <n>, spawn/goto/kill <npc>, item <id>, tp <x> <y>)",
+           "flag/rep <name> <n>, spawn/goto/kill <npc>, item/fetch <id>, tp <x> <y>, "
+           "gig <kind>, mons)",
            buf);
     if (*buf == '\033' || !*buf)
         return ECMD_OK;
@@ -2009,6 +2908,8 @@ wiz_story(void)
             static const char *const sts[] = { "-", "active", "done",
                                                "failed" };
 
+            if (!*qp->id)
+                continue; /* an empty gig slot */
             Sprintf(buf, "%c %-12s %-7s stage %d/%d  %s",
                     q == st.tracked ? '*' : ' ', qp->id, sts[qp->status],
                     qp->stage + 1, qp->nstages, qp->title);
@@ -2028,6 +2929,8 @@ wiz_story(void)
             static const char *const nst[] = { "unmade", "alive", "dead",
                                                "gone" };
 
+            if (!*st.npcs[i].id)
+                continue;
             Sprintf(buf, "npc %-10s %-6s m_id %u%s", st.npcs[i].id,
                     nst[st.npcs[i].status], st.npcs[i].m_id,
                     st.npcs[i].pending ? " (pending)" : "");
@@ -2047,6 +2950,56 @@ wiz_story(void)
             return ECMD_OK;
         }
         teleds(tx, ty, TELEDS_TELEPORT);
+        return ECMD_OK;
+    }
+    if (!strcmp(cmd, "gig")) { /* "gig <template>": from the first fixer */
+        struct offer_tmp {
+            d_level place;
+            int pm, gend;
+        } o;
+        int t, f, k;
+        char spec[BUFSZ];
+
+        for (t = 0; t < st.ntpls; t++)
+            if (!strcmp(st.tpls[t].id, arg))
+                break;
+        for (f = 0; f < st.nnpcs; f++)
+            if (st.npcs[f].fixer)
+                break;
+        if (t == st.ntpls || f == st.nnpcs || (k = st_gig_free_slot()) < 0
+            || !st_gig_place(&st.tpls[t], &o.place)) {
+            pline("Can't make a \"%s\" gig.", arg);
+            return ECMD_OK;
+        }
+        o.gend = 0;
+        o.pm = st.tpls[t].nmonsters
+                   ? name_to_mon(st.tpls[t].monsters[0], &o.gend) : PM_HUMAN;
+        if (o.pm < LOW_PM)
+            o.pm = PM_HUMAN;
+        q = st_gig_build(k, ++st.gigseq, t, f, &o.place,
+                         st.tpls[t].reward + 10L * city_difficulty(&o.place),
+                         o.pm,
+                         st.tpls[t].nnames ? st.tpls[t].names[0] : "a contact",
+                         st.tpls[t].ninames ? st.tpls[t].inames[0] : "package",
+                         FALSE);
+        st_start_quest(q, TRUE);
+        Sprintf(spec, "%s:%d", svd.dungeons[o.place.dnum].dname,
+                o.place.dlevel);
+        pline("%s at %s.", st.quests[q].id, spec); /* for ^V */
+        return ECMD_OK;
+    }
+    if (!strcmp(cmd, "fetch")) { /* "fetch <item>": stand on it */
+        struct obj *otmp;
+
+        for (otmp = fobj; otmp; otmp = otmp->nobj)
+            if (otmp->otyp == STORY_ITEM && has_oname(otmp)
+                && !strcmp(ONAME(otmp), arg))
+                break;
+        if (!otmp) {
+            pline("No %s on this level.", arg);
+            return ECMD_OK;
+        }
+        teleds(otmp->ox, otmp->oy, TELEDS_TELEPORT);
         return ECMD_OK;
     }
     if (!strcmp(cmd, "mons")) { /* every monster on the level */
@@ -2204,7 +3157,7 @@ wiz_storycheck(void)
         putstr(win, 0, "story.lua didn't load.");
         bad++;
     }
-    for (i = 0; i < st.nnpcs; i++) {
+    for (i = 0; i < st.nstatn; i++) { /* not the gig slots */
         struct st_npc *np = &st.npcs[i];
 
         if (!np->monster || name_to_mon(np->monster, &gend) < LOW_PM) {
@@ -2227,7 +3180,7 @@ wiz_storycheck(void)
             putstr(win, 0, buf), bad++;
         }
     }
-    for (q = 0; q < st.nquests; q++) {
+    for (q = 0; q < st.nstatq; q++) {
         struct st_quest *qp = &st.quests[q];
 
         for (j = 0; j < q; j++)
@@ -2293,9 +3246,30 @@ wiz_storycheck(void)
             bad += st_check_kvl(&cp->eff, where, win);
         }
     }
+    for (i = 0; i < st.ntpls; i++) {
+        struct st_gigtpl *tp = &st.tpls[i];
+
+        for (j = 0; j < tp->nfixers; j++)
+            if (st_npc_idx(tp->fixers[j]) < 0) {
+                Snprintf(buf, sizeof buf, "gig %s: unknown fixer \"%s\"",
+                         tp->id, tp->fixers[j]);
+                putstr(win, 0, buf), bad++;
+            }
+        for (j = 0; j < tp->nmonsters; j++)
+            if (name_to_mon(tp->monsters[j], &gend) < LOW_PM) {
+                Snprintf(buf, sizeof buf, "gig %s: unknown monster \"%s\"",
+                         tp->id, tp->monsters[j]);
+                putstr(win, 0, buf), bad++;
+            }
+        if (strcmp(tp->place, "district") && strcmp(tp->place, "site")) {
+            Snprintf(buf, sizeof buf, "gig %s: place must be district or site",
+                     tp->id);
+            putstr(win, 0, buf), bad++;
+        }
+    }
     Snprintf(buf, sizeof buf, "story check: %d quest%s, %d NPC%s, %d dialogue node%s, "
             "%d problem%s.",
-            st.nquests, plur(st.nquests), st.nnpcs, plur(st.nnpcs),
+            st.nstatq, plur(st.nstatq), st.nstatn, plur(st.nstatn),
             st.nnodes, plur(st.nnodes), bad, plur(bad));
     putstr(win, 0, buf);
     display_nhwindow(win, TRUE);

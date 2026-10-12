@@ -1,0 +1,73 @@
+#!/bin/bash
+# gig-test - play a gig of each kind (courier, bounty, retrieval) in a
+# debug-mode game, saving and restoring in the middle of one.  Uses
+# tools/nhdrive (tmux) and the helpers in testlib.sh.
+#
+#   tools/neon2/gig-test            run it; exit status 0 if all passed
+top=$(cd "$(dirname "$0")/../.." && pwd)
+export NHSESSION=${NHSESSION:-gigtest}
+export NHDELAY=${NHDELAY:-0.5}
+export NHOPTS='name:Tester,role:Valkyrie,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore'
+fails=0
+. "$top/tools/neon2/testlib.sh"
+
+# newgig KIND: start one; sets $gig (its id) and $where (for ^V)
+newgig() {
+    local line i
+    wizstory "gig $1"
+    for i in 1 2 3 4 5 6; do
+        line=$(screen | grep -o 'gig[0-9]* at [^.]*' | head -1)
+        [ -n "$line" ] && break
+        screen | grep -q -e '--More--' && key Enter || sleep 0.3
+    done
+    gig=${line%% at *}
+    where=${line#* at }
+    clear_msgs
+    if [ -n "$gig" ]; then echo "ok   $1 gig: $gig at $where"
+    else echo "FAIL couldn't start a $1 gig"; screen | sed 's/^/     | /'; fails=$((fails + 1)); fi
+}
+
+"$drive" start -D
+sleep 1.5; clear_msgs; sleep 0.5; clear_msgs
+wizstory "finish prologue"; clear_msgs
+ext wizcity; clear_msgs
+
+# Mags has a board
+talk mags
+expect "Mags Vance has work:" "the gig board"
+key Escape; clear_msgs
+
+# courier: the recipient waits by the metro
+newgig courier
+levelport "$where"
+talk "${gig}_t"
+expect_msg "Gig complete" "courier delivered"
+expect_msg "credits" "courier paid"
+clear_msgs
+
+# bounty: the target is somewhere on a site floor
+newgig bounty
+levelport "$where"
+wizstory list; expect "${gig}_t" "bounty target listed"; clear_msgs
+wizstory "kill ${gig}_t"
+expect_msg "Gig complete" "bounty collected"
+clear_msgs
+
+# retrieval: find the item, survive a save and restore, bring it back
+newgig retrieval
+levelport "$where"
+wizstory "fetch ${gig}_i"; clear_msgs
+keys ','; sleep 0.3; clear_msgs
+key Tab; expect "Bring the" "retrieval: item found"; key Escape; clear_msgs
+save_and_restore
+key Tab; expect "Bring the" "retrieval survives a restore"; key Escape
+clear_msgs
+levelport "Neo Yendor:1"
+talk mags
+expect_msg "Gig complete" "retrieval delivered"
+clear_msgs
+key Tab; expect "Finished" "journal lists finished gigs"; key Escape
+
+"$drive" stop
+echo "gig-test: $fails failure(s)"
+exit $((fails > 0))

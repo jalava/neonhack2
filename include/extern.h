@@ -396,6 +396,8 @@ extern void city_lost_stairs(void);
 extern void city_init_state(void);
 extern void city_unlock(int, boolean);
 extern int city_district_num(const char *) NONNULLARG1;
+extern int city_district_total(void);
+extern boolean city_district_isopen(int);
 extern void city_arrived(void);
 extern int city_state_lines(char **, int) NONNULLARG1;
 extern boolean city_state_line(const char *) NONNULLARG1;
@@ -3277,6 +3279,9 @@ extern void story_district_note(int, char *, int) NONNULLARG2;
 extern int story_state_lines(char **, int, int) NONNULLARG1;
 extern boolean story_state_line(const char *) NONNULLARG1;
 extern int wiz_story(void);
+extern struct permonst *story_city_monster(void);
+extern void story_city_people(boolean);
+extern void story_city_ambience(void);
 extern int wiz_storycheck(void);
 
 /* ### sys.c ### */

@@ -19,6 +19,8 @@ story = {
    npcs = { id = { ... }, ... },
    quests = { { ... }, ... },                        -- in journal order
    dialogue = { id = { ... }, ... },
+   gigs = { { ... }, ... },                          -- repeatable jobs
+   districts = { ["nc-stacks"] = { ... }, ... },     -- city life
 }
 ```
 
@@ -43,6 +45,7 @@ okoye = {
    level = 5,                -- experience level (default: the monster's)
    faction = "jade",
    chat = "okoye_chat",      -- dialogue for small talk (optional)
+   fixer = true,             -- offers gigs when there's nothing else to say
    idle = { "Doc Okoye wipes down her tools." },  -- one-liners otherwise
 }
 ```
@@ -87,6 +90,48 @@ A stage:
 
 A stage with none of these is finished by an `advance` effect, usually from
 a dialogue choice. If an NPC you must talk to dies, the quest fails.
+
+### Gigs
+
+Gigs are repeatable jobs made from templates. When you talk to a fixer and no
+story stage needs them, they offer up to three. You can have three running
+at once, and you can drop one from the journal.
+
+```lua
+{ id = "courier", title = "Delivery to %T",
+  fixers = { "mags" },          -- who offers it (all fixers if missing)
+  place = "district",           -- or "site": a random floor of a site
+  spot = "metro",               -- the target waits by the metro
+  hostile = true,               -- the target is a hostile (bounties)
+  drop = true,                  -- the item lies somewhere at the place
+  target = { "citizen", ... },  -- monster types for the target
+  names = { "Juno Reyes", ... },
+  items = { "sealed package", ... },
+  reward = 30,                  -- credits, plus 10 per point of danger
+  stages = { ... },             -- as quest stages
+  done = { credits = "$reward", call = "$fixer", text = [[...]] } }
+```
+
+The template's text has placeholders that are filled in when a gig is made:
+- in any text, `%T` is the target's name, `%P` the place, `%I` the item and `%F` the fixer;
+- as ids or numbers, `$target`, `$item`, `$place`, `$fixer`, `$fixerhome` and `$reward`.
+
+Only places the story has opened are used.
+
+### Districts
+
+```lua
+["nc-stacks"] = {
+   monsters = { ["street punk"] = 5, ["giant rat"] = 2 },  -- random ones
+   people = { citizen = 3 },                  -- civilians kept around
+   sights = { "..." }, sounds = { "..." },    -- ambient messages
+},
+["Block 7"] = { monsters = { ... } },         -- a site, by dungeon name
+```
+
+- **`monsters`:** random monsters on the level are picked from this list, by weight, as long as they suit the difficulty. Otherwise NetHack picks as usual.
+- **`people`:** civilians (citizen, salaryman, street vendor) are topped up out of sight.
+- **`sights` and `sounds`:** now and then one of these is shown. Sights are skipped while you're blind and sounds while you're deaf.
 
 ### Dialogue
 
@@ -148,6 +193,7 @@ this order:
   - `start`, `next`, `finish`, `fail` or `track` followed by a quest id;
   - `flag <name> <n>` or `rep <faction> <n>`;
   - `spawn <npc>`, `goto <npc>` (teleport next to it), `kill <npc>` or `item <id>`;
-  - `tp <x> <y>` (teleport to level coordinates) or `mons` (list monsters).
+  - `tp <x> <y>` (teleport to level coordinates) or `mons` (list monsters);
+  - `gig <kind>` (start a gig from the first fixer; says where) or `fetch <item>` (stand on a story item lying on this level).
 - `#wizstorycheck` checks every reference in story.lua.
 - `#wizcity` opens every district.

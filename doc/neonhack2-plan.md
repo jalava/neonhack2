@@ -1,7 +1,8 @@
 # NeonHack 2: Neo Yendor
 
-Status (2026-10-12): phases P0-P6 done; the vertical slice (prologue and
-act 1) is playable.  Next: user playtest, then P7 onwards.
+Status (2026-10-12): phases P0-P8 done (P7 and P8 are planned in
+doc/neonhack2-next-phases.md): the slice is playable in organic districts,
+with gigs and city life.  Next: user playtest, then P9 (acts 2-4).
 
 ## Context
 

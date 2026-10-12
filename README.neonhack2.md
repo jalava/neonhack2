@@ -29,7 +29,12 @@ Settings come from `~/.neonhack2rc`. If that file doesn't exist,
 | `Tab` (`#journal`) | the journal: story missions, jobs and gigs with their objectives; pick one to read its log and track it |
 | `M` (`#citymap`) | the city map; on a street, call a cab (costs credits; not while Wanted) |
 | `>` on a metro station | ride the metro to another district |
-| `#chat` (`M-c`) | talk to people; story characters have conversations with choices |
+| `#chat` (`M-c`) | talk to people; story characters have conversations with choices, and fixers (Mags Vance, at first) offer gigs |
+
+## Gigs and the street
+
+- **Gigs:** fixers have repeatable jobs: deliveries, bounties and retrievals, anywhere you can reach. They pay more in more dangerous places. Up to three can run at once. To drop one, pick it in the journal.
+- **City life:** each district has its own crowd. Citizens, salarymen and street vendors walk the streets (killing them is murder, and corpsec takes an interest). The Stacks belong to the Chrome Saints, and Lantern Market to pickpockets and the Jade Circuit. Now and then you'll notice something going on.
 
 ## Flatlining
 
@@ -50,7 +55,8 @@ A new game asks for story mode or hardcore. Put `OPTIONS=hardcore` or
 - Plans: `doc/neonhack2-plan.md` (phases 0–6) and `doc/neonhack2-next-phases.md` (7–10).
 - Story: `dat/story.lua`. The format is in `doc/story-format.md`. Check it
   with `#wizstorycheck` in a debug game (`./playground/neonhack2 -D`).
-- Tests: `tools/neon2/slice-test` plays the slice through and checks it;
+- Tests: `tools/neon2/slice-test` plays the slice through and checks it, and
+  `tools/neon2/gig-test` plays one gig of each kind;
   `tools/fuzz SECONDS ROLE` runs the fuzzer.
 - In debug mode:
   - `#wizcity` opens every district;

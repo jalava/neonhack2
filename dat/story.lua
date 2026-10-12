@@ -32,7 +32,7 @@ story = {
       },
       mags = {
          name = "Mags Vance", monster = "infiltrator", female = true,
-         home = "nc-neonmile", stay = true,
+         home = "nc-neonmile", stay = true, fixer = true,
          idle = {
             "Mags Vance is reading three feeds at once.",
             "\"Work comes to those who sit still,\" says Mags.  \"So sit.\"",
@@ -136,6 +136,125 @@ You don't remember the last week.  You remember antiseptic, a woman's voice coun
            { goal = "Bring Benny's envelope to Mags.", where = "nc-neonmile",
              talk = "mags", give = "envelope", dialogue = "mags_rent" },
         } },
+   },
+
+   ----------------------------------------------------------------------
+   -- districts (and sites, by dungeon name): who turns up at random
+   -- (monster = weight), the civilians kept around (monster = how many),
+   -- and things you see and hear now and then.
+   districts = {
+      ["nc-neonmile"] = {
+         monsters = { ["sewer rat"] = 3, pickpocket = 2, grifter = 2,
+                      ["street punk"] = 2, ["trash robot"] = 2, jackal = 1,
+                      ["grid bug"] = 1, bat = 1 },
+         people = { citizen = 6, salaryman = 2, ["street vendor"] = 1 },
+         sights = {
+            "A holo-ad for Halcyon Life Insurance blooms over the street: PEACE OF MIND, PRE-APPROVED.",
+            "Rain starts, stops, and leaves the neon running down the walls.",
+            "A delivery drone weaves past at head height, blaring its horn.",
+            "Somebody's dumped a broken cyberarm in a doorway.  It's still twitching.",
+            "The sign over the Static Lounge buzzes and goes out, then comes back brighter.",
+            "A billboard flickers to a wanted poster for a second, then back to noodles.",
+         },
+         sounds = {
+            "Bass thumps through a wall somewhere.",
+            "A siren rises across the city and fades.",
+            "Somebody is laughing too hard, a street away.",
+            "You hear the metro grind into the station.",
+         },
+      },
+      ["nc-lantern"] = {
+         monsters = { pickpocket = 3, grifter = 2, ["cat burglar"] = 1,
+                      ["sewer rat"] = 2, raven = 1, yakuza = 1,
+                      ["street punk"] = 1, ["printer drone"] = 1 },
+         people = { citizen = 5, ["street vendor"] = 3, salaryman = 1 },
+         sights = {
+            "Paper lanterns sway over the stalls, each one running an ad.",
+            "Steam rolls out of a dumpling cart and turns pink under the neon.",
+            "Two yakuza walk the market slowly; the stallholders find something else to look at.",
+            "A kid sells counterfeit firmware from a shoebox.",
+         },
+         sounds = {
+            "Stallholders shout prices over each other.",
+            "A wok hisses somewhere behind the stalls.",
+            "Somewhere a radio plays a song you almost remember.",
+         },
+      },
+      ["nc-stacks"] = {
+         monsters = { ["street punk"] = 5, ["giant rat"] = 2, ["rabid rat"] = 1,
+                      juicer = 1, ["black hat"] = 1, ["cable crawler"] = 1,
+                      ["trash robot"] = 1, ["mutant runt"] = 1 },
+         people = { citizen = 3 },
+         sights = {
+            "Forty floors up, somebody throws something out of a window.",
+            "Fresh Chrome Saints tags drip down the side of Block 5.",
+            "A stripped car sits on its rims, still smoking.",
+            "Laundry and comm cables sag between the megablocks.",
+         },
+         sounds = {
+            "Gunfire, three blocks over.  Then nothing.",
+            "A dog barks itself hoarse somewhere in Block 9.",
+            "An elevator cable screams inside Block 7.",
+         },
+      },
+      ["Block 7"] = {
+         monsters = { ["street punk"] = 5, ["black hat"] = 1, ["giant rat"] = 2,
+                      juicer = 1, ["cable crawler"] = 1 },
+      },
+      ["Jade Den"] = {
+         monsters = { yakuza = 5, ["black hat"] = 1, grifter = 1 },
+      },
+   },
+
+   ----------------------------------------------------------------------
+   -- gigs: repeatable jobs.  A fixer (an NPC with fixer = true) offers
+   -- up to three when you talk to them.  In the text, %T is the target,
+   -- %P the place, %I the item and %F the fixer; $target, $item, $place,
+   -- $fixer, $fixerhome and $reward stand for their ids and the pay.
+   gigs = {
+      { id = "courier", title = "Delivery to %T",
+        fixers = { "mags" }, place = "district", spot = "metro",
+        target = { "citizen", "salaryman", "street vendor" },
+        names = { "Juno Reyes", "Old Pak", "Sister Venn", "Taz Okafor",
+                  "Mina Kade", "Rusty Ilves", "Bo Tranh", "Kit Halloran" },
+        items = { "sealed package", "insulated medcase", "box of bootleg chips",
+                  "taped-up briefcase", "crate of synth-whisky" },
+        reward = 30,
+        stages = {
+           { goal = "Deliver the %I to %T, waiting by the metro in %P.",
+             where = "$place", talk = "$target", give = "$item",
+             start = { item = "$item", spawn = "$target" },
+             remind = "\"That's not what I'm waiting for,\" says %T." },
+        },
+        done = { credits = "$reward", despawn = "$target", call = "$fixer",
+                 text = [[%T has the %I, no questions asked.  Your cut is on its way: $reward credits.  Come see me for more.]] } },
+
+      { id = "bounty", title = "Bounty: %T",
+        fixers = { "mags" }, place = "site", hostile = true,
+        target = { "street punk", "black hat", "juicer" },
+        names = { "Knuckles Mbeki", "Vex", "Moth", "Static Pete", "Lulu Razor",
+                  "Doc Nails", "Two-Bit Ramos", "Wiremouth" },
+        reward = 40,
+        stages = {
+           { goal = "Flatline %T, holed up in %P.", where = "$place",
+             kill = "$target", start = { spawn = "$target" } },
+        },
+        done = { credits = "$reward", call = "$fixer",
+                 text = [[Word on the wire says %T won't be collecting anymore.  $reward credits, as promised.]] } },
+
+      { id = "retrieval", title = "Retrieval: the %I",
+        fixers = { "mags" }, place = "site", drop = true,
+        items = { "client's data shard", "stolen keycard", "black-box recorder",
+                  "encrypted ledger", "prototype optic" },
+        reward = 35,
+        stages = {
+           { goal = "Find the %I somewhere in %P.", where = "$place",
+             carry = "$item" },
+           { goal = "Bring the %I to %F.", where = "$fixerhome",
+             talk = "$fixer", give = "$item",
+             remind = "\"No %I, no pay,\" says %F." },
+        },
+        done = { credits = "$reward" } },
    },
 
    ----------------------------------------------------------------------

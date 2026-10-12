@@ -51,7 +51,7 @@ def legend(d):
     d.lit("2")                          # the Static Lounge
     d.npc("g", "mags")
     d.mon("u", "urchin", peaceful=True)
-    d.mon("n", "tourist", peaceful=True)
+    d.mon("n", "salaryman", peaceful=True)
     d.room("3", "shop")
     d.room("4", "food shop")
     d.room("5", "tool shop")

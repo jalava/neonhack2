@@ -790,6 +790,17 @@ m_initinv(struct monst *mtmp)
         } else if (ptr == &mons[PM_STREET_PUNK]) {
             if (!rn2(4))
                 (void) mongets(mtmp, CUP_OF_RAMEN);
+        } else if (ptr == &mons[PM_CITIZEN]) {
+            /* NeonHack 2: pocket money, and dinner */
+            mkmonmoney(mtmp, (long) rnd(15));
+            if (!rn2(3))
+                (void) mongets(mtmp, CUP_OF_RAMEN);
+        } else if (ptr == &mons[PM_SALARYMAN]) {
+            mkmonmoney(mtmp, (long) rn1(40, 10));
+        } else if (ptr == &mons[PM_STREET_VENDOR]) {
+            (void) mongets(mtmp, KNIFE);
+            mkmonmoney(mtmp, (long) rn1(30, 5));
+            (void) mongets(mtmp, !rn2(2) ? CUP_OF_RAMEN : FOOD_RATION);
         } else if (ptr == &mons[PM_SHOPKEEPER]) {
             (void) mongets(mtmp, SKELETON_KEY);
             switch (rn2(4)) {
@@ -1309,7 +1320,9 @@ makemon(
         int tryct = 0; /* maybe there are no good choices */
 
         do {
-            if (!(ptr = rndmonst())) {
+            /* NeonHack 2: a district's own crowd (gangs, critters) */
+            ptr = (In_city(&u.uz) && tryct < 25) ? story_city_monster() : 0;
+            if (!ptr && !(ptr = rndmonst())) {
                 debugpline0("Warning: no monster.");
                 return (struct monst *) 0; /* no more monsters! */
             }

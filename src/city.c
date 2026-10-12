@@ -324,6 +324,19 @@ city_init_state(void)
             cstate.unlocked |= 1UL << n;
 }
 
+/* for the story's gig board */
+int
+city_district_total(void)
+{
+    return district_count();
+}
+
+boolean
+city_district_isopen(int n)
+{
+    return district_open(n);
+}
+
 /* open a district for travel (story progress, or wizard mode) */
 void
 city_unlock(int n, boolean verbose)

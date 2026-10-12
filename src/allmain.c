@@ -283,6 +283,9 @@ moveloop_core(void)
                 /* NeonHack: cyberware upkeep and corporate heat */
                 cyber_turn();
                 heat_turn();
+                /* NeonHack 2: people in the streets, life in the city */
+                story_city_people(FALSE);
+                story_city_ambience();
 
                 /* One possible result of prayer is healing.  Whether or
                  * not you get healed depends on your current hit points.
