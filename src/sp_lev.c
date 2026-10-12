@@ -3364,7 +3364,14 @@ lspo_monster(lua_State *L)
             tmpmons.female = 0;
 
         tmpmons.class = get_table_monclass(L);
-        /* NeonHack 2: a story NPC brings its own type, name and mood */
+        /* NeonHack 2: a story NPC brings its own type, name and mood;
+           one that is elsewhere (or dead) isn't made at all */
+        if (tmpmons.npc && !story_npc_wanted(tmpmons.npc)) {
+            Free(tmpmons.name.str);
+            Free(tmpmons.appear_as.str);
+            Free(tmpmons.npc);
+            return 0;
+        }
         if (tmpmons.npc) {
             boolean fem = FALSE;
             const char *nm = story_npc_name(tmpmons.npc);

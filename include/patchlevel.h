@@ -17,7 +17,7 @@
  * Incrementing EDITLEVEL can be used to force invalidation of old bones
  * and save files.
  */
-#define EDITLEVEL 1 /* NeonHack 2: the city's civilians */
+#define EDITLEVEL 2 /* NeonHack 2: outriders, smugglers, execs */
 
 /*
  * Development status possibilities.

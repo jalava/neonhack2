@@ -1123,7 +1123,8 @@ dog_move(
                 || (max_passive_dmg(mtmp2, mtmp) >= mtmp->mhp)
                 || ((mtmp->mhp * 4 < mtmp->mhpmax
                      || mtmp2->data->msound == MS_GUARDIAN
-                     || mtmp2->data->msound == MS_LEADER)
+                     || mtmp2->data->msound == MS_LEADER
+                     || story_npc_protected(mtmp2)) /* NeonHack 2 */
                     && mtmp2->mpeaceful && !Conflict)) {
                 continue;
             }

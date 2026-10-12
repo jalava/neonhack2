@@ -414,14 +414,16 @@ steal(struct monst *mtmp, char *objnambuf)
     tmp = 0;
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if ((!uarm || otmp != uarmc) && otmp != uskin
-            && otmp->oclass != COIN_CLASS)
+            && otmp->oclass != COIN_CLASS
+            && otmp->otyp != STORY_ITEM) /* NeonHack 2: the plot stays */
             tmp += (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
     if (!tmp)
         goto nothing_to_steal;
     tmp = rn2(tmp);
     for (otmp = gi.invent; otmp; otmp = otmp->nobj)
         if ((!uarm || otmp != uarmc) && otmp != uskin
-            && otmp->oclass != COIN_CLASS) {
+            && otmp->oclass != COIN_CLASS
+            && otmp->otyp != STORY_ITEM) {
             tmp -= (otmp->owornmask & (W_ARMOR | W_ACCESSORY)) ? 5 : 1;
             if (tmp < 0)
                 break;

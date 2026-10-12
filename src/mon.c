@@ -3517,6 +3517,8 @@ xkilled(
                            "poor", namedpet ? SUPPRESS_SADDLE : 0, FALSE));
     }
 
+    story_killed(mtmp); /* NeonHack 2: factions keep count */
+
     if (mtmp->mtrapped && (t = t_at(x, y)) != 0 && is_pit(t->ttyp)) {
         if (sobj_at(BOULDER, x, y))
             nocorpse = TRUE; /* Prevent corpses/treasure being created
@@ -4322,6 +4324,8 @@ setmangry(struct monst *mtmp, boolean via_attack)
        look the other way when you attack a pet?] */
     if (mtmp->mtame)
         return;
+    if (via_attack)
+        story_angered(mtmp); /* NeonHack 2: its faction hears of it */
     mtmp->mpeaceful = 0;
     if (mtmp->ispriest) {
         if (p_coaligned(mtmp))

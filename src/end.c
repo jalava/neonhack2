@@ -1065,6 +1065,9 @@ done(int how)
         svk.killer.format = KILLED_BY;
     if (!svk.killer.name[0] || how >= PANICKED)
         Strcpy(svk.killer.name, deaths[how]);
+    /* NeonHack 2: the story ended and you walked away */
+    if (how == ESCAPED && story_walkaway())
+        Strcpy(svk.killer.name, story_walkaway());
 
     if (how < PANICKED) {
         u.umortality++;

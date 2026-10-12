@@ -3282,6 +3282,13 @@ extern int wiz_story(void);
 extern struct permonst *story_city_monster(void);
 extern void story_city_people(boolean);
 extern void story_city_ambience(void);
+extern boolean story_npc_wanted(const char *) NONNULLARG1;
+extern boolean story_npc_protected(struct monst *) NONNULLARG1;
+extern int story_faction_peace(struct permonst *) NONNULLARG1;
+extern void story_angered(struct monst *) NONNULLARG1;
+extern void story_killed(struct monst *) NONNULLARG1;
+extern boolean story_stair_locked(d_level *);
+extern const char *story_walkaway(void);
 extern int wiz_storycheck(void);
 
 /* ### sys.c ### */

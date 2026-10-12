@@ -24,14 +24,23 @@
 
 /* a flattened Lua table entry: credits = 50 -> ("credits", 0, 50);
    start = "act1" -> ("start", "act1", 0); rep = { jade = 5 } ->
-   ("rep", "jade", 5); unlock = { "a", "b" } -> ("unlock", "a"), ... */
+   ("rep", "jade", 5); unlock = { "a", "b" } -> ("unlock", "a"), ...;
+   move = { hex = "Seal Vault:2" } -> ("move", "hex", val "Seal Vault:2");
+   cases = { { need = {...}, <effects> }, ... } -> ("cases", cases[]) */
+struct st_case;
 struct st_kv {
     char *key, *str;
     long num;
+    char *val;             /* name = "string" in a sub-table */
+    int ncases;            /* cases and when */
+    struct st_case *cases;
 };
 struct st_kvl {
     int n;
     struct st_kv *kv;
+};
+struct st_case {
+    struct st_kvl need, eff;
 };
 
 struct st_item {
@@ -41,8 +50,14 @@ struct st_item {
 };
 struct st_faction {
     char *id, *name;
-    long rep; /* state */
+    int nmembers;
+    int *members; /* monster types that belong to it */
+    long rep;     /* state */
 };
+/* reputation at which a faction's people turn friendly or hostile */
+#define REP_FRIENDLY 15
+#define REP_HOSTILE (-15)
+#define st_stance(r) ((r) >= REP_FRIENDLY ? 1 : (r) <= REP_HOSTILE ? -1 : 0)
 struct st_npc {
     char *id, *name, *monster, *home, *faction, *chat;
     boolean female, stay, hostile;
@@ -51,14 +66,18 @@ struct st_npc {
     int level; /* experience level, if not the monster type's own */
     int nidle;
     char **idle;
+    struct st_kvl died; /* effects when it is killed */
     d_level homelev;
     /* state */
     unsigned m_id;
     xint8 status;    /* NPC_xxx */
     boolean pending; /* spawn when the hero reaches its home */
+    boolean angry;   /* turned hostile by the story */
+    boolean moved;   /* its home was changed by the story */
 };
 #define SPOT_RANDOM 0
 #define SPOT_METRO 1 /* next to the district's metro station */
+#define SPOT_NEAR 2  /* next to the hero */
 #define NPC_UNMADE 0
 #define NPC_ALIVE 1
 #define NPC_DEAD 2
@@ -142,13 +161,33 @@ struct st_flag {
     struct st_flag *next;
 };
 
+/* the way into a site or the Undercity, closed until a flag is set */
+struct st_lock {
+    char *key, *flag, *text;
+    d_level lev; /* dlevel 0: the whole dungeon */
+};
+
+/* the story's endings */
+struct st_ending {
+    char *id, *title, *text;
+    struct st_kvl stay; /* effects when you stay in the city */
+};
+
+#define STALE_MAX 16 /* old copies of moved NPCs, to remove */
+
 static struct story_data {
     boolean loaded;
     int nquests, nnpcs, nnodes, nitems, nfactions;
     int nstatq, nstatn, nstati; /* story.lua's own; gig slots follow */
-    int ntpls, ndist;
+    int ntpls, ndist, nlocks, nendings;
     struct st_gigtpl *tpls;
     struct st_district *dist;
+    struct st_lock *locks;
+    struct st_ending *endings;
+    struct st_npc *talking; /* in a conversation with */
+    char walkaway[BUFSZ];   /* how the game ended, if you walked away */
+    unsigned stale[STALE_MAX];
+    int nstale;
     long lastamb; /* turn of the last ambient message */
     struct st_gig gigs[GIG_SLOTS];
     long gigseq;
@@ -169,6 +208,8 @@ static struct story_data {
 staticfn void st_free(genericptr_t);
 staticfn int st_count_keys(lua_State *);
 staticfn int st_check_kvl(struct st_kvl *, const char *, winid);
+staticfn struct st_kv *st_kv_push(struct st_kvl *, int *, const char *);
+staticfn void st_read_cases(lua_State *, struct st_kv *);
 staticfn void st_read_kvl(lua_State *, struct st_kvl *, const char *const *);
 staticfn void st_read_kvl_field(lua_State *, const char *, struct st_kvl *);
 staticfn void st_free_kvl(struct st_kvl *);
@@ -189,6 +230,20 @@ staticfn int st_gig_free_slot(void);
 staticfn void st_gig_board(struct st_npc *);
 staticfn void st_drop_items(void);
 staticfn void st_read_districts(lua_State *);
+staticfn void st_read_locks(lua_State *);
+staticfn void st_read_endings(lua_State *);
+staticfn int st_ending_idx(const char *);
+staticfn void st_ending(int);
+staticfn void st_rep_add(int, long, boolean);
+staticfn void st_faction_sync(void);
+staticfn int st_member_of(struct monst *);
+staticfn void st_anger(struct st_npc *);
+staticfn void st_move_npc(struct st_npc *, const char *);
+staticfn void st_allies(const char *, long);
+staticfn void st_stale_add(unsigned);
+staticfn void st_stale_remove(void);
+staticfn int st_rank_faction(boolean);
+staticfn boolean st_site_locked(xint16);
 staticfn int st_read_weights(lua_State *, const char *, int **, int **);
 staticfn struct st_district *st_here(void);
 staticfn void st_read_nodes(lua_State *);
@@ -237,12 +292,59 @@ st_free(genericptr_t p)
         free(p);
 }
 
+/* room for one more entry in a list being read */
+staticfn struct st_kv *
+st_kv_push(struct st_kvl *out, int *cap, const char *key)
+{
+    struct st_kv *kv;
+
+    if (out->n >= *cap) {
+        struct st_kv *bigger;
+
+        *cap *= 2;
+        bigger = (struct st_kv *) alloc(*cap * sizeof *bigger);
+        (void) memcpy(bigger, out->kv, out->n * sizeof *bigger);
+        free((genericptr_t) out->kv);
+        out->kv = bigger;
+    }
+    kv = &out->kv[out->n++];
+    (void) memset((genericptr_t) kv, 0, sizeof *kv);
+    kv->key = dupstr(key);
+    return kv;
+}
+
+/* cases = { { need = {...}, <effects> }, ... } at the top of the stack */
+staticfn void
+st_read_cases(lua_State *L, struct st_kv *kv)
+{
+    static const char *const case_skip[] = { "need", 0 };
+    int len, j;
+
+    lua_len(L, -1);
+    len = (int) lua_tointeger(L, -1);
+    lua_pop(L, 1);
+    kv->cases = (struct st_case *) alloc((len + 1) * sizeof *kv->cases);
+    (void) memset(kv->cases, 0, (len + 1) * sizeof *kv->cases);
+    for (j = 0; j < len; j++) {
+        lua_pushinteger(L, j + 1);
+        lua_gettable(L, -2);
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            struct st_case *cp = &kv->cases[kv->ncases++];
+
+            st_read_kvl_field(L, "need", &cp->need);
+            st_read_kvl(L, &cp->eff, case_skip);
+        }
+        lua_pop(L, 1);
+    }
+}
+
 /* flatten the table at the top of the stack, skipping 'skip' keys */
 staticfn void
 st_read_kvl(lua_State *L, struct st_kvl *out, const char *const *skip)
 {
     int cap = 8, i;
     const char *key;
+    struct st_kv *kv;
 
     out->n = 0;
     out->kv = (struct st_kv *) alloc(cap * sizeof (struct st_kv));
@@ -261,54 +363,36 @@ st_read_kvl(lua_State *L, struct st_kvl *out, const char *const *skip)
             lua_pop(L, 1);
             continue;
         }
-        if (lua_type(L, -1) == LUA_TTABLE) {
+        if (lua_type(L, -1) == LUA_TTABLE
+            && (!strcmp(key, "cases") || !strcmp(key, "when"))) {
+            kv = st_kv_push(out, &cap, key);
+            st_read_cases(L, kv);
+        } else if (lua_type(L, -1) == LUA_TTABLE) {
             /* sub-table: array of strings, or name = number|string */
             lua_pushnil(L);
             while (lua_next(L, -2) != 0) {
-                if (out->n >= cap) {
-                    struct st_kv *bigger;
-
-                    cap *= 2;
-                    bigger = (struct st_kv *) alloc(cap * sizeof *bigger);
-                    (void) memcpy(bigger, out->kv, out->n * sizeof *bigger);
-                    free((genericptr_t) out->kv);
-                    out->kv = bigger;
-                }
-                out->kv[out->n].key = dupstr(key);
-                out->kv[out->n].str = 0;
-                out->kv[out->n].num = 0;
+                kv = st_kv_push(out, &cap, key);
                 if (lua_type(L, -2) == LUA_TSTRING) {
-                    out->kv[out->n].str = dupstr(lua_tostring(L, -2));
+                    kv->str = dupstr(lua_tostring(L, -2));
                     if (lua_type(L, -1) == LUA_TNUMBER)
-                        out->kv[out->n].num = (long) lua_tointeger(L, -1);
+                        kv->num = (long) lua_tointeger(L, -1);
                     else if (lua_type(L, -1) == LUA_TBOOLEAN)
-                        out->kv[out->n].num = lua_toboolean(L, -1);
+                        kv->num = lua_toboolean(L, -1);
+                    else if (lua_type(L, -1) == LUA_TSTRING)
+                        kv->val = dupstr(lua_tostring(L, -1));
                 } else if (lua_type(L, -1) == LUA_TSTRING) {
-                    out->kv[out->n].str = dupstr(lua_tostring(L, -1));
+                    kv->str = dupstr(lua_tostring(L, -1));
                 }
-                out->n++;
                 lua_pop(L, 1);
             }
         } else {
-            if (out->n >= cap) {
-                struct st_kv *bigger;
-
-                cap *= 2;
-                bigger = (struct st_kv *) alloc(cap * sizeof *bigger);
-                (void) memcpy(bigger, out->kv, out->n * sizeof *bigger);
-                free((genericptr_t) out->kv);
-                out->kv = bigger;
-            }
-            out->kv[out->n].key = dupstr(key);
-            out->kv[out->n].str = 0;
-            out->kv[out->n].num = 0;
+            kv = st_kv_push(out, &cap, key);
             if (lua_type(L, -1) == LUA_TSTRING)
-                out->kv[out->n].str = dupstr(lua_tostring(L, -1));
+                kv->str = dupstr(lua_tostring(L, -1));
             else if (lua_type(L, -1) == LUA_TNUMBER)
-                out->kv[out->n].num = (long) lua_tointeger(L, -1);
+                kv->num = (long) lua_tointeger(L, -1);
             else if (lua_type(L, -1) == LUA_TBOOLEAN)
-                out->kv[out->n].num = lua_toboolean(L, -1);
-            out->n++;
+                kv->num = lua_toboolean(L, -1);
         }
         lua_pop(L, 1);
     }
@@ -331,12 +415,20 @@ st_read_kvl_field(lua_State *L, const char *name, struct st_kvl *out)
 staticfn void
 st_free_kvl(struct st_kvl *l)
 {
-    int i;
+    int i, j;
 
     for (i = 0; i < l->n; i++) {
         free((genericptr_t) l->kv[i].key);
         if (l->kv[i].str)
             free((genericptr_t) l->kv[i].str);
+        if (l->kv[i].val)
+            free((genericptr_t) l->kv[i].val);
+        for (j = 0; j < l->kv[i].ncases; j++) {
+            st_free_kvl(&l->kv[i].cases[j].need);
+            st_free_kvl(&l->kv[i].cases[j].eff);
+        }
+        if (l->kv[i].cases)
+            free((genericptr_t) l->kv[i].cases);
     }
     if (l->kv)
         free((genericptr_t) l->kv);
@@ -391,8 +483,27 @@ st_read_named(lua_State *L, const char *section)
             if (!name)
                 name = dupstr(id);
             if (factions) {
-                st.factions[i].id = dupstr(id);
-                st.factions[i].name = name;
+                struct st_faction *fp = &st.factions[i];
+
+                fp->id = dupstr(id);
+                fp->name = name;
+                if (lua_type(L, -1) == LUA_TTABLE) {
+                    int nm, k, gend = 0;
+                    char **mnames = st_read_strlist(L, "members", &nm);
+
+                    fp->members = (int *) alloc((nm + 1) * sizeof (int));
+                    for (k = 0; k < nm; k++) {
+                        int pm = name_to_mon(mnames[k], &gend);
+
+                        if (pm >= LOW_PM)
+                            fp->members[fp->nmembers++] = pm;
+                        else
+                            impossible("story.lua: unknown monster \"%s\"",
+                                       mnames[k]);
+                        free((genericptr_t) mnames[k]);
+                    }
+                    st_free(mnames);
+                }
             } else {
                 st.items[i].id = dupstr(id);
                 st.items[i].name = name;
@@ -401,10 +512,23 @@ st_read_named(lua_State *L, const char *section)
         }
         lua_pop(L, 1);
     }
-    if (factions)
+    if (factions) {
+        int j;
+
         st.nfactions = i;
-    else
+        /* Lua tables have no order; keep the factions in id order, so
+           that ties (the "worst" faction) always go the same way */
+        for (i = 1; i < st.nfactions; i++)
+            for (j = i; j > 0 && strcmp(st.factions[j - 1].id,
+                                        st.factions[j].id) > 0; j--) {
+                struct st_faction tmp = st.factions[j];
+
+                st.factions[j] = st.factions[j - 1];
+                st.factions[j - 1] = tmp;
+            }
+    } else {
         st.nitems = i;
+    }
     lua_pop(L, 1);
 }
 
@@ -441,6 +565,15 @@ st_read_npcs(lua_State *L)
             np->hostile = get_table_boolean_opt(L, "hostile", FALSE);
             np->level = get_table_int_opt(L, "level", 0);
             np->fixer = get_table_boolean_opt(L, "fixer", FALSE);
+            {
+                char *spot = get_table_str_opt(L, "spot", (char *) 0);
+
+                np->spot = !spot ? SPOT_RANDOM
+                           : !strcmp(spot, "metro") ? SPOT_METRO
+                           : !strcmp(spot, "near") ? SPOT_NEAR : SPOT_RANDOM;
+                st_free(spot);
+            }
+            st_read_kvl_field(L, "died", &np->died);
             lua_getfield(L, -1, "idle");
             if (lua_type(L, -1) == LUA_TTABLE) {
                 lua_len(L, -1);
@@ -701,6 +834,67 @@ st_read_districts(lua_State *L)
     lua_pop(L, 1);
 }
 
+/* locks = { ["The Undercity"] = { flag = "shaft_open", text = [[...]] } } */
+staticfn void
+st_read_locks(lua_State *L)
+{
+    int n;
+
+    lua_getfield(L, -1, "locks");
+    if (lua_type(L, -1) != LUA_TTABLE) {
+        lua_pop(L, 1);
+        return;
+    }
+    n = st_count_keys(L);
+    st.locks = (struct st_lock *) alloc((n + 1) * sizeof *st.locks);
+    (void) memset(st.locks, 0, (n + 1) * sizeof *st.locks);
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0) {
+        if (lua_type(L, -2) == LUA_TSTRING && lua_type(L, -1) == LUA_TTABLE
+            && st.nlocks < n) {
+            struct st_lock *lp = &st.locks[st.nlocks++];
+
+            lp->key = dupstr(lua_tostring(L, -2));
+            lp->flag = get_table_str_opt(L, "flag", (char *) 0);
+            lp->text = get_table_str_opt(L, "text", (char *) 0);
+        }
+        lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+}
+
+/* endings = { open = { title =, text =, stay = {...} }, ... } */
+staticfn void
+st_read_endings(lua_State *L)
+{
+    int n;
+
+    lua_getfield(L, -1, "endings");
+    if (lua_type(L, -1) != LUA_TTABLE) {
+        lua_pop(L, 1);
+        return;
+    }
+    n = st_count_keys(L);
+    st.endings = (struct st_ending *) alloc((n + 1) * sizeof *st.endings);
+    (void) memset(st.endings, 0, (n + 1) * sizeof *st.endings);
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0) {
+        if (lua_type(L, -2) == LUA_TSTRING && lua_type(L, -1) == LUA_TTABLE
+            && st.nendings < n) {
+            struct st_ending *ep = &st.endings[st.nendings++];
+
+            ep->id = dupstr(lua_tostring(L, -2));
+            ep->title = get_table_str_opt(L, "title", (char *) 0);
+            if (!ep->title)
+                ep->title = dupstr(ep->id);
+            ep->text = get_table_str_opt(L, "text", (char *) 0);
+            st_read_kvl_field(L, "stay", &ep->stay);
+        }
+        lua_pop(L, 1);
+    }
+    lua_pop(L, 1);
+}
+
 /* room for gigs at the end of the quest, NPC and item arrays; done once,
    right after loading, so no pointers into the arrays exist yet */
 staticfn void
@@ -821,6 +1015,18 @@ st_resolve(void)
         }
     }
 
+    for (i = 0; i < st.nlocks; i++) {
+        struct st_lock *lp = &st.locks[i];
+
+        if (strchr(lp->key, ':') || find_level(lp->key)) {
+            if (!city_resolve_dest(lp->key, &lp->lev))
+                lp->lev.dnum = -1, lp->lev.dlevel = 0;
+        } else if ((dn = dname_lookup(lp->key)) >= 0) {
+            lp->lev.dnum = dn, lp->lev.dlevel = 0;
+        } else {
+            lp->lev.dnum = -1, lp->lev.dlevel = 0;
+        }
+    }
     for (i = 0; i < st.nnpcs; i++)
         if (st.npcs[i].home
             && !city_resolve_dest(st.npcs[i].home, &st.npcs[i].homelev))
@@ -866,6 +1072,8 @@ story_load(void)
         st_read_nodes(L);
         st_read_gigs(L);
         st_read_districts(L);
+        st_read_locks(L);
+        st_read_endings(L);
         st_add_gig_slots();
         st.loaded = TRUE;
     } else {
@@ -923,8 +1131,19 @@ story_free(void)
         for (j = 0; j < np->nidle; j++)
             st_free(np->idle[j]);
         st_free(np->idle);
+        st_free_kvl(&np->died);
     }
     st_free(st.npcs);
+    for (i = 0; i < st.nlocks; i++)
+        st_free(st.locks[i].key), st_free(st.locks[i].flag),
+            st_free(st.locks[i].text);
+    st_free(st.locks);
+    for (i = 0; i < st.nendings; i++) {
+        st_free(st.endings[i].id), st_free(st.endings[i].title);
+        st_free(st.endings[i].text);
+        st_free_kvl(&st.endings[i].stay);
+    }
+    st_free(st.endings);
     for (i = 0; i < st.nnodes; i++) {
         struct st_node *np = &st.nodes[i];
 
@@ -941,7 +1160,8 @@ story_free(void)
         st_free(st.items[i].id), st_free(st.items[i].name);
     st_free(st.items);
     for (i = 0; i < st.nfactions; i++)
-        st_free(st.factions[i].id), st_free(st.factions[i].name);
+        st_free(st.factions[i].id), st_free(st.factions[i].name),
+            st_free(st.factions[i].members);
     st_free(st.factions);
     for (lp = st.log; lp; lp = lnext) {
         lnext = lp->next;
@@ -1261,7 +1481,28 @@ story_npc_hostile(const char *id)
 {
     int i = st_npc_idx(id);
 
-    return (i >= 0) ? st.npcs[i].hostile : FALSE;
+    return (i >= 0) ? (st.npcs[i].hostile || st.npcs[i].angry) : FALSE;
+}
+
+/* should a level file make this NPC here?  Not if it's alive elsewhere,
+   dead, gone, or lives somewhere else */
+boolean
+story_npc_wanted(const char *id)
+{
+    int i = st_npc_idx(id);
+
+    if (!st.loaded || i < 0)
+        return TRUE;
+    return (boolean) (st.npcs[i].status == NPC_UNMADE
+                      && (st.npcs[i].homelev.dlevel <= 0
+                          || on_level(&st.npcs[i].homelev, &u.uz)));
+}
+
+/* pets leave peaceful story NPCs alone */
+boolean
+story_npc_protected(struct monst *mtmp)
+{
+    return (boolean) (mtmp->mpeaceful && st_npc_by_mon(mtmp) != 0);
 }
 
 /* a level file or the story made an NPC's monster */
@@ -1283,7 +1524,7 @@ story_npc_made(const char *id, struct monst *mtmp)
     np->m_id = mtmp->m_id;
     np->status = NPC_ALIVE;
     np->pending = FALSE;
-    if (np->hostile) {
+    if (np->hostile || np->angry) {
         mtmp->mpeaceful = 0;
     } else {
         mtmp->mpeaceful = 1;
@@ -1307,7 +1548,7 @@ story_npc_stays(struct monst *mtmp)
     if (!st.loaded || !mtmp->mpeaceful)
         return FALSE;
     np = st_npc_by_mon(mtmp);
-    return (boolean) (np && np->stay);
+    return (boolean) (np && np->stay && !mtmp->mtame);
 }
 
 /* make an NPC now if the hero is at its home, otherwise on arrival */
@@ -1341,10 +1582,13 @@ st_spawn(struct st_npc *np, boolean now)
                     sx = cc.x, sy = cc.y;
                     break;
                 }
+        } else if (np->spot == SPOT_NEAR
+                   && enexto(&cc, u.ux, u.uy, &mons[pm])) {
+            sx = cc.x, sy = cc.y;
         }
         mtmp = makemon(&mons[pm], sx, sy,
                        MM_NOMSG | (fem ? MM_FEMALE : MM_MALE)
-                       | (np->hostile ? 0 : NO_MINVENT));
+                       | ((np->hostile || np->angry) ? 0 : NO_MINVENT));
     }
     if (!mtmp) {
         np->pending = TRUE;
@@ -1381,6 +1625,7 @@ story_mon_gone(struct monst *mtmp, boolean died)
     np->status = died ? NPC_DEAD : NPC_GONE;
     if (!died)
         return;
+    story_effects(&np->died);
     for (q = 0; q < st.nquests; q++) {
         struct st_stage *sp = st_cur(q);
 
@@ -1395,6 +1640,301 @@ story_mon_gone(struct monst *mtmp, boolean died)
     }
     i = (int) (np - st.npcs);
     nhUse(i);
+}
+
+/*
+ * Factions
+ */
+
+/* change a faction's opinion of you; its people react when it tips */
+staticfn void
+st_rep_add(int f, long amt, boolean loud)
+{
+    struct st_faction *fp = &st.factions[f];
+    int was = st_stance(fp->rep), now;
+
+    fp->rep += amt;
+    if (fp->rep > 100)
+        fp->rep = 100;
+    if (fp->rep < -100)
+        fp->rep = -100;
+    now = st_stance(fp->rep);
+    if (now != was) {
+        pline("Word gets around: %s %s.", fp->name,
+              (now > 0) ? "counts you as a friend now"
+              : (now < 0) ? "wants you dead"
+              : (was > 0) ? "doesn't trust you anymore"
+              : "is willing to let things go");
+        st_faction_sync();
+    } else if (loud && amt) {
+        char buf[BUFSZ];
+
+        pline("%s will remember that.", upstart(strcpy(buf, fp->name)));
+    }
+}
+
+/* the faction a monster belongs to, or -1; story NPCs, pets and the
+   like answer to nobody */
+staticfn int
+st_member_of(struct monst *mtmp)
+{
+    int f, k, mndx = monsndx(mtmp->data);
+
+    if (mtmp->mtame || mtmp->isshk || mtmp->ispriest || mtmp->isgd
+        || mtmp->isminion || st_npc_by_mon(mtmp))
+        return -1;
+    for (f = 0; f < st.nfactions; f++)
+        for (k = 0; k < st.factions[f].nmembers; k++)
+            if (st.factions[f].members[k] == mndx)
+                return f;
+    return -1;
+}
+
+/* a faction's people on this level act on its opinion of you */
+staticfn void
+st_faction_sync(void)
+{
+    struct monst *mtmp;
+    int f, stance;
+
+    for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
+        if (DEADMONSTER(mtmp) || (f = st_member_of(mtmp)) < 0)
+            continue;
+        stance = st_stance(st.factions[f].rep);
+        if (stance > 0 && !mtmp->mpeaceful) {
+            mtmp->mpeaceful = 1;
+            set_malign(mtmp);
+            newsym(mtmp->mx, mtmp->my);
+        } else if (stance < 0 && mtmp->mpeaceful) {
+            mtmp->mpeaceful = 0;
+            mtmp->mstrategy &= ~STRAT_WAITMASK;
+            set_malign(mtmp);
+            newsym(mtmp->mx, mtmp->my);
+        }
+    }
+}
+
+/* for peace_minded(): 1 peaceful, 0 hostile, -1 up to NetHack */
+int
+story_faction_peace(struct permonst *ptr)
+{
+    int f, k, mndx = monsndx(ptr), stance;
+
+    if (!st.loaded)
+        return -1;
+    for (f = 0; f < st.nfactions; f++)
+        for (k = 0; k < st.factions[f].nmembers; k++)
+            if (st.factions[f].members[k] == mndx) {
+                stance = st_stance(st.factions[f].rep);
+                return (stance > 0) ? 1 : (stance < 0) ? 0 : -1;
+            }
+    return -1;
+}
+
+/* you attacked a peaceful monster, or killed one */
+void
+story_angered(struct monst *mtmp)
+{
+    int f;
+
+    if (st.loaded && (f = st_member_of(mtmp)) >= 0)
+        st_rep_add(f, -3L, FALSE);
+}
+
+void
+story_killed(struct monst *mtmp)
+{
+    int f;
+
+    if (st.loaded && (f = st_member_of(mtmp)) >= 0)
+        st_rep_add(f, mtmp->mpeaceful ? -4L : -1L, FALSE);
+}
+
+/*
+ * NPCs the story changes
+ */
+
+staticfn void
+st_anger(struct st_npc *np)
+{
+    struct monst *mtmp = st_npc_mon(np);
+
+    np->angry = TRUE;
+    if (mtmp) {
+        mtmp->mpeaceful = 0;
+        mtmp->mtame = 0;
+        mtmp->mstrategy &= ~STRAT_WAITMASK;
+        set_malign(mtmp);
+        newsym(mtmp->mx, mtmp->my);
+    }
+}
+
+/* an old copy of a moved NPC, to remove when its level is visited */
+staticfn void
+st_stale_add(unsigned mid)
+{
+    if (mid && st.nstale < STALE_MAX)
+        st.stale[st.nstale++] = mid;
+}
+
+staticfn void
+st_stale_remove(void)
+{
+    struct monst *mtmp, *nmtmp;
+    int k;
+
+    for (mtmp = fmon; mtmp; mtmp = nmtmp) {
+        nmtmp = mtmp->nmon;
+        if (DEADMONSTER(mtmp))
+            continue;
+        for (k = 0; k < st.nstale; k++)
+            if (st.stale[k] == mtmp->m_id) {
+                mongone(mtmp);
+                st.stale[k] = st.stale[--st.nstale];
+                break;
+            }
+    }
+}
+
+/* the NPC lives somewhere else now; it turns up there */
+staticfn void
+st_move_npc(struct st_npc *np, const char *place)
+{
+    d_level lev;
+    struct monst *mtmp;
+
+    if (!city_resolve_dest(place, &lev)) {
+        impossible("story: unknown place \"%s\"", place);
+        return;
+    }
+    st_free(np->home);
+    np->home = dupstr(place);
+    np->homelev = lev;
+    np->moved = TRUE;
+    if (np->status == NPC_DEAD)
+        return;
+    if ((mtmp = st_npc_mon(np)) != 0) {
+        if (on_level(&lev, &u.uz))
+            return; /* already there */
+        if (canseemon(mtmp))
+            pline("%s is gone.", Monnam(mtmp));
+        np->status = NPC_GONE; /* so that m_detach doesn't count it */
+        mongone(mtmp);
+    } else if (np->m_id) {
+        st_stale_add(np->m_id);
+    }
+    np->status = NPC_UNMADE;
+    np->m_id = 0;
+    np->pending = FALSE;
+    st_spawn(np, TRUE);
+}
+
+/* monsters that join you */
+staticfn void
+st_allies(const char *name, long n)
+{
+    int gend = 0, pm = name_to_mon(name, &gend);
+    struct monst *mtmp;
+
+    if (pm < LOW_PM) {
+        impossible("story: unknown monster \"%s\"", name);
+        return;
+    }
+    while (n-- > 0) {
+        mtmp = makemon(&mons[pm], u.ux, u.uy,
+                       MM_EDOG | MM_ADJACENTOK | MM_NOMSG);
+        if (!mtmp)
+            break;
+        initedog(mtmp, TRUE);
+    }
+}
+
+/*
+ * Locks and endings
+ */
+
+/* stairs into a site or the Undercity that the story keeps shut */
+boolean
+story_stair_locked(d_level *dest)
+{
+    int i;
+    char buf[BUFSZ * 4];
+
+    if (!st.loaded || !dest || dest->dnum == u.uz.dnum)
+        return FALSE;
+    for (i = 0; i < st.nlocks; i++) {
+        struct st_lock *lp = &st.locks[i];
+
+        if (lp->lev.dnum != dest->dnum
+            || (lp->lev.dlevel > 0 && lp->lev.dlevel != dest->dlevel))
+            continue;
+        if (lp->flag && st_flag_val(lp->flag))
+            return FALSE;
+        if (lp->text)
+            pline("%s", st_subst(lp->text, buf, (int) sizeof buf));
+        else
+            pline("That way is closed.");
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* is a site closed to gigs? */
+staticfn boolean
+st_site_locked(xint16 dnum)
+{
+    int i;
+
+    for (i = 0; i < st.nlocks; i++)
+        if (st.locks[i].lev.dnum == dnum && st.locks[i].lev.dlevel <= 0
+            && !(st.locks[i].flag && st_flag_val(st.locks[i].flag)))
+            return TRUE;
+    return FALSE;
+}
+
+staticfn int
+st_ending_idx(const char *id)
+{
+    int i;
+
+    for (i = 0; id && i < st.nendings; i++)
+        if (!strcmp(st.endings[i].id, id))
+            return i;
+    return -1;
+}
+
+/* the story ends: walk away (the game ends), or stay */
+staticfn void
+st_ending(int e)
+{
+    struct st_ending *ep = &st.endings[e];
+    char buf[BUFSZ];
+
+    st_show_text(ep->title, ep->text);
+    livelog_printf(LL_ACHIEVE, "chose the %s ending of NeonHack 2",
+                   ep->title);
+    Sprintf(buf, "Ending: %s.", ep->title);
+    st_log_add(st.tracked, svm.moves, buf);
+    st_flag_set("ending", (long) e + 1);
+    Sprintf(buf, "ending_%s", ep->id);
+    st_flag_set(buf, 1L);
+    if (!iflags.debug_fuzzer
+        && y_n("Walk away from Neo Yendor?  (The game ends here.)") == 'y') {
+        Snprintf(st.walkaway, sizeof st.walkaway,
+                 "walked away from Neo Yendor (%s)", ep->title);
+        done(ESCAPED);
+        st.walkaway[0] = '\0'; /* still here: a debug-mode "no" */
+        return;
+    }
+    pline("Neo Yendor goes on, and so do you.");
+    story_effects(&ep->stay);
+}
+
+/* for done(): how the game ended, if you walked away */
+const char *
+story_walkaway(void)
+{
+    return st.walkaway[0] ? st.walkaway : (const char *) 0;
 }
 
 /*
@@ -1437,9 +1977,33 @@ st_need(struct st_kvl *need)
         } else if (!strcmp(kv->key, "notdone")) {
             if ((q = st_quest_idx(s)) >= 0 && st.quests[q].status == Q_DONE)
                 return FALSE;
+        } else if (!strcmp(kv->key, "worst") || !strcmp(kv->key, "best")) {
+            f = st_rank_faction(!strcmp(kv->key, "best"));
+            if (f < 0 || strcmp(st.factions[f].id, s))
+                return FALSE;
+        } else if (!strcmp(kv->key, "alive") || !strcmp(kv->key, "dead")) {
+            int x = st_npc_idx(s);
+            boolean dead = (x >= 0 && st.npcs[x].status == NPC_DEAD);
+
+            if (dead != !strcmp(kv->key, "dead"))
+                return FALSE;
         }
     }
     return TRUE;
+}
+
+/* the faction you're on the worst (or best) terms with; ties go to the
+   first in id order */
+staticfn int
+st_rank_faction(boolean best)
+{
+    int i, f = -1;
+
+    for (i = 0; i < st.nfactions; i++)
+        if (f < 0 || (best ? st.factions[i].rep > st.factions[f].rep
+                           : st.factions[i].rep < st.factions[f].rep))
+            f = i;
+    return f;
 }
 
 /* a choice whose only unmet needs are ones the player can see (credits,
@@ -1562,9 +2126,10 @@ void
 story_effects(void *vkvl)
 {
     static const char *const order[] = {
-        "say", "text", "log", "credits", "object", "item", "take", "rep",
-        "flag", "flags", "unflag", "spawn", "despawn", "unlock", "advance",
-        "fail", "finish", "start", "track", "xp", 0
+        "say", "text", "log", "cases", "when", "credits", "object", "item",
+        "take", "rep", "heat", "flag", "flags", "unflag", "anger", "move",
+        "spawn", "despawn", "allies", "unlock", "advance", "fail", "finish",
+        "start", "track", "xp", "gigs", "ending", 0
     };
     struct st_kvl *eff = (struct st_kvl *) vkvl;
     const char *calltitle = 0;
@@ -1637,19 +2202,39 @@ story_effects(void *vkvl)
                 st_give_item(s);
             } else if (!strcmp(kv->key, "take")) {
                 st_take_item(s);
+            } else if (!strcmp(kv->key, "cases") || !strcmp(kv->key, "when")) {
+                /* cases: the first that holds; when: every one that does */
+                int c;
+
+                for (c = 0; c < kv->ncases; c++)
+                    if (st_need(&kv->cases[c].need)) {
+                        story_effects(&kv->cases[c].eff);
+                        if (!strcmp(kv->key, "cases"))
+                            break;
+                    }
             } else if (!strcmp(kv->key, "rep")) {
-                if ((x = st_faction_idx(s)) >= 0) {
-                    st.factions[x].rep += kv->num;
-                    if (st.factions[x].rep > 100)
-                        st.factions[x].rep = 100;
-                    if (st.factions[x].rep < -100)
-                        st.factions[x].rep = -100;
-                    if (kv->num)
-                        pline("%s will remember that.",
-                              upstart(strcpy(buf, st.factions[x].name)));
-                } else {
+                if ((x = st_faction_idx(s)) >= 0)
+                    st_rep_add(x, kv->num, TRUE);
+                else
                     impossible("story: unknown faction \"%s\"", s);
-                }
+            } else if (!strcmp(kv->key, "heat")) {
+                heat_add((int) kv->num);
+            } else if (!strcmp(kv->key, "anger")) {
+                if ((x = st_npc_idx(s)) >= 0)
+                    st_anger(&st.npcs[x]);
+            } else if (!strcmp(kv->key, "move")) {
+                if ((x = st_npc_idx(s)) >= 0 && kv->val)
+                    st_move_npc(&st.npcs[x], kv->val);
+            } else if (!strcmp(kv->key, "allies")) {
+                st_allies(s, kv->num ? kv->num : 1L);
+            } else if (!strcmp(kv->key, "gigs")) {
+                if (st.talking && st.talking->fixer)
+                    st_gig_board(st.talking);
+            } else if (!strcmp(kv->key, "ending")) {
+                if ((x = st_ending_idx(s)) >= 0)
+                    st_ending(x);
+                else
+                    impossible("story: unknown ending \"%s\"", s);
             } else if (!strcmp(kv->key, "flag")) {
                 st_flag_set(s, 1L);
             } else if (!strcmp(kv->key, "flags")) {
@@ -1794,18 +2379,30 @@ st_gigsub_kvl(struct st_kvl *to, struct st_kvl *from, struct st_gig *g)
 {
     int i;
 
+    int j;
+
     to->n = from->n;
     to->kv = (struct st_kv *) alloc((from->n + 1) * sizeof *to->kv);
     for (i = 0; i < from->n; i++) {
         struct st_kv *f = &from->kv[i], *t = &to->kv[i];
 
+        (void) memset((genericptr_t) t, 0, sizeof *t);
         t->key = dupstr(f->key);
         t->num = f->num;
         t->str = st_gigsub(f->str, g);
+        t->val = st_gigsub(f->val, g);
         if (t->str && (!strcmp(t->key, "credits") || !strcmp(t->key, "xp"))
             && digit(*t->str)) {
             t->num = atol(t->str);
             free((genericptr_t) t->str), t->str = 0;
+        }
+        if (f->ncases) {
+            t->ncases = f->ncases;
+            t->cases = (struct st_case *) alloc(f->ncases * sizeof *t->cases);
+            for (j = 0; j < f->ncases; j++) {
+                st_gigsub_kvl(&t->cases[j].need, &f->cases[j].need, g);
+                st_gigsub_kvl(&t->cases[j].eff, &f->cases[j].eff, g);
+            }
         }
     }
 }
@@ -1915,7 +2512,8 @@ st_gig_place(struct st_gigtpl *tp, d_level *lev)
             dungeon *dp = &svd.dungeons[d];
 
             if (!dp->flags.city || d == city_dnum || dp->parent.dlevel <= 0
-                || !city_district_isopen(dp->parent.dlevel))
+                || !city_district_isopen(dp->parent.dlevel)
+                || st_site_locked((xint16) d))
                 continue;
             for (l = 1; l <= dp->num_dunlevs && n < 60; l++) {
                 here.dnum = d, here.dlevel = l;
@@ -2372,6 +2970,8 @@ story_arrived(void)
                 }
         }
     }
+    st_stale_remove();
+    st_faction_sync();
     st_drop_items();
     story_city_people(TRUE);
     st_recheck();
@@ -2427,14 +3027,12 @@ story_chat(struct monst *mtmp)
         }
         return TRUE;
     }
-    /* fixers have work */
-    if (np->fixer) {
-        st_gig_board(np);
-        return TRUE;
-    }
-    /* nothing urgent: small talk */
+    /* nothing urgent: small talk, which for a fixer can lead to work
+       (a choice with gigs = true); a fixer without it gets to the point */
     if (np->chat && st_node_idx(np->chat) >= 0) {
         (void) st_dialogue(np, np->chat);
+    } else if (np->fixer) {
+        st_gig_board(np);
     } else if (np->nidle) {
         pline("%s", st_subst(np->idle[rn2(np->nidle)], buf,
                              (int) sizeof buf));
@@ -2454,6 +3052,7 @@ st_dialogue(struct st_npc *np, const char *start)
     menu_item *pick;
     char buf[BUFSZ * 4], tbuf[BUFSZ];
 
+    st.talking = np;
     for (steps = 0; n >= 0 && steps < 50; steps++) {
         struct st_node *node = &st.nodes[n];
         int nshown = 0, chosen = -1, only = -1;
@@ -2503,14 +3102,15 @@ st_dialogue(struct st_npc *np, const char *start)
             free((genericptr_t) pick);
         }
         if (!nshown)
-            return 1; /* just text: read and done */
+            break; /* just text: read and done */
         if (k == 0 && nshown == 1)
             chosen = only; /* Enter with the one answer deselected */
         if (k == 0 && chosen < 0)
             continue; /* Enter without an answer: ask again */
         if (chosen < 0) {
             You("walk away from %s.", np->name);
-            return 0;
+            res = 0;
+            break;
         }
         {
             struct st_choice *cp = &node->choices[chosen];
@@ -2523,6 +3123,7 @@ st_dialogue(struct st_npc *np, const char *start)
                 impossible("story: unknown dialogue \"%s\"", cp->go);
         }
     }
+    st.talking = 0;
     return res;
 }
 
@@ -2757,10 +3358,16 @@ story_state_lines(char **lines, int n, int max)
     for (i = 0; i < st.nnpcs && n < max; i++) {
         struct st_npc *np = &st.npcs[i];
 
-        if (np->status == NPC_UNMADE && !np->pending)
+        if (np->status == NPC_UNMADE && !np->pending && !np->angry
+            && !np->moved)
             continue;
-        Sprintf(buf, "npc %s %u %d %d", np->id, np->m_id, np->status,
-                np->pending);
+        Snprintf(buf, sizeof buf, "npc %s %u %d %d %d %d %s", np->id,
+                 np->m_id, np->status, np->pending, np->angry, np->moved,
+                 (np->moved && np->home) ? np->home : "-");
+        lines[n++] = dupstr(buf);
+    }
+    for (i = 0; i < st.nstale && n < max; i++) {
+        Sprintf(buf, "stale %u", st.stale[i]);
         lines[n++] = dupstr(buf);
     }
     for (fp = st.flags; fp && n < max; fp = fp->next) {
@@ -2839,12 +3446,33 @@ story_state_line(const char *line)
         return TRUE;
     }
     if (!strncmp(line, "npc ", 4)) {
-        if (sscanf(line, "npc %255s %u %d %d", id, &mid, &a, &b) == 4
+        int angry = 0, moved = 0, k = 0;
+
+        if (sscanf(line, "npc %255s %u %d %d %d %d %n", id, &mid, &a, &b,
+                   &angry, &moved, &k) >= 4
             && (i = st_npc_idx(id)) >= 0) {
-            st.npcs[i].m_id = mid;
-            st.npcs[i].status = (xint8) a;
-            st.npcs[i].pending = (boolean) b;
+            struct st_npc *np = &st.npcs[i];
+
+            np->m_id = mid;
+            np->status = (xint8) a;
+            np->pending = (boolean) b;
+            np->angry = (boolean) angry;
+            if (moved && k > 0 && strcmp(line + k, "-")) {
+                d_level lev;
+
+                if (city_resolve_dest(line + k, &lev)) {
+                    st_free(np->home);
+                    np->home = dupstr(line + k);
+                    np->homelev = lev;
+                    np->moved = TRUE;
+                }
+            }
         }
+        return TRUE;
+    }
+    if (!strncmp(line, "stale ", 6)) {
+        if (sscanf(line, "stale %u", &mid) == 1)
+            st_stale_add(mid);
         return TRUE;
     }
     if (!strncmp(line, "flag ", 5)) {
@@ -2893,7 +3521,7 @@ wiz_story(void)
     }
     getlin("Story command? (list, start/next/finish/fail/track <quest>, "
            "flag/rep <name> <n>, spawn/goto/kill <npc>, item/fetch <id>, tp <x> <y>, "
-           "gig <kind>, mons)",
+           "gig <kind>, ending <id>, mons)",
            buf);
     if (*buf == '\033' || !*buf)
         return ECMD_OK;
@@ -2931,9 +3559,12 @@ wiz_story(void)
 
             if (!*st.npcs[i].id)
                 continue;
-            Sprintf(buf, "npc %-10s %-6s m_id %u%s", st.npcs[i].id,
-                    nst[st.npcs[i].status], st.npcs[i].m_id,
-                    st.npcs[i].pending ? " (pending)" : "");
+            Snprintf(buf, sizeof buf, "npc %-10s %-6s m_id %u%s%s%s%s",
+                     st.npcs[i].id, nst[st.npcs[i].status], st.npcs[i].m_id,
+                     st.npcs[i].pending ? " (pending)" : "",
+                     st.npcs[i].angry ? " (angry)" : "",
+                     st.npcs[i].moved ? " now at " : "",
+                     st.npcs[i].moved ? st.npcs[i].home : "");
             putstr(win, 0, buf);
         }
         city_respawn_info(buf);
@@ -3021,6 +3652,14 @@ wiz_story(void)
         destroy_nhwindow(win);
         return ECMD_OK;
     }
+    if (!strcmp(cmd, "ending")) {
+        if ((i = st_ending_idx(arg)) < 0) {
+            pline("No ending \"%s\".", arg);
+            return ECMD_OK;
+        }
+        st_ending(i);
+        return ECMD_OK;
+    }
     q = st_quest_idx(arg);
     if (!strcmp(cmd, "start") && q >= 0) {
         st_start_quest(q, TRUE);
@@ -3038,7 +3677,7 @@ wiz_story(void)
     } else if (!strcmp(cmd, "flag") && *arg) {
         st_flag_set(arg, n >= 3 ? num : 1L);
     } else if (!strcmp(cmd, "rep") && (i = st_faction_idx(arg)) >= 0) {
-        st.factions[i].rep = num;
+        st_rep_add(i, num - st.factions[i].rep, FALSE);
     } else if (!strcmp(cmd, "spawn") && (i = st_npc_idx(arg)) >= 0) {
         st_spawn(&st.npcs[i], TRUE);
     } else if (!strcmp(cmd, "item") && st_item_idx(arg) >= 0) {
@@ -3111,9 +3750,30 @@ st_check_kvl(struct st_kvl *l, const char *where, winid win)
             || !strcmp(kv->key, "advance") || !strcmp(kv->key, "active")
             || !strcmp(kv->key, "done") || !strcmp(kv->key, "notdone"))
             ok = st_quest_idx(s) >= 0;
-        else if (!strcmp(kv->key, "spawn") || !strcmp(kv->key, "despawn")
-                 || !strcmp(kv->key, "call"))
+        else if (!strcmp(kv->key, "cases") || !strcmp(kv->key, "when")) {
+            int c;
+
+            for (c = 0; c < kv->ncases; c++) {
+                Snprintf(buf, sizeof buf, "%s, %s %d", where, kv->key, c + 1);
+                bad += st_check_kvl(&kv->cases[c].need, buf, win);
+                bad += st_check_kvl(&kv->cases[c].eff, buf, win);
+            }
+            continue;
+        } else if (!strcmp(kv->key, "spawn") || !strcmp(kv->key, "despawn")
+                 || !strcmp(kv->key, "call") || !strcmp(kv->key, "anger")
+                 || !strcmp(kv->key, "alive") || !strcmp(kv->key, "dead"))
             ok = st_npc_idx(s) >= 0;
+        else if (!strcmp(kv->key, "move"))
+            ok = st_npc_idx(s) >= 0 && kv->val
+                 && city_resolve_dest(kv->val, &lev);
+        else if (!strcmp(kv->key, "allies")) {
+            int gend = 0;
+
+            ok = name_to_mon(s, &gend) >= LOW_PM;
+        } else if (!strcmp(kv->key, "ending"))
+            ok = st_ending_idx(s) >= 0;
+        else if (!strcmp(kv->key, "worst") || !strcmp(kv->key, "best"))
+            ok = st_faction_idx(s) >= 0;
         else if (!strcmp(kv->key, "item") || !strcmp(kv->key, "take"))
             ok = st_item_idx(s) >= 0;
         else if (!strcmp(kv->key, "rep") || !strcmp(kv->key, "norep"))
@@ -3126,7 +3786,8 @@ st_check_kvl(struct st_kvl *l, const char *where, winid win)
                    && strcmp(kv->key, "log") && strcmp(kv->key, "credits")
                    && strcmp(kv->key, "flag") && strcmp(kv->key, "flags")
                    && strcmp(kv->key, "unflag") && strcmp(kv->key, "xp")
-                   && strcmp(kv->key, "noflag")) {
+                   && strcmp(kv->key, "noflag") && strcmp(kv->key, "heat")
+                   && strcmp(kv->key, "gigs")) {
             Snprintf(buf, sizeof buf, "%s: unknown key \"%s\"", where, kv->key);
             putstr(win, 0, buf);
             bad++;
@@ -3179,6 +3840,18 @@ wiz_storycheck(void)
                     np->faction);
             putstr(win, 0, buf), bad++;
         }
+        Snprintf(where, sizeof where, "npc %s died", np->id);
+        bad += st_check_kvl(&np->died, where, win);
+    }
+    for (i = 0; i < st.nlocks; i++)
+        if (st.locks[i].lev.dnum < 0 || !st.locks[i].flag) {
+            Snprintf(buf, sizeof buf, "lock \"%s\": %s", st.locks[i].key,
+                     st.locks[i].flag ? "no such place" : "no flag");
+            putstr(win, 0, buf), bad++;
+        }
+    for (i = 0; i < st.nendings; i++) {
+        Snprintf(where, sizeof where, "ending %s stay", st.endings[i].id);
+        bad += st_check_kvl(&st.endings[i].stay, where, win);
     }
     for (q = 0; q < st.nstatq; q++) {
         struct st_quest *qp = &st.quests[q];

@@ -1004,11 +1004,13 @@ send_squad(void)
     }
     if (leader != NON_PM && (mtmp = makemon(&mons[leader], 0, 0, MM_NOMSG)))
         mtmp->mpeaceful = 0, mtmp->mstrategy &= ~STRAT_WAITMASK;
+    /* (hostile even when Halcyon likes you: NeonHack 2's factions) */
     if (heat >= 60)
         for (i = 0; i < 2; i++)
-            (void) makemon(&mons[PM_SECURITY_DRONE], 0, 0, MM_NOMSG);
-    if (heat >= 90)
-        (void) makemon(&mons[PM_SENTRY_BOT], 0, 0, MM_NOMSG);
+            if ((mtmp = makemon(&mons[PM_SECURITY_DRONE], 0, 0, MM_NOMSG)))
+                mtmp->mpeaceful = 0;
+    if (heat >= 90 && (mtmp = makemon(&mons[PM_SENTRY_BOT], 0, 0, MM_NOMSG)))
+        mtmp->mpeaceful = 0;
     u.uheatsquad = svm.moves;
 }
 

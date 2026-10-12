@@ -1224,6 +1224,9 @@ dodown(void)
     /* NeonHack 2: '>' on a metro station opens the city map */
     if (stway && stway->kind == STWAY_METRO && stairs_down)
         return city_metro();
+    /* ... and the story keeps some ways shut */
+    if (stway && stairs_down && story_stair_locked(&stway->tolev))
+        return ECMD_OK;
 
     if (!stairs_down && !ladder_down) {
         trap = t_at(u.ux, u.uy);
@@ -1361,6 +1364,8 @@ doup(void)
             }
         }
     }
+    if (story_stair_locked(&stway->tolev)) /* NeonHack 2 */
+        return ECMD_OK;
     if (!next_to_u()) {
         You("are held back by your pet!");
         return ECMD_OK;

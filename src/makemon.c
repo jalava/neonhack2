@@ -277,6 +277,16 @@ m_initweap(struct monst *mtmp)
             }
             if (!rn2(3))
                 (void) mongets(mtmp, LEATHER_JACKET);
+        } else if (mm == PM_OUTRIDER) {
+            /* NeonHack 2: road leathers and a sawn-off */
+            if (rn2(2))
+                m_initgun(mtmp, CROSSBOW);
+            (void) mongets(mtmp, rn2(2) ? AXE : MACE);
+            (void) mongets(mtmp, LEATHER_JACKET);
+        } else if (mm == PM_SMUGGLER) {
+            (void) mongets(mtmp, rn2(2) ? KNIFE : SHORT_SWORD);
+            if (!rn2(3))
+                m_initgun(mtmp, BOW);
         } else if (mm == PM_YAKUZA) {
             (void) mongets(mtmp, rn2(3) ? KATANA : SHORT_SWORD);
             if (rn2(2))
@@ -801,6 +811,10 @@ m_initinv(struct monst *mtmp)
             (void) mongets(mtmp, KNIFE);
             mkmonmoney(mtmp, (long) rn1(30, 5));
             (void) mongets(mtmp, !rn2(2) ? CUP_OF_RAMEN : FOOD_RATION);
+        } else if (ptr == &mons[PM_CORPORATE_EXEC]) {
+            mkmonmoney(mtmp, (long) rn1(120, 40));
+        } else if (ptr == &mons[PM_SMUGGLER]) {
+            mkmonmoney(mtmp, (long) rn1(30, 10));
         } else if (ptr == &mons[PM_SHOPKEEPER]) {
             (void) mongets(mtmp, SKELETON_KEY);
             switch (rn2(4)) {
@@ -2379,7 +2393,11 @@ boolean
 peace_minded(struct permonst *ptr)
 {
     aligntyp mal = ptr->maligntyp, ual = u.ualign.type;
+    int fp;
 
+    /* NeonHack 2: a faction's people go by what it thinks of you */
+    if ((fp = story_faction_peace(ptr)) >= 0)
+        return (boolean) fp;
     if (always_peaceful(ptr))
         return TRUE;
     if (always_hostile(ptr))

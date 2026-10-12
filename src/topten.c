@@ -970,7 +970,10 @@ outentry(int rank, struct toptenentry *t1, boolean so)
         Sprintf(eos(linebuf), "-%s ", t1->plalign);
     else
         Strcat(linebuf, " ");
-    if (!strncmp("escaped", t1->death, 7)) {
+    if (!strncmp("walked away", t1->death, 11)) { /* NeonHack 2 */
+        Sprintf(eos(linebuf), "%s [max level %d]", t1->death, t1->maxlvl);
+        second_line = FALSE;
+    } else if (!strncmp("escaped", t1->death, 7)) {
         Sprintf(eos(linebuf), "escaped the dungeon %s[max level %d]",
                 !strncmp(" (", t1->death + 7, 2) ? t1->death + 7 + 2 : "",
                 t1->maxlvl);
