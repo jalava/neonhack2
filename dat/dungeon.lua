@@ -369,6 +369,18 @@ dungeon = {
          { name = "nc-b7roof", base = 1 },
       }
    },
+   -- the cold open: Halcyon's black site, a week before the story
+   {
+      name = "Orison",
+      base = 3,
+      flags = { "unconnected", "city" },
+      danger = 10,
+      lvlfill = "nc-orisonfill",
+      levels = {
+         { name = "nc-orison1", base = 1 },
+         { name = "nc-orison3", base = -1 },
+      }
+   },
    {
       name = "Jade Den",
       base = 3,

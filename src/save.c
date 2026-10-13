@@ -44,6 +44,10 @@ staticfn void save_adjust_levelflags(void);
 int
 dosave(void)
 {
+    if (story_in_coldopen()) { /* NeonHack 2 */
+        pline("No saving in the middle of a job.  Finish it first.");
+        return ECMD_OK;
+    }
     clear_nhwindow(WIN_MESSAGE);
     if (y_n("Really save?") == 'n') {
         clear_nhwindow(WIN_MESSAGE);

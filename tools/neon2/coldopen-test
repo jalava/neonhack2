@@ -1,0 +1,86 @@
+#!/bin/bash
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
+# coldopen-test - play the cold open (the job a week before the story)
+# in a debug-mode game: the borrowed kit and level, no saving, the vault,
+# ARBITER, the ending, and waking on Okoye's table with your own kit.
+# Uses tools/nhdrive (tmux) and the helpers in testlib.sh.
+#
+#   tools/neon2/coldopen-test         run it; exit status 0 if all passed
+top=$(cd "$(dirname "$0")/../.." && pwd)
+export NHSESSION=${NHSESSION:-coldopentest}
+export NHDELAY=${NHDELAY:-0.5}
+export NHOPTS='name:Tester,role:Valkyrie,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore,coldopen,msghistory:60,msg_window:full,time'
+fails=0
+. "$top/tools/neon2/testlib.sh"
+
+"$drive" start -D
+sleep 1.5
+expect_msg "Little runner" "the client's briefing"
+clear_msgs
+expect "Orison" "on the job"
+expect "Xp:12" "a veteran, for a week"
+keys i; expect "assault rifle" "the borrowed kit"
+expect "(in quiver" "bullets ready"
+key Escape; clear_msgs
+keys S; expect "No saving in the middle of a job" "no saving on the job"
+clear_msgs
+# deck 2, then the vault
+wizstory "next coldopen"; clear_msgs
+wizstory "next coldopen"; clear_msgs
+levelport "Orison:3"
+wizstory "fetch splinter_mine"; clear_msgs
+keys ','; sleep 0.5
+expect_msg "Every light in the vault turns red" "the splinter, and the alarm"
+expect_msg "that's the thing, now MOVE" "Wren's warning"
+clear_msgs
+listed "arbiter0   alive" "ARBITER is here"
+# hold out (or don't): it ends either way, in 25 turns at the most
+for i in $(seq 1 40); do
+    screen | grep -q "Nothing for a long time" && break
+    key m; key s; sleep 0.2
+    screen | grep -q "Nothing for a long time" && break
+    screen | grep -q -e '--More--' && key Enter
+done
+expect "Nothing for a long time" "the job ends badly"
+key Enter
+expect_msg "Neo Yendor, 2188" "the prologue begins"
+clear_msgs
+expect "Neon Mile" "waking up on Neon Mile"
+expect "Xp:1 " "back to experience level 1"
+keys i
+if screen | grep -q "assault rifle"; then
+    echo "FAIL the kit is gone"; screen | sed 's/^/     | /'; fails=$((fails + 1))
+else
+    echo "ok   the kit is gone"
+fi
+key Escape; clear_msgs
+key Tab; expect "The Orison Job" "the job is in the journal"; key Escape; clear_msgs
+key Tab; expect "Talk to Doc Okoye" "the prologue's first step"; key Escape; clear_msgs
+save_and_restore
+expect "Neon Mile" "saving works again"
+"$drive" stop
+
+# a hangup in the middle of the job saves the game without the stored
+# start; restoring it cuts the job short and wakes you up
+"$drive" start -D
+sleep 1.5; clear_msgs; clear_msgs
+tmux kill-session -t "$NHSESSION"; sleep 2
+tl_home=$(mktemp -d /tmp/nhhome.XXXXXX)
+tmux new-session -d -s "$NHSESSION" -x 80 -y 24 \
+    "cd '$top/playground' && HOME='$tl_home' TERM=xterm-256color NETHACKOPTIONS='$NHOPTS' ./neonhack2 -D; sleep 600"
+sleep 1.5
+cut=
+for i in 1 2 3 4 5 6 7 8 9; do
+    screen | grep -q "breaks up like a bad signal" && cut=1
+    screen | grep -q "keep the save file" && keys n
+    screen | grep -q -e '--More--' -e '(end)' && key Enter
+    sleep 0.4
+done
+[ -n "$cut" ] && echo "ok   a restored job is cut short" \
+    || { echo "FAIL a restored job is cut short"; fails=$((fails + 1)); }
+expect "Neon Mile" "and you wake up"
+expect "Xp:1 " "with your own level"
+"$drive" stop
+echo "coldopen-test: $fails failure(s)"
+exit $((fails > 0))

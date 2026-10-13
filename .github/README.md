@@ -27,6 +27,9 @@ re-themed) still waits beneath the Shaft in Ashfall.
   other shards; get them by a deal or the hard way.
 - **Factions:** Halcyon Dynamics, the Jade Circuit and the Long Road
   remember what you do. Their people are friends or enemies accordingly.
+- **The cold open:** start, if you like, with the job a week earlier, kitted
+  to the teeth at level 12, all the way down a black site to the thing
+  that guards it. It doesn't end well.
 - **Death:** story mode (wake up at the last clinic, poorer) or hardcore.
 - **Under the hood:** firearms, cyberware, hacking, corporate Heat, and
   the NeonGrid look for UTF-8 terminals.

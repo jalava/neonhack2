@@ -142,6 +142,7 @@ Written by `tools/neon-notices`; don't edit it by hand.
 - `src/mthrowu.c`: 2026-10-11 to 2026-10-13
 - `src/muse.c`: 2026-10-11 to 2026-10-13
 - `src/music.c`: 2026-10-11 to 2026-10-13
+- `src/nhlua.c`: 2026-10-13
 - `src/o_init.c`: 2026-10-11 to 2026-10-13
 - `src/objnam.c`: 2026-10-11 to 2026-10-13
 - `src/options.c`: 2026-10-11 to 2026-10-13
@@ -212,6 +213,9 @@ Written by `tools/neon-notices`; don't edit it by hand.
 - `dat/nc-marafill.lua`
 - `dat/nc-marahold.lua`
 - `dat/nc-neonmile.lua`
+- `dat/nc-orison1.lua`
+- `dat/nc-orison3.lua`
+- `dat/nc-orisonfill.lua`
 - `dat/nc-sealfill.lua`
 - `dat/nc-sealloom.lua`
 - `dat/nc-spirefill.lua`
@@ -259,6 +263,7 @@ Written by `tools/neon-notices`; don't edit it by hand.
 - `tools/neon/roles.py`
 - `tools/neon/showcase.lua`
 - `tools/neon2/.gitignore`
+- `tools/neon2/coldopen-test`
 - `tools/neon2/district.py`
 - `tools/neon2/districts/ashfall.py`
 - `tools/neon2/districts/b7roof.py`
@@ -272,6 +277,8 @@ Written by `tools/neon-notices`; don't edit it by hand.
 - `tools/neon2/districts/lantern.py`
 - `tools/neon2/districts/marahold.py`
 - `tools/neon2/districts/neonmile.py`
+- `tools/neon2/districts/orison1.py`
+- `tools/neon2/districts/orison3.py`
 - `tools/neon2/districts/sealloom.py`
 - `tools/neon2/districts/spiretop.py`
 - `tools/neon2/districts/stacks.py`

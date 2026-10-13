@@ -234,6 +234,9 @@ static int optfn_##a(int, int, boolean, char *, char *);
     NHOPTB(cmdassist, Behavior, 0, opt_out, set_in_game,
            On, Yes, No, No, NoAlias, &iflags.cmdassist, Term_False,
            "give help for errors on direction input")
+    NHOPTB(coldopen, Advanced, 0, opt_in, set_in_config,
+           Off, Yes, No, No, NoAlias, &flags.coldopen, Term_False,
+           "start a new game with the job a week before the story")
     NHOPTB(color, Map, 0, opt_in, set_in_game,
            On, Yes, No, No, "colour", &iflags.wc_color, Term_False,
            "use color in map")

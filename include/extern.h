@@ -2226,6 +2226,7 @@ extern int get_table_option(lua_State *, const char *, const char *,
 extern const char *get_lua_version(void);
 extern void nhl_pushhooked_open_table(lua_State *L) NONNULLARG1;
 extern void free_tutorial(void);
+extern void nh_gamestate(boolean);
 extern void tutorial(boolean);
 #endif /* !CROSSCOMPILE || CROSSCOMPILE_TARGET */
 
@@ -2375,6 +2376,7 @@ extern int shiny_obj(char);
 
 extern boolean ask_do_tutorial(void);
 extern void ask_death_mode(void);
+extern void ask_coldopen(void);
 extern boolean match_optname(const char *, const char *, int, boolean) NONNULLARG12;
 extern uchar txt2key(char *) NONNULLARG1;
 extern void initoptions(void);
@@ -3290,6 +3292,10 @@ extern void story_angered(struct monst *) NONNULLARG1;
 extern void story_killed(struct monst *) NONNULLARG1;
 extern boolean story_stair_locked(d_level *);
 extern const char *story_walkaway(void);
+extern boolean story_coldopen_begin(void);
+extern boolean story_in_coldopen(void);
+extern boolean story_coldopen_death(int);
+extern void story_coldopen_resumed(void);
 extern int wiz_storycheck(void);
 
 /* ### sys.c ### */

@@ -1,6 +1,7 @@
 /* NetHack 5.0	nhlua.c	$NHDT-Date: 1744963460 2025/04/18 00:04:20 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.153 $ */
 /*      Copyright (c) 2018 by Pasi Kallinen */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-13. */
 
 #include "hack.h"
 #include "dlb.h"
@@ -1721,10 +1722,19 @@ nhl_callback(lua_State *L)
 staticfn int
 nhl_gamestate(lua_State *L)
 {
-    long wornmask;
-    struct obj *otmp;
     int argc = lua_gettop(L);
     boolean reststate = (argc > 0) ? lua_toboolean(L, -1) : FALSE;
+
+    nh_gamestate(reststate);
+    return 0;
+}
+
+/* NeonHack 2: the same, for the story's cold open (from C) */
+void
+nh_gamestate(boolean reststate)
+{
+    long wornmask;
+    struct obj *otmp;
     int otyp;
 
     debugpline4("gamestate: %d:%d (%c vs %c)", u.uz.dnum, u.uz.dlevel,
@@ -1735,7 +1745,9 @@ nhl_gamestate(lua_State *L)
 
         /* restore game state */
         svm.moves = gg.gmst_moves;
+#ifndef NEONHACK2
         pline("Resetting time to move #%ld.", svm.moves);
+#endif
         gg.gmst_moves = 0L;
 
         gl.lastinvnr = 51;
@@ -1798,7 +1810,6 @@ nhl_gamestate(lua_State *L)
                    gg.gmst_stored ? "already stored" : "not stored");
     }
     update_inventory();
-    return 0;
 }
 
 RESTORE_WARNING_UNREACHABLE_CODE

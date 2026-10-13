@@ -67,6 +67,7 @@ struct st_npc {
     boolean fixer; /* offers gigs */
     xint8 spot;    /* where it appears when spawned: SPOT_xxx */
     int level; /* experience level, if not the monster type's own */
+    int hp;    /* hit points, if not the level's */
     int nidle;
     char **idle;
     struct st_kvl died; /* effects when it is killed */
@@ -89,6 +90,8 @@ struct st_npc {
 struct st_stage {
     char *goal, *where, *talk, *give, *carry, *kill, *arrive, *flag;
     char *dialogue, *remind, *log;
+    int turns;   /* also finished this many turns after it began */
+    int hpbelow; /* also finished when your HP drops below this percent */
     struct st_kvl start, done;
     d_level wherelev, arrivelev;
 };
@@ -102,6 +105,7 @@ struct st_quest {
     xint8 status; /* Q_xxx */
     int stage;    /* current stage, 0-based */
     long ended;   /* turn it was finished or failed */
+    long began;   /* turn the current stage began */
 };
 #define Q_INACTIVE 0
 #define Q_ACTIVE 1
@@ -178,6 +182,15 @@ struct st_ending {
 
 #define STALE_MAX 16 /* old copies of moved NPCs, to remove */
 
+/* the cold open: a job a week before the story, played with a borrowed
+   kit and level, that always ends badly */
+struct st_coldopen {
+    char *place, *quest, *ending, *fallen;
+    d_level lev;
+    int level, nkit;
+    char **kit;
+};
+
 static struct story_data {
     boolean loaded;
     int nquests, nnpcs, nnodes, nitems, nfactions;
@@ -191,6 +204,7 @@ static struct story_data {
     char walkaway[BUFSZ];   /* how the game ended, if you walked away */
     unsigned stale[STALE_MAX];
     int nstale;
+    struct st_coldopen co;
     long lastamb; /* turn of the last ambient message */
     struct st_gig gigs[GIG_SLOTS];
     long gigseq;
@@ -247,6 +261,10 @@ staticfn void st_stale_add(unsigned);
 staticfn void st_stale_remove(void);
 staticfn int st_rank_faction(boolean);
 staticfn boolean st_site_locked(xint16);
+staticfn void st_coldopen_end(boolean);
+staticfn void st_fresh_start(void);
+staticfn void st_equip(struct obj *);
+staticfn boolean st_coldopen_here(void);
 staticfn int st_read_weights(lua_State *, const char *, int **, int **);
 staticfn struct st_district *st_here(void);
 staticfn void st_read_nodes(lua_State *);
@@ -568,6 +586,7 @@ st_read_npcs(lua_State *L)
             np->stay = get_table_boolean_opt(L, "stay", FALSE);
             np->hostile = get_table_boolean_opt(L, "hostile", FALSE);
             np->level = get_table_int_opt(L, "level", 0);
+            np->hp = get_table_int_opt(L, "hp", 0);
             np->fixer = get_table_boolean_opt(L, "fixer", FALSE);
             {
                 char *spot = get_table_str_opt(L, "spot", (char *) 0);
@@ -646,6 +665,8 @@ st_read_quest(lua_State *L, struct st_quest *qp, int i)
                 sp->dialogue = get_table_str_opt(L, "dialogue", (char *) 0);
                 sp->remind = get_table_str_opt(L, "remind", (char *) 0);
                 sp->log = get_table_str_opt(L, "log", (char *) 0);
+                sp->turns = get_table_int_opt(L, "turns", 0);
+                sp->hpbelow = get_table_int_opt(L, "hpbelow", 0);
                 st_read_kvl_field(L, "start", &sp->start);
                 st_read_kvl_field(L, "done", &sp->done);
             } else {
@@ -1019,6 +1040,8 @@ st_resolve(void)
         }
     }
 
+    if (!st.co.place || !city_resolve_dest(st.co.place, &st.co.lev))
+        st.co.lev.dlevel = 0;
     for (i = 0; i < st.nlocks; i++) {
         struct st_lock *lp = &st.locks[i];
 
@@ -1078,6 +1101,16 @@ story_load(void)
         st_read_districts(L);
         st_read_locks(L);
         st_read_endings(L);
+        lua_getfield(L, -1, "coldopen");
+        if (lua_type(L, -1) == LUA_TTABLE) {
+            st.co.place = get_table_str_opt(L, "place", (char *) 0);
+            st.co.quest = get_table_str_opt(L, "quest", (char *) 0);
+            st.co.ending = get_table_str_opt(L, "ending", (char *) 0);
+            st.co.fallen = get_table_str_opt(L, "fallen", (char *) 0);
+            st.co.level = get_table_int_opt(L, "level", 0);
+            st.co.kit = st_read_strlist(L, "kit", &st.co.nkit);
+        }
+        lua_pop(L, 1);
         st_add_gig_slots();
         st.loaded = TRUE;
     } else {
@@ -1148,6 +1181,11 @@ story_free(void)
         st_free_kvl(&st.endings[i].stay);
     }
     st_free(st.endings);
+    st_free(st.co.place), st_free(st.co.quest), st_free(st.co.ending);
+    st_free(st.co.fallen);
+    for (i = 0; i < st.co.nkit; i++)
+        st_free(st.co.kit[i]);
+    st_free(st.co.kit);
     for (i = 0; i < st.nnodes; i++) {
         struct st_node *np = &st.nodes[i];
 
@@ -1540,6 +1578,8 @@ story_npc_made(const char *id, struct monst *mtmp)
         mtmp->m_lev = (uchar) np->level;
         mtmp->mhpmax = mtmp->mhp = max(d(np->level, 8), np->level * 4);
     }
+    if (np->hp > 0)
+        mtmp->mhpmax = mtmp->mhp = np->hp;
     set_malign(mtmp);
 }
 
@@ -1708,8 +1748,8 @@ st_faction_sync(void)
     struct monst *mtmp;
     int f, stance;
 
-    if (!In_city(&u.uz)) /* the Undercity knows nothing of the factions */
-        return;
+    if (!In_city(&u.uz) || st_coldopen_here())
+        return; /* the Undercity knows nothing of the factions */
     for (mtmp = fmon; mtmp; mtmp = mtmp->nmon) {
         if (DEADMONSTER(mtmp) || (f = st_member_of(mtmp)) < 0)
             continue;
@@ -1733,7 +1773,7 @@ story_faction_peace(struct permonst *ptr)
 {
     int f, k, mndx = monsndx(ptr), stance;
 
-    if (!st.loaded || !In_city(&u.uz))
+    if (!st.loaded || !In_city(&u.uz) || st_coldopen_here())
         return -1;
     for (f = 0; f < st.nfactions; f++)
         for (k = 0; k < st.factions[f].nmembers; k++)
@@ -1750,7 +1790,8 @@ story_angered(struct monst *mtmp)
 {
     int f;
 
-    if (st.loaded && In_city(&u.uz) && (f = st_member_of(mtmp)) >= 0)
+    if (st.loaded && In_city(&u.uz) && !st_coldopen_here()
+        && (f = st_member_of(mtmp)) >= 0)
         st_rep_add(f, -3L, FALSE);
 }
 
@@ -1759,7 +1800,8 @@ story_killed(struct monst *mtmp)
 {
     int f;
 
-    if (st.loaded && In_city(&u.uz) && (f = st_member_of(mtmp)) >= 0)
+    if (st.loaded && In_city(&u.uz) && !st_coldopen_here()
+        && (f = st_member_of(mtmp)) >= 0)
         st_rep_add(f, mtmp->mpeaceful ? -4L : -1L, FALSE);
 }
 
@@ -2142,7 +2184,7 @@ story_effects(void *vkvl)
         "say", "text", "log", "cases", "when", "credits", "object", "item",
         "take", "rep", "heat", "flag", "flags", "unflag", "anger", "move",
         "spawn", "despawn", "allies", "unlock", "advance", "fail", "finish",
-        "start", "track", "xp", "gigs", "ending", 0
+        "start", "track", "xp", "gigs", "ending", "wake", 0
     };
     struct st_kvl *eff = (struct st_kvl *) vkvl;
     const char *calltitle = 0;
@@ -2243,6 +2285,8 @@ story_effects(void *vkvl)
             } else if (!strcmp(kv->key, "gigs")) {
                 if (st.talking && st.talking->fixer)
                     st_gig_board(st.talking);
+            } else if (!strcmp(kv->key, "wake")) {
+                st_coldopen_end(FALSE);
             } else if (!strcmp(kv->key, "ending")) {
                 if ((x = st_ending_idx(s)) >= 0)
                     st_ending(x);
@@ -2470,6 +2514,7 @@ st_gig_build(int slot, long seq, int tpl, int fixer, d_level *place,
         to->dialogue = st_gigsub(from->dialogue, g);
         to->remind = st_gigsub(from->remind, g);
         to->log = st_gigsub(from->log, g);
+        to->turns = from->turns, to->hpbelow = from->hpbelow;
         st_gigsub_kvl(&to->start, &from->start, g);
         st_gigsub_kvl(&to->done, &from->done, g);
         if (!to->where || !city_resolve_dest(to->where, &to->wherelev))
@@ -2844,6 +2889,7 @@ st_begin_stage(int q)
 
     if (!sp)
         return;
+    st.quests[q].began = svm.moves;
     if (sp->log)
         st_log_add(q, svm.moves, st_subst(sp->log, buf, (int) sizeof buf));
     story_effects(&sp->start);
@@ -2924,7 +2970,12 @@ st_recheck(void)
             if ((sp->carry && st_carried(sp->carry))
                 || (sp->flag && st_flag_val(sp->flag))
                 || (sp->arrivelev.dlevel > 0 && st_on(&sp->arrivelev)
-                    && !sp->talk)) {
+                    && !sp->talk)
+                || (sp->turns > 0
+                    && svm.moves - st.quests[q].began >= sp->turns)
+                || (sp->hpbelow > 0
+                    && (long) u.uhp * 100L
+                           < (long) u.uhpmax * sp->hpbelow)) {
                 st_finish_stage(q);
                 changed = TRUE;
             }
@@ -2950,6 +3001,174 @@ story_new_game(void)
     story_arrived();
 }
 
+/*
+ * The cold open
+ */
+
+/* in the middle of the job? */
+boolean
+story_in_coldopen(void)
+{
+    return (boolean) (st.loaded && st_flag_val("coldopen") != 0L);
+}
+
+/* on one of the job's floors (whether the job is on or not) */
+staticfn boolean
+st_coldopen_here(void)
+{
+    return (boolean) (st.co.lev.dlevel > 0 && u.uz.dnum == st.co.lev.dnum);
+}
+
+/* put on and ready what the kit holds, as for a starting inventory */
+staticfn void
+st_equip(struct obj *obj)
+{
+    obj->known = obj->dknown = obj->bknown = obj->rknown = 1;
+    if (OBJ_DESCR(objects[obj->otyp]))
+        discover_object(obj->otyp, TRUE, TRUE, FALSE);
+    if (obj->oclass == ARMOR_CLASS) {
+        if (is_shield(obj) && !uarms && !(uwep && bimanual(uwep)))
+            setworn(obj, W_ARMS);
+        else if (is_helmet(obj) && !uarmh)
+            setworn(obj, W_ARMH);
+        else if (is_gloves(obj) && !uarmg)
+            setworn(obj, W_ARMG);
+        else if (is_shirt(obj) && !uarmu)
+            setworn(obj, W_ARMU);
+        else if (is_cloak(obj) && !uarmc)
+            setworn(obj, W_ARMC);
+        else if (is_boots(obj) && !uarmf)
+            setworn(obj, W_ARMF);
+        else if (is_suit(obj) && !uarm && !uarmc)
+            setworn(obj, W_ARM);
+    } else if (obj->oclass == WEAPON_CLASS || is_weptool(obj)) {
+        if (is_ammo(obj) || is_missile(obj)) {
+            if (!uquiver)
+                setuqwep(obj);
+        } else if (!uwep) {
+            setuwep(obj);
+        } else if (!uswapwep) {
+            setuswapwep(obj);
+        }
+    }
+}
+
+/* start the job (a new game, if it was asked for); False: no job */
+boolean
+story_coldopen_begin(void)
+{
+    struct st_coldopen *co = &st.co;
+    int q, k;
+
+    if (!st.loaded || co->lev.dlevel <= 0 || (q = st_quest_idx(co->quest)) < 0)
+        return FALSE;
+    nh_gamestate(FALSE); /* the real start waits for after the job */
+    for (k = 0; k < co->nkit; k++) {
+        char buf[BUFSZ];
+        long n = atol(co->kit[k]);
+        struct obj *otmp;
+
+        copynchars(buf, co->kit[k], (int) sizeof buf - 1);
+        otmp = readobjnam(buf, (struct obj *) 0);
+        if (!otmp || otmp == &hands_obj) {
+            impossible("story: no \"%s\" for the cold open", co->kit[k]);
+            continue;
+        }
+        if (n > 1 && objects[otmp->otyp].oc_merge) {
+            otmp->quan = n;
+            otmp->owt = weight(otmp);
+        }
+        otmp = addinv(otmp);
+        st_equip(otmp);
+    }
+    find_ac();
+    if (co->level > u.ulevel) { /* a veteran, for a week */
+        u.ulevel = u.ulevelmax = co->level;
+        u.uexp = newuexp(co->level - 1);
+        u.uhpmax = u.uhp = u.uhppeak = max(u.uhpmax, 12 * co->level);
+        u.uenmax = u.uen = u.uenpeak = max(u.uenmax, 4 * co->level);
+    }
+    update_inventory();
+    disp.botl = TRUE;
+    st_flag_set("coldopen", 1L);
+    /* off to the job; pets wait at home */
+    iflags.nofollowers = TRUE;
+    schedule_goto(&co->lev, UTOTYPE_NONE, (char *) 0, (char *) 0);
+    deferred_goto();
+    iflags.nofollowers = FALSE;
+    vision_recalc(0);
+    docrt();
+    st_start_quest(q, TRUE);
+    return TRUE;
+}
+
+/* the start a new game would have had, when the stored one is lost
+   (a game saved by a hangup in the middle of the job) */
+staticfn void
+st_fresh_start(void)
+{
+    u_init_inventory_attrs();
+    u_init_skills_discoveries();
+    u.ulevel = 0;
+    u.uhp = u.uhpmax = u.uhppeak = newhp();
+    u.uen = u.uenmax = u.uenpeak = newpw();
+    u.ulevel = u.ulevelmax = 1;
+    u.uexp = 0L;
+    u.uheat = 0L;
+    find_ac();
+}
+
+/* the job goes wrong; you wake up a week later, on Okoye's table */
+staticfn void
+st_coldopen_end(boolean fallen)
+{
+    int q;
+
+    if (!story_in_coldopen())
+        return;
+    st_flag_set("coldopen", 0L);
+    /* the guardian's ending once you've reached it, else the other */
+    q = st_quest_idx(st.co.quest);
+    if (q >= 0 && st.quests[q].stage >= st.quests[q].nstages - 1)
+        fallen = FALSE;
+    st_show_text("", fallen && st.co.fallen ? st.co.fallen : st.co.ending);
+    if (q >= 0 && st.quests[q].status == Q_ACTIVE)
+        st_end_quest(q, Q_FAILED, (char *) 0);
+    if (gg.gmst_stored)
+        nh_gamestate(TRUE); /* your own kit, level and turn */
+    else
+        st_fresh_start();
+    update_inventory();
+    disp.botl = TRUE;
+    st_flag_set("wake", 1L);
+    iflags.nofollowers = TRUE; /* nobody from the job comes along */
+    schedule_goto(&citystart_level, UTOTYPE_NONE, (char *) 0, (char *) 0);
+}
+
+/* dying on the job is how it ends */
+boolean
+story_coldopen_death(int how)
+{
+    if (!story_in_coldopen())
+        return FALSE;
+    savelife(how);
+    st_coldopen_end(TRUE);
+    return TRUE;
+}
+
+/* a game restored in the middle of the job lost the stored start */
+void
+story_coldopen_resumed(void)
+{
+    if (story_in_coldopen() && !gg.gmst_stored) {
+        pline("The memory of the job breaks up like a bad signal.");
+        st_coldopen_end(TRUE);
+        deferred_goto(); /* wake up now, not after the next move */
+        vision_recalc(0);
+        docrt();
+    }
+}
+
 /* after every move */
 void
 story_turn(void)
@@ -2968,6 +3187,16 @@ story_arrived(void)
 
     if (!st.loaded)
         return;
+    /* back from the cold open: now the story begins */
+    if (st_flag_val("wake") && !st_coldopen_here()) {
+        int q;
+
+        st_flag_set("wake", 0L);
+        iflags.nofollowers = FALSE;
+        for (q = 0; q < st.nquests; q++)
+            if (st.quests[q].autostart)
+                st_start_quest(q, FALSE);
+    }
     for (i = 0; i < st.nnpcs; i++) {
         struct st_npc *np = &st.npcs[i];
 
@@ -3360,8 +3589,8 @@ story_state_lines(char **lines, int n, int max)
 
         if (qp->status == Q_INACTIVE)
             continue;
-        Sprintf(buf, "quest %s %d %d %ld", qp->id, qp->status, qp->stage,
-                qp->ended);
+        Sprintf(buf, "quest %s %d %d %ld %ld", qp->id, qp->status, qp->stage,
+                qp->ended, qp->began);
         lines[n++] = dupstr(buf);
     }
     for (i = 0; i < st.nfactions && n < max; i++) {
@@ -3409,12 +3638,16 @@ story_state_line(const char *line)
     long l;
 
     if (!strncmp(line, "quest ", 6)) {
+        long began = 0L;
+
         l = 0L;
-        if (sscanf(line, "quest %255s %d %d %ld", id, &a, &b, &l) >= 3
+        if (sscanf(line, "quest %255s %d %d %ld %ld", id, &a, &b, &l, &began)
+                >= 3
             && (i = st_quest_idx(id)) >= 0) {
             st.quests[i].status = (xint8) a;
             st.quests[i].stage = b;
             st.quests[i].ended = l;
+            st.quests[i].began = began;
         }
         return TRUE;
     }
@@ -3825,7 +4058,7 @@ st_check_kvl(struct st_kvl *l, const char *where, winid win)
                    && strcmp(kv->key, "flag") && strcmp(kv->key, "flags")
                    && strcmp(kv->key, "unflag") && strcmp(kv->key, "xp")
                    && strcmp(kv->key, "noflag") && strcmp(kv->key, "heat")
-                   && strcmp(kv->key, "gigs")) {
+                   && strcmp(kv->key, "gigs") && strcmp(kv->key, "wake")) {
             Snprintf(buf, sizeof buf, "%s: unknown key \"%s\"", where, kv->key);
             putstr(win, 0, buf);
             bad++;
@@ -3892,6 +4125,9 @@ wiz_storycheck(void)
                      st.locks[i].flag ? "no such place" : "no flag");
             putstr(win, 0, buf), bad++;
         }
+    if (st.co.place && (st.co.lev.dlevel <= 0 || st_quest_idx(st.co.quest) < 0)) {
+        putstr(win, 0, "coldopen: unknown place or quest"), bad++;
+    }
     for (i = 0; i < st.nendings; i++) {
         Snprintf(where, sizeof where, "ending %s stay", st.endings[i].id);
         bad += st_check_kvl(&st.endings[i].stay, where, win);

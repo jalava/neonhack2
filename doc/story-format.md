@@ -23,6 +23,7 @@ story = {
    districts = { ["nc-stacks"] = { ... }, ... },     -- city life
    locks = { ["The Undercity"] = { ... }, ... },     -- shut ways
    endings = { open = { ... }, ... },                -- how it ends
+   coldopen = { ... },                               -- the job before
 }
 ```
 
@@ -75,6 +76,7 @@ okoye = {
    idle = { "Doc Okoye wipes down her tools." },  -- one-liners otherwise
    spot = "metro",           -- spawns by the metro, or "near" (next to you)
    near = "hex",             -- spawns next to that NPC, if it's there
+   hp = 999,                 -- hit points (default: from its level)
    died = { <effects> },     -- when it is killed (by anyone)
 }
 ```
@@ -119,6 +121,9 @@ A stage:
   kill = "ratking",               -- the NPC dying
   carry = "shard",                -- having the item in your pack
   flag = "door_open",             -- the story flag becoming non-zero
+  -- and also by either of these, whatever else the stage needs:
+  turns = 25,                     -- this many turns after it began
+  hpbelow = 30,                   -- your HP dropping below this percent
 }
 ```
 
@@ -176,6 +181,29 @@ Only places the story has opened are used.
 
 Stairs that lead into that dungeon (or floor) refuse to take you, with the
 text, until the flag is set. Gigs aren't sent to a locked site.
+
+### The cold open
+
+```lua
+coldopen = {
+   place = "Orison:1",           -- where the job starts
+   quest = "coldopen",           -- the job's quest (not "start = true")
+   level = 12,                   -- your experience level on the job
+   kit = { "blessed +2 assault rifle", "120 blessed +2 bullets", ... },
+   ending = [[...]],             -- how it ends, once its last stage began
+   fallen = [[...]],             -- how it ends if you fall before that
+},
+```
+
+A new game can start with the cold open (the `coldopen` option, asked at
+character creation). Your starting kit, level and turn are put aside;
+you get the kit (worn and readied) and the level, and the quest starts at
+`place`. Saving is refused on the job. It ends with the `wake = true`
+effect or with your death, whichever comes first: the ending text, the
+quest fails, everything put aside comes back, and you wake up where a new
+game starts, where the quests marked `start = true` begin. A game saved by
+a hangup in the middle of the job loses what was put aside, so restoring
+it ends the job at once, with a freshly made starting kit.
 
 ### Endings
 
@@ -238,6 +266,7 @@ this order:
 | `heat = n` | Heat (corporate security's interest) |
 | `gigs = true` | (in a fixer's dialogue) the fixer's gig board |
 | `ending = "open"` | an ending (see above) |
+| `wake = true` | ends the cold open (see above) |
 
 ### Conditions (`need`)
 

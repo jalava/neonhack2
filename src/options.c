@@ -479,6 +479,32 @@ ask_do_tutorial(void)
     return dotut;
 }
 
+/* NeonHack 2: the cold open (the job a week before the story), unless the
+   config file says */
+void
+ask_coldopen(void)
+{
+    const char *rc;
+    boolean norc;
+    char buf[BUFSZ];
+
+    if (opt_set_in_config[opt_coldopen])
+        return;
+    if (iflags.debug_fuzzer) {
+        flags.coldopen = FALSE;
+        return;
+    }
+    rc = nh_basename(get_configfile(), TRUE);
+    norc = !strcmp(get_configfile(), "/dev/null");
+    Snprintf(buf, sizeof buf,
+             "(Put \"OPTIONS=coldopen\" or \"OPTIONS=!coldopen\" in %s"
+             " to skip this question.)",
+             (rc && *rc && !norc) ? rc : "your configuration file");
+    pline("%s", buf);
+    flags.coldopen = (y_n("Start with the cold open: one last job, a week"
+                          " before you wake up?") != 'n');
+}
+
 /* NeonHack 2: story mode or hardcore, unless the config file says */
 void
 ask_death_mode(void)

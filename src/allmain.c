@@ -89,6 +89,7 @@ moveloop_preamble(boolean resuming)
     if (resuming) { /* restoring old game */
         read_engr_at(u.ux, u.uy); /* subset of pickup() */
         fix_shop_damage();
+        story_coldopen_resumed(); /* NeonHack 2: a cold open cut short */
     }
 
     encumber_msg(); /* in case they auto-picked up something */
@@ -869,7 +870,9 @@ newgame(void)
     /* Success! */
     welcome(TRUE);
     ask_death_mode(); /* NeonHack 2: story mode or hardcore */
-    story_new_game(); /* NeonHack 2: the prologue begins */
+    ask_coldopen();   /* NeonHack 2: and the job a week before? */
+    if (!flags.coldopen || !story_coldopen_begin())
+        story_new_game(); /* NeonHack 2: the prologue begins */
     notice_mon_on(); /* now we can notice monsters */
     if (a11y.glyph_updates)
         (void) dolookaround();

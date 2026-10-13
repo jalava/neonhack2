@@ -15,7 +15,7 @@
 top=$(cd "$(dirname "$0")/../.." && pwd)
 export NHSESSION=${NHSESSION:-storytest}
 export NHDELAY=${NHDELAY:-0.5}
-export NHOPTS='name:Tester,role:Valkyrie,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore,msghistory:60,msg_window:full'
+export NHOPTS='name:Tester,role:Valkyrie,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore,!coldopen,msghistory:60,msg_window:full'
 fails=0
 . "$top/tools/neon2/testlib.sh"
 

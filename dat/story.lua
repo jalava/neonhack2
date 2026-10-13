@@ -35,6 +35,7 @@ story = {
       splinter_road = { name = "splinter on a leather cord" },
       splinter_halcyon = { name = "splinter in a Halcyon cryo-vial" },
       splinterkey = { name = "Splinter key" },
+      splinter_mine = { name = "splinter in a black cryo-vial" },
    },
 
    ----------------------------------------------------------------------
@@ -161,6 +162,15 @@ story = {
       -- never seen: the voice from below
       voice = { name = "UNKNOWN CALLER", monster = "black ICE" },
 
+      -- the cold open: your crew's eyes and ears, and the thing in the vault
+      wren = { name = "Wren", monster = "salvager", female = true },
+      arbiter0 = {
+         name = "ARBITER", monster = "battle mech", level = 20, hp = 999,
+         hostile = true, home = "Orison:3", spot = "near",
+         died = { say = "ARBITER crashes down.  Behind it, a second one unfolds from the wall.",
+                  wake = true },
+      },
+
       -- act 4
       arbiter = {
          name = "ARBITER", monster = "battle mech", level = 18,
@@ -171,6 +181,34 @@ story = {
 
    ----------------------------------------------------------------------
    quests = {
+
+      -- the cold open: one week earlier (see coldopen below)
+      { id = "coldopen", title = "The Orison Job", kind = "main",
+        stages = {
+           { goal = "Get through the dock and take the lift down.",
+             where = "Orison:1", arrive = "Orison:2",
+             start = { call = "voice", text = [[Little runner.
+
+You come recommended.  I need something fetched from a place that does not exist: Orison, Halcyon's black site under the sea.  In its vault, on the lowest deck, there is a splinter of glass in a black vial.  Bring it to me.
+
+Halcyon will not be expecting you.  Halcyon never expects anyone.  That is why it keeps a guardian.
+
+You will be paid more than you have ever been paid.  Your sub is surfacing now.]] },
+             log = [[One week earlier.  The job: Orison, Halcyon's black site under the sea.  The client never gave a name.  Wren, a kid in road leathers, is on comms from the sub.]] },
+           { goal = "Find the lift down to the vault deck.", where = "Orison:2",
+             arrive = "Orison:3",
+             start = { say = "Wren, in your ear: \"Deck two.  Labs.  Don't touch anything that glows.\"" } },
+           { goal = "Take the splinter from the vault.", where = "Orison:3",
+             carry = "splinter_mine",
+             start = { say = "Wren: \"Vault deck.  Whatever's in that cage, grab it and run.\"" },
+             done = { say = "The vial is cold enough to burn.  Every light in the vault turns red.",
+                      spawn = "arbiter0", call = "wren",
+                      text = [[That's it, that's the thing, now MOVE!
+
+Something just came online down there and it isn't on any schematic.  The label says ARBITER.  It's coming for you.  Get to the lift!]] } },
+           { goal = "Get out.", where = "Orison:3", turns = 25, hpbelow = 30,
+             done = { wake = true } },
+        } },
 
       -- the prologue: wake up, meet Okoye and Mags
       { id = "prologue", title = "Cold Start", kind = "main", start = true,
@@ -433,6 +471,37 @@ Old Juno sends you a road map with every road on it.]],
    },
 
    ----------------------------------------------------------------------
+   -- the cold open: a new game can start a week earlier, with the job
+   -- that put the splinter in your head.  You play it with this kit, at
+   -- this experience level; it always ends badly, and then the story
+   -- starts as usual, with your own kit, on Okoye's table.
+   coldopen = {
+      place = "Orison:1", quest = "coldopen", level = 12,
+      kit = {
+         "blessed +2 assault rifle", "120 blessed +2 bullets",
+         "blessed +2 katana", "blessed +2 titanium mesh coat",
+         "blessed +1 armored duster", "blessed +2 combat helmet",
+         "blessed +1 gauntlets of power", "blessed +1 speed boots",
+         "4 frag grenades", "2 flashbangs", "3 blessed medkits",
+         "2 blessed potions of extra healing",
+      },
+      ending = [[ARBITER doesn't hurry.  It doesn't need to.
+
+Your rounds spark off its plating.  Your blade skates off it.  Its first blow takes your legs; the second puts you into the wall, and the wall gives first.
+
+Somewhere far away, Wren is screaming your name.  Then she's close: small hands under your jaw, cold fingers at the port behind your ear.  "They'll strip the body for it," she whispers.  "So it can't be on the body."  Shaky hands.  Something slides into your skull like a splinter of ice.
+
+ARBITER raises its arm.
+
+Then nothing.  Nothing for a long time.]],
+      fallen = [[You go down hard, a long way short of the vault.
+
+Wren's voice is frantic in your ear, then close, then her hands are under your jaw.  "It's all right, I've got it, I went in myself.  Hold still."  Something cold slides into the port behind your ear.
+
+Then nothing.  Nothing for a long time.]],
+   },
+
+   ----------------------------------------------------------------------
    -- ways the story keeps shut until a flag is set
    locks = {
       ["The Undercity"] = { flag = "shaft_open", text = [[Blast doors close the Shaft, welded shut, with a Halcyon seal glowing on every weld.  Not yet.]] },
@@ -601,6 +670,10 @@ Old Juno sends you a road map with every road on it.]],
       ["Seal Vault"] = {
          monsters = { ["mutant runt"] = 3, ghoul = 2, feral = 1,
                       ["scav zombie"] = 2 },
+      },
+      ["Orison"] = {
+         monsters = { ["corpsec trooper"] = 4, ["security drone"] = 2,
+                      ["combat synth"] = 1, ["sentry bot"] = 1 },
       },
       ["Zenith Spire"] = {
          monsters = { ["corpsec sergeant"] = 3, ["combat synth"] = 2,

@@ -11,7 +11,7 @@ top=$(cd "$(dirname "$0")/../.." && pwd)
 drive="$top/tools/nhdrive"
 export NHSESSION=${NHSESSION:-slicetest}
 export NHDELAY=${NHDELAY:-0.5}
-export NHOPTS='name:Tester,role:Netrunner,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore'
+export NHOPTS='name:Tester,role:Netrunner,race:human,gender:female,align:neutral,!legacy,!autopickup,suppress_alert:5.0.0,!splash_screen,!tips,!hardcore,!coldopen'
 fails=0
 . "$top/tools/neon2/testlib.sh"
 

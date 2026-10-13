@@ -1105,6 +1105,9 @@ done(int how)
             survive = TRUE;
         }
     }
+    /* NeonHack 2: the cold open always ends badly, but not like this */
+    if (!survive && how < GENOCIDED && story_coldopen_death(how))
+        survive = TRUE;
     /* NeonHack 2: story mode wakes you up at a clinic */
     if (!survive && how < GENOCIDED && city_flatline(how))
         survive = TRUE;

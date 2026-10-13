@@ -76,6 +76,15 @@ real thing at the bottom of the Undercity.
 - **Gigs:** fixers have repeatable jobs: deliveries, bounties and retrievals, anywhere you can reach. They pay more in more dangerous places. Up to three can run at once. To drop one, pick it in the journal.
 - **City life:** each district has its own crowd. Citizens, salarymen and street vendors walk the streets (killing them is murder, and corpsec takes an interest). The Stacks belong to the Chrome Saints, and Lantern Market to pickpockets and the Jade Circuit. Now and then you'll notice something going on.
 
+## The cold open
+
+A new game asks whether to start with the cold open: one last job, a
+week before you wake up on Okoye's table, played with a borrowed kit at
+experience level 12. It doesn't end well; afterwards you start the story
+with your own kit, at level 1, as usual. Put `OPTIONS=coldopen` or
+`OPTIONS=!coldopen` in the config file to skip the question. There's no
+saving in the middle of the job.
+
 ## Flatlining
 
 A new game asks for story mode or hardcore. Put `OPTIONS=hardcore` or
@@ -98,7 +107,8 @@ A new game asks for story mode or hardcore. Put `OPTIONS=hardcore` or
   hand-drawn key floor each.
 - Story: `dat/story.lua`. The format is in `doc/story-format.md`. Check it
   with `#wizstorycheck` in a debug game (`./playground/neonhack2 -D`).
-- Tests: `tools/neon2/slice-test` plays the prologue and act 1 through,
+- Tests: `tools/neon2/coldopen-test` plays the cold open (and a hangup in
+  the middle of it), `tools/neon2/slice-test` plays the prologue and act 1 through,
   `tools/neon2/story-test` plays acts 2 to 4 both ways round (deals,
   force, theft, betrayal, two endings), and `tools/neon2/gig-test` plays
   one gig of each kind. Debug-mode games all play as "wizard" in the
