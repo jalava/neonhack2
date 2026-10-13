@@ -4,8 +4,8 @@ A cyberpunk variant of [NetHack](https://www.nethack.org/) 5.0 with an
 open city and a story. Same terminal map, same keys, same deep game
 underneath; but instead of one long descent you work the streets of Neo
 Yendor, district by district, with a quest journal, fixers, factions and
-three endings. All of NeonHack's Undercity (the whole NetHack dungeon,
-re-themed) still waits under the Shaft in Ashfall.
+three endings. Under it all, the Undercity (the whole NetHack dungeon,
+re-themed) still waits beneath the Shaft in Ashfall.
 
 ```
  You fire 3 bullets.  Rat-a-tat-tat!  The 1st bullet hits the corpsec trooper.
@@ -28,10 +28,14 @@ re-themed) still waits under the Shaft in Ashfall.
 - **Factions:** Halcyon Dynamics, the Jade Circuit and the Long Road
   remember what you do. Their people are friends or enemies accordingly.
 - **Death:** story mode (wake up at the last clinic, poorer) or hardcore.
-- **Everything from NeonHack:** firearms, cyberware, hacking, corporate
-  Heat, and the NeonGrid look for UTF-8 terminals.
+- **Under the hood:** firearms, cyberware, hacking, corporate Heat, and
+  the NeonGrid look for UTF-8 terminals.
 
 ## Build and play (Linux)
+
+NeonHack 2 has only been tested on Linux (x86-64), in the tty and curses
+interfaces, in UTF-8 terminals, both locally and over ssh. Other systems
+NetHack runs on may need work.
 
 ```sh
 git clone https://github.com/jalava/neonhack2.git

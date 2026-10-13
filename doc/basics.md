@@ -1,13 +1,13 @@
-# NeonHack
+# NeonHack 2: the basics
 
-> **In this repository:** this page describes NeonHack, the game that
-> NeonHack 2 grew out of. The NeonHack 2 tree builds only NeonHack 2; see
-> `README.neonhack2.md`.
+NeonHack 2 is a cyberpunk variant of **NetHack 5.0.0**. Same terminal map,
+same commands, same deep game, re-themed for a neon-lit megacity. This page
+covers the rules under the city: roles, gear, controls and the look. The
+city and the story are in `README.neonhack2.md`.
 
-A cyberpunk variant of **NetHack 5.0.0**. Same terminal map, same commands,
-same deep game, set in the Undercity of a neon-lit arcology instead of a
-fantasy dungeon. You still go down for the Amulet of Yendor; you just do it
-with a pistol, a cyberdeck and too much chrome.
+Under Neo Yendor lies the Undercity: the whole NetHack dungeon, re-themed,
+with the Amulet of Yendor still at the bottom. You go down for it with a
+pistol, a cyberdeck and too much chrome.
 
 ```
  You fire 3 bullets.  💥 Rat-a-tat-tat!  The 1st bullet hits the corpsec trooper.
@@ -21,22 +21,7 @@ with a pistol, a cyberdeck and too much chrome.
 
 ## Build and play
 
-```sh
-sh sys/unix/setup.sh sys/unix/hints/neonhack.500
-make fetch-Lua        # once; downloads Lua 5.4
-make all              # builds and installs into ./playground
-./playground/neonhack
-```
-
-* Interfaces: tty (default) and curses (`OPTIONS=windowtype:curses`).
-* Config: `~/.neonhackrc` (an existing `~/.nethackrc` is used if there is no
-  `~/.neonhackrc`), or the `NEONHACKOPTIONS` / `NETHACKOPTIONS` environment
-  variables. See `neonhackrc.sample`.
-* The playground build allows debug mode for the local user:
-  `./playground/neonhack -D`.
-* On distros that ship ncurses without its headers the
-  hints file uses Homebrew's ncurses headers and links the system's
-  runtime libraries; nothing extra needs to be installed.
+See `README.neonhack2.md`.
 
 ## Controls
 
@@ -120,7 +105,7 @@ Windows Terminal or PowerShell.
 
 ## For developers
 
-* Design and plan: `NEONHACK.md`.
+* Design of the cyberpunk layer: `doc/neonhack-plan.md`.
 * Every NeonHack change is a commit on top of the `NetHack-5.0.0_Released`
   tag: `git diff NetHack-5.0.0_Released` shows the whole variant.
 * New mechanics live in `src/neon.c`; the NetHack sources get small hooks.

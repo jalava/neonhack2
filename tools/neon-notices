@@ -122,8 +122,8 @@ def main():
             if cs:
                 header_added(f, cs)
     out = ["# NeonHack: changes to NetHack", "",
-           "NeonHack and NeonHack 2 are modified versions of NetHack 5.0.0",
-           f"(upstream tag `{BASE}`), by {WHO}. They are distributed",
+           "NeonHack 2 is a modified version of NetHack 5.0.0",
+           f"(upstream tag `{BASE}`), by {WHO}. It is distributed",
            "under the NetHack General Public License (`dat/license`). This",
            "file lists every file changed or added since that release; each",
            "changed file also carries a notice saying so, except where noted.",

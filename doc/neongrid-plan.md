@@ -112,7 +112,7 @@ corridors, trees and iron bars no longer use `#`.
    read, so `symset:` in the config (`symset:default` for ASCII) wins.
    This also replaces curses' own default ("curses", DEC line drawing).
    Emoji use the same terminal check.
-4. **Docs**: README, `dat/help`, `neonhackrc.sample`, NEONHACK.md.
+4. **Docs**: README, `dat/help`, `neonhackrc.sample`, `doc/neonhack-plan.md`.
 
 Not done: translating IBMgraphics to UTF-8 (NeonGrid covers the IBM
 look), and honouring `COLORTERM` (24-bit is on by default instead).

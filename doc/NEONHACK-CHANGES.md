@@ -1,7 +1,7 @@
 # NeonHack: changes to NetHack
 
-NeonHack and NeonHack 2 are modified versions of NetHack 5.0.0
-(upstream tag `NetHack-5.0.0_Released`), by jalava. They are distributed
+NeonHack 2 is a modified version of NetHack 5.0.0
+(upstream tag `NetHack-5.0.0_Released`), by jalava. It is distributed
 under the NetHack General Public License (`dat/license`). This
 file lists every file changed or added since that release; each
 changed file also carries a notice saying so, except where noted.
@@ -193,8 +193,6 @@ Written by `tools/neon-notices`; don't edit it by hand.
 
 - `.github/README.md`
 - `LICENSE`
-- `NEONHACK.md`
-- `README.neonhack.md`
 - `README.neonhack2.md`
 - `dat/nc-ashfall.lua`
 - `dat/nc-b7fill.lua`
@@ -222,7 +220,9 @@ Written by `tools/neon-notices`; don't edit it by hand.
 - `dat/nc-zenith.lua`
 - `dat/story.lua`
 - `doc/NEONHACK-CHANGES.md`
+- `doc/basics.md`
 - `doc/neongrid-plan.md`
+- `doc/neonhack-plan.md`
 - `doc/neonhack-screens.html`
 - `doc/neonhack-screens.png`
 - `doc/neonhack2-next-phases.md`

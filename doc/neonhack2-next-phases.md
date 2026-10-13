@@ -8,8 +8,7 @@ then P10 (balance, hardening).
 
 Phases P0–P6 are done: the city, metro, journal, story engine, death modes,
 and a playable slice (prologue + act 1). Playtesting led to fixes in
-fbbbb591c (dialogue answers) and 248f607c9 (balance). The scrap-bullet
-poison fix is also in NeonHack 1 (5f4a7b653).
+fbbbb591c (dialogue answers) and 248f607c9 (balance).
 
 Playtest feedback shaped what came next:
 - **Districts:** they looked like grids of boxes. They should be tight

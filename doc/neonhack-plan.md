@@ -1,14 +1,14 @@
-# NeonHack — design and implementation plan
+# The cyberpunk layer: design and implementation plan
 
-NeonHack is a cyberpunk variant of NetHack 5.0.0. It keeps NetHack's look
-and feel: the same 80x24 terminal map, the same symbols and commands, the same
+NeonHack 2 is built on this layer: a cyberpunk re-theme of NetHack 5.0.0.
+It keeps NetHack's look and feel: the same 80x24 terminal map, the same symbols and commands, the same
 dungeon structure and the same depth of interaction. The game around those
 mechanics is re-themed for a neon-lit megacity, and adds a set of
 cyberpunk-native features that plug into NetHack's existing systems
 (intrinsics, skills, shops, Kops, conducts) instead of bolting on a new game.
 
 Base: upstream tag `NetHack-5.0.0_Released`, branch `neonhack`.
-Player-facing overview: `README.neonhack.md`.
+Player-facing overview: `doc/basics.md`.
 
 ## Status (2026-10-11)
 
@@ -336,7 +336,7 @@ as a modem handshake) get re-themed messages.
 
 Each phase is one or more commits that build and pass the smoke tests.
 
-1. **Build and branding** — `neonhack.500` hints, binary name, version,
+1. **Build and branding** — hints file, binary name, version,
    welcome, intro, death and tombstone.
 2. **Races and roles** — names, ranks, pantheons, quest names (`role.c`).
 3. **Monster reskin** — `monsters.h` names plus every Lua, C and data
@@ -373,12 +373,4 @@ Each phase is one or more commits that build and pass the smoke tests.
 
 ## 11. Building
 
-```sh
-sh sys/unix/setup.sh sys/unix/hints/neonhack.500
-make fetch-Lua        # once
-make -j all           # builds and installs into ./playground
-./playground/neonhack
-```
-
-On image-based distros without ncurses headers the hints file falls back
-to Homebrew's ncurses headers and links the system's runtime libraries.
+See `README.neonhack2.md`.

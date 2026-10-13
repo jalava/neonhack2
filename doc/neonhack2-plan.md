@@ -7,8 +7,9 @@ P10 (balance and hardening).
 
 ## Context
 
-NeonHack (NetHack 5.0 + a cyberpunk layer) plays well, but it is still
-NetHack's single dungeon descent. The goal is a sequel that stands out: an open city, a quest journal, and a story that sends the player
+NetHack 5.0 with a cyberpunk layer (doc/neonhack-plan.md) plays well, but
+it is still NetHack's single dungeon descent. The goal is a game that
+stands out: an open city, a quest journal, and a story that sends the player
 from location to location. It must keep the familiar rendering (NeonGrid,
 tty/curses, 24-bit colour) and keymap (arrows, Fn diagonals, mouse travel).
 
@@ -18,10 +19,10 @@ Decisions (2026-10-11):
   between districts by metro or taxi from a city map.
 - **Death mode chosen at character creation**: story mode (wake at the
   last clinic) or hardcore (one life).
-- **City + deep Undercity**: all of NeonHack 1 stays under the city as the
+- **City + deep Undercity**: the whole re-themed NetHack dungeon stays under the city as the
   optional endgame; ascension remains the ultimate ending.
 - Original setting: the city **Neo Yendor**, the sprawl grown over NeonHack
-  1's sealed arcology Yendor (2188, a year after NeonHack 1).
+  the sealed arcology Yendor (2188).
 - Story premise **The Splinter**, with **factions and 3 endings**.
 
 Approach: fork NeonHack and keep the whole engine (monsters, items,
@@ -49,7 +50,7 @@ key floor), reached by stairs or an elevator in the lobby.
 | Ashfall | quake-ruined old downtown | 5 | Seal Vault (2); the Shaft to the Undercity | act 3 |
 | Zenith | corporate island, finale | 8 | Zenith Spire (8) | act 4 |
 
-The Undercity (all of NeonHack 1: Old Metro, Sokoban, Quest, Gehennom,
+The Undercity (the whole NetHack dungeon: Old Metro, Sokoban, Quest, Gehennom,
 Planes) is reached through the Shaft in Ashfall.
 
 ### Travel and keys (existing keymap unchanged)
@@ -77,7 +78,7 @@ peaceful (hook in `peace_minded`) and which quest options you get.
 
 ### Story: The Splinter (draft for review; names editable)
 Background: the Amulet of Yendor at the bottom of the Undercity holds the
-Grid's root keys (NeonHack 1). Decades ago Halcyon cut a copy and split it
+Grid's root keys. Decades ago Halcyon cut a copy and split it
 into four shards ("splinters") for safety. Together the shards give control
 of Neo Yendor's Grid. One shard is now in your head.
 
@@ -86,7 +87,7 @@ of Neo Yendor's Grid. One shard is now in your head.
 | Prologue "Cold Start" | Neon Mile | You wake in Doc Okoye's clinic (your first respawn point) with the Splinter implanted and no memory of how. Mags Vance, the fixer at the Static Lounge, offers protection in exchange for work. You get the safehouse key and starter gigs. |
 | 1 "Street Cred" | Neon Mile, Lantern Market, The Stacks | Pay off the Doc. Find a netrunner who can read the shard: Hex, under siege in Block 7. Climb Block 7 (4F). Hex reveals what the Splinter is and that the corp, the gang and the nomads each hold one of the other three shards. |
 | 2 "Three Shards" | Lantern Market, Docks, Fringe, Chrome Heights | Three quest lines in any order. Each shard can be won by a deal, by force or by theft, and each choice moves reputation. Jade Circuit: do Matron Lin a job on the *Mara Sun*, or take her den. Long Road: recover a stolen convoy rig from the storm drains, or sell the nomads out to Halcyon. Halcyon: steal the shard from Halcyon tower (Heat!), or take Halcyon's offer. |
-| 3 "Ashfall" | Ashfall | The shards resonate and the Shaft opens. Whichever faction you've angered most grabs Mags or Hex. You enter the Seal Vault (2F) and learn the full truth; a voice from the Undercity daemons (NeonHack 1's Wizard) offers a third way. |
+| 3 "Ashfall" | Ashfall | The shards resonate and the Shaft opens. Whichever faction you've angered most grabs Mags or Hex. You enter the Seal Vault (2F) and learn the full truth; a voice from the Undercity's daemons (the Wizard of Yendor) offers a third way. |
 | 4 "Zenith" | Zenith | Assault on the Zenith Spire (8F). Allies who show up depend on reputation. At the root console you choose an ending. |
 
 Endings:
@@ -195,7 +196,7 @@ floor N, flatline target Y, deliver a package to Z, or hack a terminal.
 
 | # | Phase | Done when |
 |---|---|---|
-| P0 | Fork, rename, build | `./playground/neonhack2` runs; it is NeonHack 1 under a new name |
+| P0 | Fork, rename, build | `./playground/neonhack2` runs; it builds and runs under the new name |
 | P1 | Limits (`xint16` ledgers, `MAXDUNGEON`, `LEV_LIMIT`, one-floor sites) | a wizard-mode game visits 100+ levels and survives save/restore; fuzzer clean |
 | P2 | World plumbing, with 3 stub districts and 1 stub site | start in Neon Mile; walk in and out of the site; Shaft to Undercity 1 and back; travel locks hold |
 | P3 | Metro, city map, taxi | ride between the 3 districts; markers shown; taxi blocked while Wanted |
