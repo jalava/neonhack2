@@ -191,6 +191,7 @@ Written by `tools/neon-notices`; don't edit it by hand.
 
 ## Added files
 
+- `.github/README.md`
 - `LICENSE`
 - `NEONHACK.md`
 - `README.neonhack.md`
