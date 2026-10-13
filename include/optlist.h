@@ -236,7 +236,7 @@ static int optfn_##a(int, int, boolean, char *, char *);
            "give help for errors on direction input")
     NHOPTB(coldopen, Advanced, 0, opt_in, set_in_config,
            Off, Yes, No, No, NoAlias, &flags.coldopen, Term_False,
-           "start a new game with the job a week before the story")
+           "debug mode: start with the job a week before (always, otherwise)")
     NHOPTB(color, Map, 0, opt_in, set_in_game,
            On, Yes, No, No, "colour", &iflags.wc_color, Term_False,
            "use color in map")

@@ -78,12 +78,10 @@ real thing at the bottom of the Undercity.
 
 ## The cold open
 
-A new game asks whether to start with the cold open: one last job, a
-week before you wake up on Okoye's table, played with a borrowed kit at
-experience level 12. It doesn't end well; afterwards you start the story
-with your own kit, at level 1, as usual. Put `OPTIONS=coldopen` or
-`OPTIONS=!coldopen` in the config file to skip the question. There's no
-saving in the middle of the job.
+Every new game starts with the cold open: one last job, a week before
+you wake up on Okoye's table, played with a borrowed kit at experience
+level 12. It doesn't end well; afterwards you start the story with your
+own kit, at level 1. There's no saving in the middle of the job.
 
 ## Flatlining
 
@@ -108,7 +106,8 @@ A new game asks for story mode or hardcore. Put `OPTIONS=hardcore` or
 - Story: `dat/story.lua`. The format is in `doc/story-format.md`. Check it
   with `#wizstorycheck` in a debug game (`./playground/neonhack2 -D`).
 - Tests: `tools/neon2/coldopen-test` plays the cold open (and a hangup in
-  the middle of it), `tools/neon2/slice-test` plays the prologue and act 1 through,
+  the middle of it; the other tests skip it with `OPTIONS=!coldopen`,
+  which only debug mode allows), `tools/neon2/slice-test` plays the prologue and act 1 through,
   `tools/neon2/story-test` plays acts 2 to 4 both ways round (deals,
   force, theft, betrayal, two endings), and `tools/neon2/gig-test` plays
   one gig of each kind. Debug-mode games all play as "wizard" in the

@@ -870,7 +870,7 @@ newgame(void)
     /* Success! */
     welcome(TRUE);
     ask_death_mode(); /* NeonHack 2: story mode or hardcore */
-    ask_coldopen();   /* NeonHack 2: and the job a week before? */
+    ask_coldopen();   /* NeonHack 2: and the job a week before */
     if (!flags.coldopen || !story_coldopen_begin())
         story_new_game(); /* NeonHack 2: the prologue begins */
     notice_mon_on(); /* now we can notice monsters */

@@ -195,8 +195,8 @@ coldopen = {
 },
 ```
 
-A new game can start with the cold open (the `coldopen` option, asked at
-character creation). Your starting kit, level and turn are put aside;
+Every new game starts with the cold open (debug-mode games can skip it
+with `OPTIONS=!coldopen`, for tests). Your starting kit, level and turn are put aside;
 you get the kit (worn and readied) and the level, and the quest starts at
 `place`. Saving is refused on the job. It ends with the `wake = true`
 effect or with your death, whichever comes first: the ending text, the
