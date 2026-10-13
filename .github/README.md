@@ -7,15 +7,7 @@ Yendor, district by district, with a quest journal, fixers, factions and
 three endings. Under it all, the Undercity (the whole NetHack dungeon,
 re-themed) still waits beneath the Shaft in Ashfall.
 
-```
- You fire 3 bullets.  Rat-a-tat-tat!  The 1st bullet hits the corpsec trooper.
-                                                   ╭──·─────╮
-                                                   │···f@···│
-                                                   │·$·····<│
-                                                   ╰────────╯
- Tester the Script Kiddie   St:10 Dx:16 Co:13 In:18 Wi:10 Ch:9 Neutral
- Neon Mile $:120 HP:17(17) Pw:12(12) AC:9 Xp:2 Wanted
-```
+![The cold open: Orison, deck 1](../doc/neonhack2-coldopen.png)
 
 - **The city:** eight hand-drawn districts (Neon Mile, Lantern Market, the
   Stacks, Rustwater Docks, the Fringe, Chrome Heights, Ashfall, Zenith),

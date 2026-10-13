@@ -78,6 +78,8 @@ real thing at the bottom of the Undercity.
 
 ## The cold open
 
+![The cold open: Orison, deck 1](doc/neonhack2-coldopen.png)
+
 Every new game starts with the cold open: one last job, a week before
 you wake up on Okoye's table, played with a borrowed kit at experience
 level 12. It doesn't end well; afterwards you start the story with your

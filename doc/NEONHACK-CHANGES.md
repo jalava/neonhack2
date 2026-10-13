@@ -229,6 +229,7 @@ Written by `tools/neon-notices`; don't edit it by hand.
 - `doc/neonhack-plan.md`
 - `doc/neonhack-screens.html`
 - `doc/neonhack-screens.png`
+- `doc/neonhack2-coldopen.png`
 - `doc/neonhack2-next-phases.md`
 - `doc/neonhack2-plan.md`
 - `doc/story-format.md`
