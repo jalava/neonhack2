@@ -1,5 +1,7 @@
 /* NeonHack 2   city.c   Neo Yendor: districts, sites and getting around */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Copyright (c) 2026 jalava */
+/* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * The city is a set of "city" dungeons (dat/dungeon.lua):

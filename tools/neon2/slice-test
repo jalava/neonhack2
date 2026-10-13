@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # slice-test - play the prologue and act 1 in a debug-mode game, checking
 # the screen at each step.  Uses tools/nhdrive (tmux).  Wizard commands
 # move the hero around; every conversation and stage is played for real.

@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # story-test - play acts 2 to 4 through, both ways round, in debug-mode
 # games, with a save and restore in the middle of each.  Uses
 # tools/nhdrive (tmux) and the helpers in testlib.sh.

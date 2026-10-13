@@ -2,6 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2006. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13. */
 
 #ifndef GLOBAL_H
 #define GLOBAL_H

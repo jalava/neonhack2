@@ -1,6 +1,7 @@
 -- NetHack castle castle.lua	$NHDT-Date: 1652196024 2022/05/10 15:20:24 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.7 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 -- NetHack may be freely redistributed.  See license for details.
+-- Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13.
 --
 --
 -- This is the stronghold level :

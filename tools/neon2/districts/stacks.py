@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # The Stacks: megablocks and gang wars.
 #
 # North: Block 5 (sealed), a dead-end cut, Block 7 (its lobby stairs

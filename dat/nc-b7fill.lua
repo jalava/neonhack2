@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: a floor of Block 7 (2F to 4F).
 -- Capsule flats off narrow halls; the Chrome Saints have taken over.
 

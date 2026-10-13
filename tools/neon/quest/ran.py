@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Ran"
 TEXTS = {
     "assignquest": {"text": '''"You are indeed ready, %p.  I shall tell you what has transpired,

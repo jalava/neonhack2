@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonGrid showcase: a room with every map feature, built where you
 -- stand.  Wizard mode: copy this file into the playground, then
 -- #wizloaddes and give its name.  The right end of the room is unlit, to

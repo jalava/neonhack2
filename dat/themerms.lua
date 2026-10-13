@@ -1,6 +1,7 @@
 -- NetHack themerms.lua	$NHDT-Date: 1744445274 2025/04/12 00:07:54 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.40 $
 --	Copyright (c) 2020 by Pasi Kallinen
 -- NetHack may be freely redistributed.  See license for details.
+-- Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13.
 --
 -- themerooms is an array of tables.
 -- the tables define "name", "frequency", "contents", "mindiff" and "maxdiff".

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # The Fringe: where the city stops and the dust starts.
 #
 # West: the end of the metro line, a platform under a broken canopy.

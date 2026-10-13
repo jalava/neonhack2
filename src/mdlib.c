@@ -4,6 +4,7 @@
 /* Copyright (c) M. Stephenson, 1990, 1991.                       */
 /* Copyright (c) Dean Luick, 1990.                                */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13. */
 
 /*
  * This can be linked into a binary to provide the functionality

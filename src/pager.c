@@ -2,6 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13. */
 
 /*
  * This file contains the command routines dowhatis() and dohelp() and
@@ -2731,6 +2732,17 @@ docontact(void)
         putstr(cwin, 0, buf);
         putstr(cwin, 0, "");
     }
+#ifdef NEONHACK
+    putstr(cwin, 0, "NeonHack 2 is a variant of NetHack.  It isn't made by");
+    putstr(cwin, 0, "the NetHack development team, so please don't send them");
+    putstr(cwin, 0, "its bugs.  Report them at:");
+    Sprintf(buf, "  %s", NEONHACK_ISSUES_URL);
+    putstr(cwin, 0, buf);
+    putstr(cwin, 0, "");
+    putstr(cwin, 0, "For NetHack itself, visit");
+    Sprintf(buf, "  %s", DEVTEAM_URL);
+    putstr(cwin, 0, buf);
+#else
     putstr(cwin, 0, "To contact the NetHack development team directly,");
     /*XXX overflow possibilities*/
     Sprintf(buf, "see the 'Contact' form on our website or email <%s>.",
@@ -2740,6 +2752,7 @@ docontact(void)
     putstr(cwin, 0, "For more information on NetHack, or to report a bug,");
     Sprintf(buf, "visit our website \"%s\".", DEVTEAM_URL);
     putstr(cwin, 0, buf);
+#endif
     display_nhwindow(cwin, FALSE);
     destroy_nhwindow(cwin);
 }

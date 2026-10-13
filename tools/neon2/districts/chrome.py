@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Chrome Heights: the corporate plaza.
 #
 # The odd one out: wide, clean and lit, the way Halcyon likes it.  North:

@@ -1,6 +1,7 @@
 -- NetHack tower tower1.lua	$NHDT-Date: 1717178759 2024/05/31 18:05:59 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.3 $
 --	Copyright (c) 1989 by Jean-Christophe Collet
 -- NetHack may be freely redistributed.  See license for details.
+-- Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13.
 --
 --
 -- Upper stage of Vlad's tower

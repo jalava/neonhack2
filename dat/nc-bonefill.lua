@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: the Boneyard, 1F (the vault below is nc-bonevault).
 -- The Long Road's scrapyard runs on underground through the old landfill.
 

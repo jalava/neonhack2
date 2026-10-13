@@ -2,6 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Robert Patrick Rankin, 2018. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-13. */
 
 #include "hack.h"
 
@@ -613,7 +614,11 @@ impossible(const char *s, ...)
     if (program_state.something_worth_saving)
         Strcat(pbuf2, "  (Saving and reloading may fix this problem.)");
     pline("%s", pbuf2);
+#ifdef NEONHACK
+    pline("Please report these messages at %s.", NEONHACK_ISSUES_URL);
+#else
     pline("Please report these messages to %s.", DEVTEAM_EMAIL);
+#endif
     if (sysopt.support) {
         pline("Alternatively, contact local support: %s", sysopt.support);
     }

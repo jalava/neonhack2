@@ -1,6 +1,8 @@
 # NeonHack 2 (NetHack 5.0 variant)  neonhack2.500, derived from linux.500 $NHDT-Date: 1693519390 2023/08/31 22:03:10 $  $NHDT-Branch: keni-crashweb2 $:$NHDT-Revision: 1.61 $
 # Copyright (c) Kenneth Lorber, Kensington, Maryland, 2007.
 # NetHack may be freely redistributed.  See license for details.
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 #
 #---------------------------------------------------------------------
 # Linux hints file with support for multiple window ports (interfaces)

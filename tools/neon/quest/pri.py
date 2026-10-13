@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Pri"
 TEXTS = {
     "assignquest": {"text": '''"Yes, %p.  You are truly ready now.  Attend to me and I shall

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # The Zenith Spire, the top floor: the crown.
 #
 # A round floor at the top of the Spire.  The stairs come up in the west;

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Halcyon Tower, the top floor: the executive level.
 #
 # The lift lobby in the west, with server closets either side; offices

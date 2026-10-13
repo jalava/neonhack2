@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # The Jade Den, 3F: Matron Lin's hall.
 #
 # The stairs come down into a hall in the west; a passage with guard

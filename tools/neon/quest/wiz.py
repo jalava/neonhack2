@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Wiz"
 TEXTS = {
     "assignquest": {"text": '''"Yes, %p, you truly are ready for this dire task.  Listen,

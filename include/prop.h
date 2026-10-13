@@ -1,6 +1,7 @@
 /* NetHack 5.0	prop.h	$NHDT-Date: 1702274027 2023/12/11 05:53:47 $  $NHDT-Branch: NetHack-3.7 $:$NHDT-Revision: 1.24 $ */
 /* Copyright (c) 1989 Mike Threepoint                             */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13. */
 
 #ifndef PROP_H
 #define PROP_H

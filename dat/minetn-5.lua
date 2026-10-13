@@ -2,6 +2,7 @@
 --	Copyright (c) 1989-95 by Jean-Christophe Collet
 --	Copyright (c) 1991-95 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
+-- Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13.
 --
 -- "Grotto Town" by Kelly Bailey
 

@@ -1,6 +1,7 @@
 /* NetHack 5.0	report.c	$NHDT-Date: 1777240823 2026/04/26 22:00:23 $  $NHDT-Branch: to500 $:$NHDT-Revision: 1.19 $ */
 /* Copyright (c) Kenneth Lorber, Kensington, Maryland, 2024 */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-13. */
 
 #include "hack.h"
 
@@ -464,7 +465,11 @@ dobugreport(void)
         pline("Unable to send bug report.  Please visit %s instead.",
               (sysopt.crashreporturl && *sysopt.crashreporturl)
               ? sysopt.crashreporturl
+#ifdef NEONHACK
+              : NEONHACK_ISSUES_URL
+#else
               : DEVTEAM_URL
+#endif
         );
     }
     return ECMD_OK;

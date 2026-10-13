@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Block 7, the roof (5F): Hex's barricaded server room, under siege.
 #
 # The stairhead in the west; air-con housings and antenna clusters break

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 """Apply NeonHack monster renames.
 
   rename_monsters.py apply     rewrite include/monsters.h and dat/*.lua

@@ -3,6 +3,7 @@
 --	Copyright (c) 1992,1993 by Izchak Miller, David Cohrs,
 --                      and Timo Hakulinen
 -- NetHack may be freely redistributed.  See license for details.
+-- Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13.
 --
 --
 -- These are the ENDGAME levels: earth, air, fire, water, and astral.

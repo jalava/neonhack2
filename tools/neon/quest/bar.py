@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Bar"
 TEXTS = {
     "assignquest": {"text": '''"The wastes are in great need of your assistance, %p.

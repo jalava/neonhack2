@@ -1,6 +1,7 @@
 /* NetHack 5.0	sfctool.c */
 /* Copyright (c) Michael Allison, 2025.                           */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13. */
 
 /*
  *  Utility for reading a binary save file in the native historical

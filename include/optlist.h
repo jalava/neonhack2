@@ -1,5 +1,6 @@
 /* NetHack 5.0	optlist.h */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13. */
 
 #ifndef OPTLIST_H
 #define OPTLIST_H

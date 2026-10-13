@@ -12,12 +12,20 @@ endless gigs from fixers. Balance comes next. The design is in
 
 ## Building and playing
 
+On Linux (other Unix-likes may need their own hints file):
+
 ```sh
+git clone https://github.com/jalava/neonhack2.git
 cd neonhack2
 sh sys/unix/setup.sh sys/unix/hints/neonhack2.500   # once
-make all
+make fetch-lua                                      # once; downloads Lua 5.4
+make all                                            # builds into ./playground
 ./playground/neonhack2
 ```
+
+You need a C compiler, make, curl and ncurses. On image-based distros
+without ncurses headers, the hints file uses
+Homebrew's ncurses headers; set `NHNCURSESINC` to use others.
 
 Settings come from `~/.neonhack2rc`. If that file doesn't exist,
 `~/.neonhackrc` is used, then `~/.nethackrc`.
@@ -95,3 +103,24 @@ A new game asks for story mode or hardcore. Put `OPTIONS=hardcore` or
   - `#wizcity` opens every district;
   - `#wizstory` inspects and steers the story;
   - level teleport (`^V`) accepts `Dungeon:level`, e.g. `Block 7:1`.
+
+## Bugs
+
+Report NeonHack 2's bugs at https://github.com/jalava/neonhack2/issues,
+not to the NetHack DevTeam: they don't make it.
+
+## License and credits
+
+NeonHack 2 is a modified version of NetHack 5.0.0 (upstream tag
+`NetHack-5.0.0_Released`), built on NeonHack, a cyberpunk variant of
+NetHack by the same author. NetHack is by the NetHack DevTeam and many others; see
+`dat/history`.
+
+It is distributed under the NetHack General Public License, in
+`dat/license` (and `LICENSE`). Like NetHack, it may be freely
+redistributed. Every file changed from NetHack carries a notice saying
+so, and `doc/NEONHACK-CHANGES.md` lists the changes.
+
+Lua (MIT license) and, for some ports, PDCurses are fetched at build
+time; see their own licenses.
+

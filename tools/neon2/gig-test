@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # gig-test - play a gig of each kind (courier, bounty, retrieval) in a
 # debug-mode game, saving and restoring in the middle of one.  Uses
 # tools/nhdrive (tmux) and the helpers in testlib.sh.

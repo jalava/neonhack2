@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: The Splinter -- the story of Neo Yendor.
 --
 -- This file is data; src/story.c runs it.  doc/story-format.md has the

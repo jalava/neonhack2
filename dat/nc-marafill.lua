@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: a hold of the freighter Mara Sun (1F and 2F; the bottom
 -- hold is nc-marahold).  Cargo bays off narrow passages, mostly dark.
 

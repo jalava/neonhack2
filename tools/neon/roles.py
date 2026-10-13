@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 """Apply NeonHack role and race identities to src/role.c.
 
 Only display strings change (names, rank titles, pantheons, quest

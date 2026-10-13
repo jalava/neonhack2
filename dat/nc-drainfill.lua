@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: the storm drains under Rustwater Docks (1F and 2F; the
 -- junction at the bottom is nc-drainhub).  Tunnels and black water.
 

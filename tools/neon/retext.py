@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 """Rewrite NetHack terminology to NeonHack terminology in prose data
 files (rumors, oracles, ...).  Matches whole words, keeps the case of
 the first letter, and prints a diff-like summary.

@@ -8,6 +8,10 @@ built in 2026 on top of the NetHack 5.0.0 release, whose history
 follows.  All credit for the game underneath belongs to the people
 named below.
 
+NeonHack and its sequel NeonHack 2 are by jalava; this file was
+modified for them on 2026-10-11.  The changes to NetHack are listed in
+doc/NEONHACK-CHANGES.md.
+
 NetHack History file for release 5.0
 
 Behold, mortal, the origins of NetHack...

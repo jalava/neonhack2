@@ -2,6 +2,7 @@
 --	Copyright (c) 1989 by Jean-Christophe Collet
 --	Copyright (c) 1990, 1991 by M. Stephenson
 -- NetHack may be freely redistributed.  See license for details.
+-- Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13.
 --
 des.level_init({ style = "solidfill", fg = " " });
 des.level_flags("noteleport", "mazelevel", "shortsighted")

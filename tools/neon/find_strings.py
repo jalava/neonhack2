@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 """List C string literals (outside comments) that contain a word.
 
   find_strings.py WORDREGEX FILE...

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 """NeonHack object display names, keyed by the objects.h enum name.
 
 Value: (new_name, new_description); None keeps NetHack's value.  For

@@ -1,5 +1,7 @@
 /* NeonHack 2   story.c   quests, NPCs, dialogue and the journal */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Copyright (c) 2026 jalava */
+/* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * The story is data: dat/story.lua describes factions, story items,

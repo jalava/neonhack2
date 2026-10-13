@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: the Seal Vault, 1F (the Loom below is nc-sealloom).
 -- Halcyon's old R&D floors, broken by the quake and full of things
 -- that came up from below.

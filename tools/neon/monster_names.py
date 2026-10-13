@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 """NeonHack monster display names, keyed by the PM_ enum suffix.
 
 A value is either a single name (NAM) or a (male, female, neutral) tuple

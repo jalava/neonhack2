@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
+"""Keep NeonHack's NetHack General Public License notices up to date.
+
+The NGPL asks that modified files carry a prominent notice saying that
+they were changed, and when.  This tool, run from the top of the tree:
+
+  - gives every file changed since the NetHack release a one-line
+    "Modified for NeonHack by ..., <dates>." notice (in the file's own
+    comment syntax), or brings an existing notice's dates up to date;
+  - gives every file NeonHack added (code and level files) a copyright
+    and license header;
+  - writes doc/NEONHACK-CHANGES.md, the list of changed and added files.
+
+Files that can't hold a comment (the rumors files, and dat/help and
+dat/history, which carry a visible note instead) are listed in the
+changes file.  Run it before committing a batch of changes:
+
+    tools/neon-notices
+"""
+import os
+import re
+import subprocess
+
+BASE = "NetHack-5.0.0_Released"   # the upstream release NeonHack builds on
+WHO = "jalava"
+NOTICE = re.compile(r"Modified for NeonHack by [^,]+, [0-9-]+( to [0-9-]+)?\.")
+NO_COMMENTS = {"dat/rumors.tru", "dat/rumors.fal", "dat/help", "dat/history"}
+SCRIPTS = {"fuzz", "nhdrive", "gig-test", "slice-test", "story-test",
+           "neon-notices", "Makefile.top", "Makefile.src", ".gitignore",
+           "symbols"}
+
+
+def git(*a):
+    return subprocess.run(("git",) + a, capture_output=True, text=True,
+                          check=True).stdout
+
+
+def dates(f):
+    d = sorted(set(git("log", "--format=%ad", "--date=short",
+                       f"{BASE}..HEAD", "--", f).split()))
+    if not d:
+        return None
+    return d[0] if d[0] == d[-1] else f"{d[0]} to {d[-1]}"
+
+
+def comment_style(f):
+    if f.endswith((".c", ".h", ".cpp")):
+        return ("/* ", " */")
+    if f.endswith(".lua"):
+        return ("-- ", "")
+    if (f.endswith((".py", ".sh", ".500", ".txt", ".base", ".sample"))
+            or os.path.basename(f) in SCRIPTS):
+        return ("# ", "")
+    return None
+
+
+def insert_at(lines, cstyle):
+    """after the NetHack header (its 'freely redistributed' line and the
+       end of that comment), else after a #! line, else at the top"""
+    for i, l in enumerate(lines[:15]):
+        if "freely redistributed" in l:
+            if cstyle[0] == "/* ":
+                j = i
+                while j < len(lines) and "*/" not in lines[j]:
+                    j += 1
+                return j + 1
+            return i + 1
+    return 1 if lines and lines[0].startswith("#!") else 0
+
+
+def rewrite(f, fn):
+    with open(f, encoding="utf-8", errors="surrogateescape") as fp:
+        old = fp.read()
+    new = fn(old)
+    if new != old:
+        with open(f, "w", encoding="utf-8", errors="surrogateescape") as fp:
+            fp.write(new)
+
+
+def notice_modified(f, cstyle, when):
+    text = f"Modified for NeonHack by {WHO}, {when}."
+
+    def fn(s):
+        if NOTICE.search(s[:3000]):
+            return NOTICE.sub(text, s, count=1)
+        lines = s.split("\n")
+        lines.insert(insert_at(lines, cstyle), cstyle[0] + text + cstyle[1])
+        return "\n".join(lines)
+    rewrite(f, fn)
+
+
+def header_added(f, cstyle):
+    def fn(s):
+        if f"Copyright (c) 2026 {WHO}" in s[:3000]:
+            return s
+        lines = s.split("\n")
+        at = insert_at(lines, cstyle)
+        lines[at:at] = [cstyle[0] + t + cstyle[1] for t in
+                        (f"Copyright (c) 2026 {WHO}",
+                         "NetHack may be freely redistributed.  "
+                         "See license for details.")]
+        return "\n".join(lines)
+    rewrite(f, fn)
+
+
+def main():
+    changed, added = [], []
+    for line in git("diff", "--name-status", BASE, "HEAD").splitlines():
+        st, f = line.split("\t")[0], line.split("\t")[-1]
+        if not os.path.exists(f):
+            continue
+        cs = comment_style(f)
+        if st.startswith("M"):
+            when = dates(f)
+            changed.append((f, when))
+            if cs and f not in NO_COMMENTS:
+                notice_modified(f, cs, when)
+        elif st.startswith(("A", "R")):
+            added.append(f)
+            if cs:
+                header_added(f, cs)
+    out = ["# NeonHack: changes to NetHack", "",
+           "NeonHack and NeonHack 2 are modified versions of NetHack 5.0.0",
+           f"(upstream tag `{BASE}`), by {WHO}. They are distributed",
+           "under the NetHack General Public License (`dat/license`). This",
+           "file lists every file changed or added since that release; each",
+           "changed file also carries a notice saying so, except where noted.",
+           "The git history has every change in detail.", "",
+           "Written by `tools/neon-notices`; don't edit it by hand.", "",
+           "## Changed files", ""]
+    for f, when in sorted(changed):
+        note = " (no comments possible: listed here only)" \
+            if f in NO_COMMENTS - {"dat/help", "dat/history"} else ""
+        out.append(f"- `{f}`: {when}{note}")
+    out += ["", "## Added files", ""]
+    out += [f"- `{f}`" for f in sorted(added)]
+    with open("doc/NEONHACK-CHANGES.md", "w") as fp:
+        fp.write("\n".join(out) + "\n")
+    print(f"{len(changed)} changed, {len(added)} added; "
+          "doc/NEONHACK-CHANGES.md written")
+
+
+main()

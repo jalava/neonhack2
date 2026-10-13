@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: a floor of the Jade Circuit's den under Lantern Market.
 -- (Act 2; for now a gang den of rooms and halls.)
 

@@ -1,3 +1,4 @@
+-- Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13.
 
 local tut_ctrl_key = nil;
 local tut_alt_key = nil;

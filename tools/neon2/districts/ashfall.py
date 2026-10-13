@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Ashfall: old downtown, broken by the quake.
 #
 # Ruined blocks with their walls torn open, fissures where the ground

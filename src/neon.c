@@ -1,6 +1,8 @@
 /* NeonHack neon.c  -- cyberpunk mechanics layered on NetHack 5.0 */
 /* Copyright (c) 2026 NeonHack contributors. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Copyright (c) 2026 jalava */
+/* NetHack may be freely redistributed.  See license for details. */
 
 /*
  * This file collects NeonHack's own game mechanics so that the changes

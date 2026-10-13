@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Arc"
 TEXTS = {
     "assignquest": {"text": '''"Grave times have befallen the Guild, for %na has

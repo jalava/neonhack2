@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Hea"
 TEXTS = {
     "firsttime": {"text": '''What strange routing has brought you back to %H?  The smell of the

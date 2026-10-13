@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Cav"
 TEXTS = {
     "assignquest": {"text": '''"You are indeed ready now, %p.  I shall tell you a tale of

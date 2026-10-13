@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Rog"
 TEXTS = {
     "firsttime": {"text": '''Unexpectedly, you find yourself back in Ransmannsby, where you trained to

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Lantern Market: the night market, Jade Circuit turf.
 #
 # North: Dr. Sato's clinic and back room, Benny Two-Tone's stall, the

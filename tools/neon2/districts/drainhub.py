@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # The storm drains, 3F: the Drain Rats' chop shop.
 #
 # The stairs come down into a round chamber in the west.  A tunnel leads

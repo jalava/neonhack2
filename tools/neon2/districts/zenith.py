@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Zenith: the corporate island, where the story ends.
 #
 # A sea wall all round.  West: the maglev station.  North-west: Zenith

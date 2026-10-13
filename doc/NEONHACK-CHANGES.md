@@ -1,0 +1,282 @@
+# NeonHack: changes to NetHack
+
+NeonHack and NeonHack 2 are modified versions of NetHack 5.0.0
+(upstream tag `NetHack-5.0.0_Released`), by jalava. They are distributed
+under the NetHack General Public License (`dat/license`). This
+file lists every file changed or added since that release; each
+changed file also carries a notice saying so, except where noted.
+The git history has every change in detail.
+
+Written by `tools/neon-notices`; don't edit it by hand.
+
+## Changed files
+
+- `.gitignore`: 2026-10-11 to 2026-10-13
+- `dat/Arc-goal.lua`: 2026-10-11 to 2026-10-13
+- `dat/Arc-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Bar-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Cav-fila.lua`: 2026-10-11 to 2026-10-13
+- `dat/Cav-filb.lua`: 2026-10-11 to 2026-10-13
+- `dat/Cav-loca.lua`: 2026-10-11 to 2026-10-13
+- `dat/Cav-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Hea-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Kni-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Pri-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Ran-goal.lua`: 2026-10-11 to 2026-10-13
+- `dat/Ran-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Rog-fila.lua`: 2026-10-11 to 2026-10-13
+- `dat/Rog-filb.lua`: 2026-10-11 to 2026-10-13
+- `dat/Rog-goal.lua`: 2026-10-11 to 2026-10-13
+- `dat/Rog-loca.lua`: 2026-10-11 to 2026-10-13
+- `dat/Rog-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Sam-goal.lua`: 2026-10-11 to 2026-10-13
+- `dat/Sam-loca.lua`: 2026-10-11 to 2026-10-13
+- `dat/Sam-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Tou-fila.lua`: 2026-10-11 to 2026-10-13
+- `dat/Tou-filb.lua`: 2026-10-11 to 2026-10-13
+- `dat/Tou-goal.lua`: 2026-10-11 to 2026-10-13
+- `dat/Tou-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Val-goal.lua`: 2026-10-11 to 2026-10-13
+- `dat/Val-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/Wiz-goal.lua`: 2026-10-11 to 2026-10-13
+- `dat/Wiz-strt.lua`: 2026-10-11 to 2026-10-13
+- `dat/air.lua`: 2026-10-11 to 2026-10-13
+- `dat/bogusmon.txt`: 2026-10-11 to 2026-10-13
+- `dat/castle.lua`: 2026-10-11 to 2026-10-13
+- `dat/data.base`: 2026-10-11 to 2026-10-13
+- `dat/dungeon.lua`: 2026-10-11 to 2026-10-13
+- `dat/earth.lua`: 2026-10-11 to 2026-10-13
+- `dat/engrave.txt`: 2026-10-11 to 2026-10-13
+- `dat/epitaph.txt`: 2026-10-11 to 2026-10-13
+- `dat/fire.lua`: 2026-10-11 to 2026-10-13
+- `dat/help`: 2026-10-11 to 2026-10-13
+- `dat/history`: 2026-10-11 to 2026-10-13
+- `dat/knox.lua`: 2026-10-11 to 2026-10-13
+- `dat/medusa-1.lua`: 2026-10-11 to 2026-10-13
+- `dat/medusa-2.lua`: 2026-10-11 to 2026-10-13
+- `dat/medusa-3.lua`: 2026-10-11 to 2026-10-13
+- `dat/medusa-4.lua`: 2026-10-11 to 2026-10-13
+- `dat/minefill.lua`: 2026-10-11 to 2026-10-13
+- `dat/minend-1.lua`: 2026-10-11 to 2026-10-13
+- `dat/minend-2.lua`: 2026-10-11 to 2026-10-13
+- `dat/minetn-1.lua`: 2026-10-11 to 2026-10-13
+- `dat/minetn-2.lua`: 2026-10-11 to 2026-10-13
+- `dat/minetn-3.lua`: 2026-10-11 to 2026-10-13
+- `dat/minetn-4.lua`: 2026-10-11 to 2026-10-13
+- `dat/minetn-5.lua`: 2026-10-11 to 2026-10-13
+- `dat/minetn-6.lua`: 2026-10-11 to 2026-10-13
+- `dat/minetn-7.lua`: 2026-10-11 to 2026-10-13
+- `dat/nhcore.lua`: 2026-10-11 to 2026-10-13
+- `dat/oracles.txt`: 2026-10-11 to 2026-10-13
+- `dat/quest.lua`: 2026-10-11 to 2026-10-13
+- `dat/rumors.fal`: 2026-10-11 (no comments possible: listed here only)
+- `dat/rumors.tru`: 2026-10-11 (no comments possible: listed here only)
+- `dat/symbols`: 2026-10-11 to 2026-10-13
+- `dat/themerms.lua`: 2026-10-11 to 2026-10-13
+- `dat/tower1.lua`: 2026-10-11 to 2026-10-13
+- `dat/tower2.lua`: 2026-10-11 to 2026-10-13
+- `dat/tower3.lua`: 2026-10-11 to 2026-10-13
+- `dat/tut-1.lua`: 2026-10-11 to 2026-10-13
+- `dat/valley.lua`: 2026-10-11 to 2026-10-13
+- `include/artilist.h`: 2026-10-11 to 2026-10-13
+- `include/botl.h`: 2026-10-11 to 2026-10-13
+- `include/defsym.h`: 2026-10-11 to 2026-10-13
+- `include/dgn_file.h`: 2026-10-11 to 2026-10-13
+- `include/dungeon.h`: 2026-10-12 to 2026-10-13
+- `include/extern.h`: 2026-10-11 to 2026-10-13
+- `include/flag.h`: 2026-10-11 to 2026-10-13
+- `include/global.h`: 2026-10-11 to 2026-10-13
+- `include/hack.h`: 2026-10-12 to 2026-10-13
+- `include/mkroom.h`: 2026-10-11 to 2026-10-13
+- `include/mondata.h`: 2026-10-11 to 2026-10-13
+- `include/monst.h`: 2026-10-11 to 2026-10-13
+- `include/monsters.h`: 2026-10-11 to 2026-10-13
+- `include/objects.h`: 2026-10-11 to 2026-10-13
+- `include/optlist.h`: 2026-10-11 to 2026-10-13
+- `include/patchlevel.h`: 2026-10-11 to 2026-10-13
+- `include/prop.h`: 2026-10-11 to 2026-10-13
+- `include/sp_lev.h`: 2026-10-12 to 2026-10-13
+- `include/stairs.h`: 2026-10-12 to 2026-10-13
+- `include/wintty.h`: 2026-10-11 to 2026-10-13
+- `include/you.h`: 2026-10-11 to 2026-10-13
+- `src/.gitignore`: 2026-10-11 to 2026-10-13
+- `src/allmain.c`: 2026-10-11 to 2026-10-13
+- `src/apply.c`: 2026-10-11 to 2026-10-13
+- `src/artifact.c`: 2026-10-11 to 2026-10-13
+- `src/attrib.c`: 2026-10-11 to 2026-10-13
+- `src/botl.c`: 2026-10-11 to 2026-10-13
+- `src/cfgfiles.c`: 2026-10-11 to 2026-10-13
+- `src/cmd.c`: 2026-10-11 to 2026-10-13
+- `src/decl.c`: 2026-10-12 to 2026-10-13
+- `src/detect.c`: 2026-10-11 to 2026-10-13
+- `src/display.c`: 2026-10-11 to 2026-10-13
+- `src/do.c`: 2026-10-12 to 2026-10-13
+- `src/do_name.c`: 2026-10-12 to 2026-10-13
+- `src/do_wear.c`: 2026-10-11 to 2026-10-13
+- `src/dog.c`: 2026-10-12 to 2026-10-13
+- `src/dogmove.c`: 2026-10-12 to 2026-10-13
+- `src/dokick.c`: 2026-10-11 to 2026-10-13
+- `src/dothrow.c`: 2026-10-11 to 2026-10-13
+- `src/dungeon.c`: 2026-10-11 to 2026-10-13
+- `src/eat.c`: 2026-10-11 to 2026-10-13
+- `src/end.c`: 2026-10-11 to 2026-10-13
+- `src/files.c`: 2026-10-11 to 2026-10-13
+- `src/fountain.c`: 2026-10-11 to 2026-10-13
+- `src/hack.c`: 2026-10-11 to 2026-10-13
+- `src/iactions.c`: 2026-10-11 to 2026-10-13
+- `src/insight.c`: 2026-10-11 to 2026-10-13
+- `src/invent.c`: 2026-10-11 to 2026-10-13
+- `src/light.c`: 2026-10-11 to 2026-10-13
+- `src/lock.c`: 2026-10-11 to 2026-10-13
+- `src/mail.c`: 2026-10-11 to 2026-10-13
+- `src/makemon.c`: 2026-10-11 to 2026-10-13
+- `src/mdlib.c`: 2026-10-11 to 2026-10-13
+- `src/mhitu.c`: 2026-10-11 to 2026-10-13
+- `src/minion.c`: 2026-10-11 to 2026-10-13
+- `src/mklev.c`: 2026-10-12 to 2026-10-13
+- `src/mkmaze.c`: 2026-10-12 to 2026-10-13
+- `src/mkobj.c`: 2026-10-11 to 2026-10-13
+- `src/mon.c`: 2026-10-11 to 2026-10-13
+- `src/mondata.c`: 2026-10-11 to 2026-10-13
+- `src/monmove.c`: 2026-10-11 to 2026-10-13
+- `src/mthrowu.c`: 2026-10-11 to 2026-10-13
+- `src/muse.c`: 2026-10-11 to 2026-10-13
+- `src/music.c`: 2026-10-11 to 2026-10-13
+- `src/o_init.c`: 2026-10-11 to 2026-10-13
+- `src/objnam.c`: 2026-10-11 to 2026-10-13
+- `src/options.c`: 2026-10-11 to 2026-10-13
+- `src/pager.c`: 2026-10-11 to 2026-10-13
+- `src/pickup.c`: 2026-10-11 to 2026-10-13
+- `src/pline.c`: 2026-10-13
+- `src/potion.c`: 2026-10-11 to 2026-10-13
+- `src/pray.c`: 2026-10-11 to 2026-10-13
+- `src/read.c`: 2026-10-11 to 2026-10-13
+- `src/report.c`: 2026-10-13
+- `src/restore.c`: 2026-10-11 to 2026-10-13
+- `src/rip.c`: 2026-10-11 to 2026-10-13
+- `src/role.c`: 2026-10-11 to 2026-10-13
+- `src/rumors.c`: 2026-10-11 to 2026-10-13
+- `src/save.c`: 2026-10-11 to 2026-10-13
+- `src/shk.c`: 2026-10-11 to 2026-10-13
+- `src/shknam.c`: 2026-10-11 to 2026-10-13
+- `src/sit.c`: 2026-10-11 to 2026-10-13
+- `src/sounds.c`: 2026-10-11 to 2026-10-13
+- `src/sp_lev.c`: 2026-10-11 to 2026-10-13
+- `src/spell.c`: 2026-10-11 to 2026-10-13
+- `src/stairs.c`: 2026-10-12 to 2026-10-13
+- `src/steal.c`: 2026-10-11 to 2026-10-13
+- `src/steed.c`: 2026-10-11 to 2026-10-13
+- `src/teleport.c`: 2026-10-11 to 2026-10-13
+- `src/timeout.c`: 2026-10-11 to 2026-10-13
+- `src/topten.c`: 2026-10-12 to 2026-10-13
+- `src/trap.c`: 2026-10-11 to 2026-10-13
+- `src/u_init.c`: 2026-10-11 to 2026-10-13
+- `src/uhitm.c`: 2026-10-11 to 2026-10-13
+- `src/vault.c`: 2026-10-11 to 2026-10-13
+- `src/weapon.c`: 2026-10-11 to 2026-10-13
+- `src/were.c`: 2026-10-11 to 2026-10-13
+- `src/wield.c`: 2026-10-11 to 2026-10-13
+- `src/wizcmds.c`: 2026-10-11 to 2026-10-13
+- `src/write.c`: 2026-10-11 to 2026-10-13
+- `src/zap.c`: 2026-10-11 to 2026-10-13
+- `sys/unix/Makefile.src`: 2026-10-11 to 2026-10-13
+- `sys/unix/Makefile.top`: 2026-10-12 to 2026-10-13
+- `util/recover.c`: 2026-10-11 to 2026-10-13
+- `util/sfctool.c`: 2026-10-11 to 2026-10-13
+- `win/curses/cursmisc.c`: 2026-10-11 to 2026-10-13
+- `win/tty/getline.c`: 2026-10-11 to 2026-10-13
+- `win/tty/termcap.c`: 2026-10-11 to 2026-10-13
+- `win/tty/topl.c`: 2026-10-11 to 2026-10-13
+- `win/tty/wintty.c`: 2026-10-11 to 2026-10-13
+
+## Added files
+
+- `LICENSE`
+- `NEONHACK.md`
+- `README.neonhack.md`
+- `README.neonhack2.md`
+- `dat/nc-ashfall.lua`
+- `dat/nc-b7fill.lua`
+- `dat/nc-b7roof.lua`
+- `dat/nc-bonefill.lua`
+- `dat/nc-bonevault.lua`
+- `dat/nc-chrome.lua`
+- `dat/nc-docks.lua`
+- `dat/nc-drainfill.lua`
+- `dat/nc-drainhub.lua`
+- `dat/nc-fringe.lua`
+- `dat/nc-halcfill.lua`
+- `dat/nc-halctop.lua`
+- `dat/nc-jadefill.lua`
+- `dat/nc-jadehall.lua`
+- `dat/nc-lantern.lua`
+- `dat/nc-marafill.lua`
+- `dat/nc-marahold.lua`
+- `dat/nc-neonmile.lua`
+- `dat/nc-sealfill.lua`
+- `dat/nc-sealloom.lua`
+- `dat/nc-spirefill.lua`
+- `dat/nc-spiretop.lua`
+- `dat/nc-stacks.lua`
+- `dat/nc-zenith.lua`
+- `dat/story.lua`
+- `doc/NEONHACK-CHANGES.md`
+- `doc/neongrid-plan.md`
+- `doc/neonhack-screens.html`
+- `doc/neonhack-screens.png`
+- `doc/neonhack2-next-phases.md`
+- `doc/neonhack2-plan.md`
+- `doc/story-format.md`
+- `neonhackrc.sample`
+- `src/city.c`
+- `src/neon.c`
+- `src/story.c`
+- `sys/unix/hints/neonhack2.500`
+- `tools/fuzz`
+- `tools/neon-notices`
+- `tools/neon/.gitignore`
+- `tools/neon/ansi2html.py`
+- `tools/neon/find_strings.py`
+- `tools/neon/monster_names.py`
+- `tools/neon/neongrid.py`
+- `tools/neon/object_names.py`
+- `tools/neon/quest/arc.py`
+- `tools/neon/quest/bar.py`
+- `tools/neon/quest/cav.py`
+- `tools/neon/quest/hea.py`
+- `tools/neon/quest/hea2.py`
+- `tools/neon/quest/kni.py`
+- `tools/neon/quest/pri.py`
+- `tools/neon/quest/ran.py`
+- `tools/neon/quest/rog.py`
+- `tools/neon/quest/sam.py`
+- `tools/neon/quest/wiz.py`
+- `tools/neon/questtext.py`
+- `tools/neon/rename_monsters.py`
+- `tools/neon/rename_objects.py`
+- `tools/neon/retext.py`
+- `tools/neon/roles.py`
+- `tools/neon/showcase.lua`
+- `tools/neon2/.gitignore`
+- `tools/neon2/district.py`
+- `tools/neon2/districts/ashfall.py`
+- `tools/neon2/districts/b7roof.py`
+- `tools/neon2/districts/bonevault.py`
+- `tools/neon2/districts/chrome.py`
+- `tools/neon2/districts/docks.py`
+- `tools/neon2/districts/drainhub.py`
+- `tools/neon2/districts/fringe.py`
+- `tools/neon2/districts/halctop.py`
+- `tools/neon2/districts/jadehall.py`
+- `tools/neon2/districts/lantern.py`
+- `tools/neon2/districts/marahold.py`
+- `tools/neon2/districts/neonmile.py`
+- `tools/neon2/districts/sealloom.py`
+- `tools/neon2/districts/spiretop.py`
+- `tools/neon2/districts/stacks.py`
+- `tools/neon2/districts/zenith.py`
+- `tools/neon2/gig-test`
+- `tools/neon2/slice-test`
+- `tools/neon2/story-test`
+- `tools/neon2/testlib.sh`
+- `tools/nhdrive`

@@ -1,3 +1,5 @@
+-- Copyright (c) 2026 jalava
+-- NetHack may be freely redistributed.  See license for details.
 -- NeonHack 2: a floor of Halcyon Tower (the top floor is nc-halctop).
 -- Lit offices off clean corridors; corpsec on every floor.
 

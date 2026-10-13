@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # The Boneyard, 2F: the Long Road's vault.
 #
 # Under the scrapyard, a hangar dug into the old landfill: rigs parked in

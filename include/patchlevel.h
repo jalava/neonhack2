@@ -2,6 +2,7 @@
 /* Copyright (c) Stichting Mathematisch Centrum, Amsterdam, 1985. */
 /*-Copyright (c) Michael Allison, 2012. */
 /* NetHack may be freely redistributed.  See license for details. */
+/* Modified for NeonHack by jalava, 2026-10-11 to 2026-10-13. */
 
 #ifndef PATCHLEVEL_H
 #define PATCHLEVEL_H
@@ -47,6 +48,8 @@
 #define NEONHACK_VERSION_STRING "0.1.0"
 /* in-world years are this far ahead of the real calendar (2026 -> 2188) */
 #define NEON_YEAR_OFFSET 162
+/* bugs in NeonHack go here, not to the NetHack DevTeam */
+#define NEONHACK_ISSUES_URL "https://github.com/jalava/neonhack2/issues"
 
 #define COPYRIGHT_BANNER_A \
     "NeonHack 2 " NEONHACK_VERSION_STRING ", a variant of NetHack, Copyright 1985-2026"

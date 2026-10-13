@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 """Replace role quest messages in dat/quest.lua.
 
     python3 questtext.py ROLEFILE.py

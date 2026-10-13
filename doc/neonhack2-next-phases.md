@@ -1,7 +1,7 @@
 # NeonHack 2: next phases (P7–P10)
 
 Status (2026-10-12): P7 (organic districts, 8be51b252), P8 (economy and
-city life, 18ab4f741) and P9 (acts 2-4) are done.  Next: user playtest,
+city life, 18ab4f741) and P9 (acts 2-4) are done.  Next: playtest,
 then P10 (balance, hardening).
 
 ## Context
@@ -11,14 +11,14 @@ and a playable slice (prologue + act 1). Playtesting led to fixes in
 fbbbb591c (dialogue answers) and 248f607c9 (balance). The scrap-bullet
 poison fix is also in NeonHack 1 (5f4a7b653).
 
-The user's feedback shapes what comes next:
-- **Districts:** they look like grids of boxes. The user wants them tight
+Playtest feedback shaped what came next:
+- **Districts:** they looked like grids of boxes. They should be tight
   and organic, like Minetown's Grotto Town (dat/minetn-5.lua): buildings
   wall to wall, twisting alleys, dead ends, courtyards.
-- **Money:** the only ways to earn are the fixed jobs, so the user went
-  to the Stacks for loot and died there.
+- **Money:** the only ways to earn were the fixed jobs, so a player short
+  of credits went to the Stacks for loot and died there.
 
-User decisions (2026-10-12):
+Decisions (2026-10-12):
 - **Maps:** hand-drawn in Grotto style, one per district, with small
   random variations each game.
 - **Lighting:** neon pools. Shops, bars and the area around signs and
@@ -27,10 +27,10 @@ User decisions (2026-10-12):
   acts 2–4.
 
 Rules for every phase:
-- Commit each phase separately on `neonhack2`; push nothing.
+- Commit each phase separately on `neonhack2`.
 - Keep `tools/neon2/slice-test` and the fuzzer passing.
-- `make all` is safe while the user is playing (fbbbb591c).
-- After P7 and after P8, stop for a user playtest.
+- `make all` is safe while someone is playing from the playground (fbbbb591c).
+- After P7 and after P8, stop for a playtest.
 
 ## P7: Organic districts
 
@@ -91,7 +91,7 @@ placed at level (1,0)) and a legend.
 - A save that has already visited a district keeps its old map; a new game gets the new maps.
 - Not changed: the procedural Block 7 floors and the Jade Den filler.
 
-**Playtest checkpoint:** the user plays the three districts.
+**Playtest checkpoint:** play the three districts.
 
 ## P8: Economy and city life
 

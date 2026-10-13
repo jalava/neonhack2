@@ -2,18 +2,17 @@
 
 Status (2026-10-12): phases P0-P9 done (P7-P9 are planned in
 doc/neonhack2-next-phases.md): the whole story is playable in eight
-organic districts, with gigs and city life.  Next: user playtest, then
+organic districts, with gigs and city life.  Next: playtest, then
 P10 (balance and hardening).
 
 ## Context
 
-NeonHack (NetHack 5.0 + a cyberpunk layer) plays well, but it
-is still NetHack's single dungeon descent. The user wants a sequel that
-stands out: an open city, a quest journal, and a story that sends the player
+NeonHack (NetHack 5.0 + a cyberpunk layer) plays well, but it is still
+NetHack's single dungeon descent. The goal is a sequel that stands out: an open city, a quest journal, and a story that sends the player
 from location to location. It must keep the familiar rendering (NeonGrid,
 tty/curses, 24-bit colour) and keymap (arrows, Fn diagonals, mouse travel).
 
-User decisions (2026-10-11):
+Decisions (2026-10-11):
 - A new tree and branch, **neonhack2**.
 - **District hubs + city map**: each district is one 80x21 level; travel
   between districts by metro or taxi from a city map.
@@ -202,14 +201,13 @@ floor N, flatline target Y, deliver a package to Z, or hack a terminal.
 | P3 | Metro, city map, taxi | ride between the 3 districts; markers shown; taxi blocked while Wanted |
 | P4 | Story engine, journal, `#wizstory` (jump to a stage / dump state), `#wizstorycheck` (checks every id and every stair back-link) | stub quest of talk → arrive → kill → give completes and survives save/restore |
 | P5 | Death modes | the edge cases below pass |
-| **P6** | **Vertical slice: prologue + act 1** (Neon Mile, Lantern Market, The Stacks, Block 7) with real maps, NPCs and dialogue | **user playtest checkpoint** |
+| **P6** | **Vertical slice: prologue + act 1** (Neon Mile, Lantern Market, The Stacks, Block 7) with real maps, NPCs and dialogue | **playtest checkpoint** |
 | P7 | City life: pedestrians, spawn tables, ambience, signs, holo-calls | |
 | P8 | Acts 2–4: Docks, Fringe, Chrome Heights, Ashfall, Zenith; their sites; factions; 3 endings and walk-away | full story playable |
 | P9 | Procedural fixer gigs | |
-| P10 | Hardening and docs: `NEONHACK2.md`, `README.neonhack2.md`, `dat/help`, Guidebook notes, memory file | |
+| P10 | Hardening and docs: `NEONHACK2.md`, `README.neonhack2.md`, `dat/help`, Guidebook notes | |
 
-Each phase is committed separately on the local branch `neonhack2`. Nothing is
-pushed.
+Each phase is committed separately on the branch `neonhack2`.
 
 ## Verification
 

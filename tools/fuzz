@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # fuzz - run NetHack's built-in fuzzer on the playground build.
 #
 #   tools/fuzz SECONDS [ROLE] [SESSION]

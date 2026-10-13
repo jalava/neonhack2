@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Rustwater Docks: warehouses, container stacks, the harbour.
 #
 # North: the Dockside Clinic, the fish market, the Rusty Anchor bar,

@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Kni"
 TEXTS = {
     "assignquest": {"text": '''"Ah, %p.  You are truly ready, as no %c before you has

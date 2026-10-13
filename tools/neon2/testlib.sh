@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # testlib.sh - helpers for the NeonHack 2 test scripts (sourced, not run).
 # Needs $top (the source tree); drives the game through tools/nhdrive.
 drive="$top/tools/nhdrive"

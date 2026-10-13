@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 ROLE = "Sam"
 TEXTS = {
     "assignquest": {"text": '''"Domo %p-san, indeed you are ready.  I can now tell you what

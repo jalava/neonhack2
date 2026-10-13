@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # The Mara Sun, hold 3: the bottom of the ship.
 #
 # Aft, the stairs up and the engine room; amidships, containers stacked

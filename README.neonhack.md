@@ -1,5 +1,9 @@
 # NeonHack
 
+> **In this repository:** this page describes NeonHack, the game that
+> NeonHack 2 grew out of. The NeonHack 2 tree builds only NeonHack 2; see
+> `README.neonhack2.md`.
+
 A cyberpunk variant of **NetHack 5.0.0**. Same terminal map, same commands,
 same deep game, set in the Undercity of a neon-lit arcology instead of a
 fantasy dungeon. You still go down for the Amulet of Yendor; you just do it

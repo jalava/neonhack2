@@ -1,3 +1,5 @@
+# Copyright (c) 2026 jalava
+# NetHack may be freely redistributed.  See license for details.
 # Neon Mile: the nightlife strip where a new game starts.
 #
 # The Mile runs east-west between fences, cluttered with billboard
